@@ -1,4 +1,3 @@
-import { sql } from "drizzle-orm";
 import { pgTableCreator, timestamp } from "drizzle-orm/pg-core";
 
 /**
@@ -10,8 +9,8 @@ import { pgTableCreator, timestamp } from "drizzle-orm/pg-core";
 export const createTable = pgTableCreator((name) => `goldroad_${name}`);
 
 export const createdAt = timestamp("created_at", { withTimezone: true })
-  .default(sql`CURRENT_TIMESTAMP`)
+  .defaultNow()
   .notNull();
-export const updatedAt = timestamp({ withTimezone: true }).$onUpdate(
-  () => new Date(),
-);
+export const updatedAt = timestamp("updated_at", {
+  withTimezone: true,
+}).$onUpdate(() => new Date());
