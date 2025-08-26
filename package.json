@@ -23,7 +23,7 @@
     "@trpc/client": "^11.5.0",
     "@trpc/react-query": "^11.5.0",
     "@trpc/server": "^11.5.0",
-    "drizzle-orm": "^0.44.3",
+    "drizzle-orm": "^0.44.5",
     "next": "^15.5.0",
     "postgres": "^3.4.7",
     "react": "^19.1.1",

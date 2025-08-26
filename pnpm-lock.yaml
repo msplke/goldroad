@@ -24,7 +24,7 @@ importers:
         specifier: ^11.5.0
         version: 11.5.0(typescript@5.9.2)
       drizzle-orm:
-        specifier: ^0.44.3
+        specifier: ^0.44.5
         version: 0.44.5(gel@2.1.1)(postgres@3.4.7)
       next:
         specifier: ^15.5.0
