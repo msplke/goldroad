@@ -2,6 +2,7 @@
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
 import { index } from "drizzle-orm/pg-core";
+
 import { createdAt, createTable, updatedAt } from "~/server/db/schema/utils";
 
 export const posts = createTable(
