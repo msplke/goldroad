@@ -18,6 +18,7 @@ export const env = createEnv({
     BETTER_AUTH_URL: z.url(),
     DATABASE_URL: z.url(),
     KIT_API_KEY: z.string(),
+    PAYSTACK_SECRET_KEY: z.string(),
   },
 
   /**
@@ -39,6 +40,7 @@ export const env = createEnv({
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
     DATABASE_URL: process.env.DATABASE_URL,
     KIT_API_KEY: process.env.KIT_API_KEY,
+    PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY,
 
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
