@@ -12,7 +12,7 @@ const kitStateEnumSchema = z.enum([
 ]);
 
 // Can be filled later with the actual types as needed
-const kitFieldsSchema = z.object();
+const kitFieldsSchema = z.record(z.string(), z.unknown());
 
 const kitTagSchema = z.object({
   id: z.number(),
@@ -63,7 +63,7 @@ export const kitSchema = createSchema(
     },
 
     // List the subscribers for a given tag
-    "@get/:tagId/subscribers": {
+    "@get/tags/:tagId/subscribers": {
       output: z.object({
         subscribers: z.array(kitSubscriberSelectSchema),
         pagination: kitPaginationSchema,
@@ -72,8 +72,10 @@ export const kitSchema = createSchema(
 
     // Tag a subscriber
     "@post/tags/:tagId/subscribers/:subscriberId": {
-      output: kitSubscriberSelectSchema.extend({
-        tagged_at: z.coerce.date(),
+      output: z.object({
+        subscriber: kitSubscriberSelectSchema.extend({
+          tagged_at: z.coerce.date(),
+        }),
       }),
     },
 
@@ -120,7 +122,7 @@ export const kitSchema = createSchema(
   },
   {
     strict: true,
-  }
+  },
 );
 
 const KIT_BASE_URL = "https://api.kit.com/v4";
