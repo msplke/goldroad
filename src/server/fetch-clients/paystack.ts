@@ -174,13 +174,13 @@ const paystackSchema = createSchema({
         .boolean()
         .optional()
         .describe(
-          "Set to false if you don't want invoices to be sent to your customers"
+          "Set to false if you don't want invoices to be sent to your customers",
         ),
       send_sms: z
         .boolean()
         .optional()
         .describe(
-          "Set to false if you don't want text messages to be sent to your customers"
+          "Set to false if you don't want text messages to be sent to your customers",
         ),
       currency: z
         .string()
@@ -250,13 +250,13 @@ const paystackSchema = createSchema({
         .boolean()
         .optional()
         .describe(
-          "Set to false if you don't want invoices to be sent to your customers"
+          "Set to false if you don't want invoices to be sent to your customers",
         ),
       send_sms: z
         .boolean()
         .optional()
         .describe(
-          "Set to false if you don't want text messages to be sent to your customers"
+          "Set to false if you don't want text messages to be sent to your customers",
         ),
       currency: z
         .string()

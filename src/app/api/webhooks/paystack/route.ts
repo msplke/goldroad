@@ -1,10 +1,9 @@
 import { z } from "zod";
 
 import { env } from "~/env";
-import { api } from "~/trpc/server";
+import { createSubscriber } from "~/server/actions/webhooks/paystack";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-// Define event types using Zod
 const PaymentEventEnum = z.enum([
   "subscription.create",
   "invoice.payment_succeeded",
@@ -17,16 +16,9 @@ const CancelEventEnum = z.enum([
   "invoice.payment_failed",
 ]);
 
-// Combine them for all valid events that the application cares about
-// const EventEnum = z.union([PaymentEventEnum, CancelEventEnum]);
-
-// Extract TypeScript types
 type PaymentEvent = z.infer<typeof PaymentEventEnum>;
 type CancelEvent = z.infer<typeof CancelEventEnum>;
 
-// type PaystackWebhookEvent = z.infer<typeof EventEnum>;
-
-// Define the webhook payload schema
 const PaystackWebhookBodySchema = z.object({
   event: z.string(), // Keep as string for initial parsing
   data: z.object({
@@ -41,9 +33,8 @@ const PaystackWebhookBodySchema = z.object({
   }),
 });
 
-// type PaystackWebhookBody = z.infer<typeof PaystackWebhookBodySchema>;
-
-const defaultResponse = new Response("OK", { status: 200 });
+const OK_RESPONSE = new Response("OK", { status: 200 });
+const SERVER_ERROR_RESPONSE = new Response("Server Error", { status: 500 });
 
 export async function POST(req: Request) {
   const rawBody = await req.text();
@@ -74,19 +65,27 @@ export async function POST(req: Request) {
     // Type assertion is safe because we've validated with safeParse
     const paymentEvent = event as PaymentEvent;
 
-    // You get autocomplete here!
     switch (paymentEvent) {
       case "subscription.create": {
         if (!data.subscription_code)
           return new Response("No subscription code", { status: 400 });
 
-        // Create a new subscriber on Kit
-        await api.subscriber.create({
-          subscriberInfo: { email_address: data.customer.email },
-          paystackInfo: {
-            subscriptionCode: data.subscription_code,
-          },
-        });
+        // Create a new subscriber on Kit and on app db
+        try {
+          // Check if subscriber exists in app db
+          // const subscriber = await getBySubscriptionCode();
+          // if (subscriber) {
+          //   return OK_RESPONSE;
+          // }
+          await createSubscriber(
+            { email_address: data.customer.email },
+            data.subscription_code,
+          );
+        } catch (error) {
+          console.error("Unable to save subscriber");
+          console.error(error);
+          return SERVER_ERROR_RESPONSE;
+        }
 
         break;
       }
@@ -102,7 +101,6 @@ export async function POST(req: Request) {
   else if (CancelEventEnum.safeParse(event).success) {
     const cancelEvent = event as CancelEvent;
 
-    // You get autocomplete here!
     switch (cancelEvent) {
       case "subscription.disable":
         // Handle subscription disable
@@ -119,5 +117,5 @@ export async function POST(req: Request) {
     console.log("Unexpected event type:", event);
   }
 
-  return defaultResponse;
+  return OK_RESPONSE;
 }
