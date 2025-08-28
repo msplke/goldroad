@@ -76,6 +76,24 @@ const subscriptionSchema = z.object({
   status: subscriptionStatusEnum,
 });
 
+// Bank schema for the list banks endpoint
+const bankSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+  code: z.string(),
+  longcode: z.string(),
+  gateway: z.string().nullable(),
+  pay_with_bank: z.boolean(),
+  active: z.boolean(),
+  country: z.string(),
+  currency: z.string(),
+  type: z.string(),
+  is_deleted: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
 // Standard API response format
 const baseResponseSchema = z.object({
   status: z.boolean(),
@@ -269,6 +287,54 @@ const paystackSchema = createSchema({
     }),
     output: baseResponseSchema.extend({
       data: planSchema,
+    }),
+  },
+  // List banks
+  "@get/bank": {
+    query: z
+      .object({
+        country: z
+          .string()
+          .optional()
+          .describe(
+            "The country to obtain the list of supported banks. e.g country=ghana or country=nigeria",
+          ),
+        use_cursor: z
+          .boolean()
+          .optional()
+          .describe("Use cursor for pagination"),
+        perPage: z
+          .number()
+          .optional()
+          .describe("Number of records to return per page"),
+        pay_with_bank_transfer: z
+          .boolean()
+          .optional()
+          .describe("Only return banks that support bank transfer"),
+        pay_with_bank: z
+          .boolean()
+          .optional()
+          .describe("Only return banks that support pay with bank"),
+        enabled_for_verification: z
+          .boolean()
+          .optional()
+          .describe("Only return banks that support account verification"),
+        next: z.string().optional().describe("Cursor for the next page"),
+        previous: z
+          .string()
+          .optional()
+          .describe("Cursor for the previous page"),
+      })
+      .optional(),
+    output: baseResponseSchema.extend({
+      data: z.array(bankSchema),
+      meta: z
+        .object({
+          next: z.string().nullable(),
+          previous: z.string().nullable(),
+          perPage: z.number(),
+        })
+        .optional(),
     }),
   },
 });
