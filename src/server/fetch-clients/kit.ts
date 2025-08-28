@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { env } from "~/env";
 
-const kitStateEnumSchema = z.enum([
+export const kitStateEnumSchema = z.enum([
   "active",
   "cancelled",
   "bounced",
@@ -12,15 +12,15 @@ const kitStateEnumSchema = z.enum([
 ]);
 
 // Can be filled later with the actual types as needed
-const kitFieldsSchema = z.record(z.string(), z.unknown());
+export const kitFieldsSchema = z.record(z.string(), z.unknown());
 
-const kitTagSchema = z.object({
+export const kitTagSchema = z.object({
   id: z.number(),
   name: z.string(),
   created_at: z.coerce.date(),
 });
 
-const kitPaginationSchema = z.object({
+export const kitPaginationSchema = z.object({
   has_previous_page: z.boolean(),
   has_next_page: z.boolean(),
   start_cursor: z.string(),
@@ -28,7 +28,7 @@ const kitPaginationSchema = z.object({
   per_page: z.number(),
 });
 
-const kitSubscriberSelectSchema = z.object({
+export const kitSubscriberSelectSchema = z.object({
   id: z.number(),
   first_name: z.string().nullable(),
   email_address: z.email(),
@@ -37,7 +37,7 @@ const kitSubscriberSelectSchema = z.object({
   fields: kitFieldsSchema,
 });
 
-const kitSubscriberCreateSchema = z.object({
+export const kitSubscriberCreateSchema = z.object({
   email_address: z.string(),
   first_name: z.string().optional(),
   state: kitStateEnumSchema.optional(),
