@@ -15,20 +15,30 @@ const customerSchema = z.object({
   customer_code: z.string(),
 });
 
+const planIntervalEnum = z.enum([
+  "hourly",
+  "daily",
+  "weekly",
+  "monthly",
+  "quarterly",
+  "biannually",
+  "annually",
+]);
+
+const subscriptionStatusEnum = z.enum([
+  "active",
+  "non-renewing",
+  "attention",
+  "cancelled",
+  "completed",
+]);
+
 const planSchema = z.object({
   name: z.string(),
   plan_code: z.string(),
   description: z.string().optional(),
   amount: z.number(),
-  interval: z.enum([
-    "hourly",
-    "daily",
-    "weekly",
-    "monthly",
-    "quarterly",
-    "biannually",
-    "annually",
-  ]),
+  interval: planIntervalEnum.describe("Interval for the plan"),
   integration: z.number(),
 });
 
@@ -63,7 +73,7 @@ const subscriptionSchema = z.object({
   cron_expression: z.string().optional(),
   next_payment_date: z.string(),
   open_invoice: z.boolean().optional(),
-  status: z.enum(["active", "cancelled", "paused", "completed"]),
+  status: subscriptionStatusEnum,
 });
 
 // Standard API response format
@@ -98,9 +108,10 @@ const paystackSchema = createSchema({
   },
 
   // Fetch a Subscription
-  "@get/subscription/:code": {
+  "@get/subscription/:id_or_code": {
     params: z.object({
-      code: z.string(),
+      // Subscription id or code
+      id_or_code: z.string(),
     }),
     output: baseResponseSchema.extend({
       data: subscriptionSchema,
@@ -156,30 +167,20 @@ const paystackSchema = createSchema({
   "@post/plan": {
     input: z.object({
       name: z.string().describe("Name of the plan"),
-      amount: z.number().describe("Amount to be charged in cents"),
-      interval: z
-        .enum([
-          "hourly",
-          "daily",
-          "weekly",
-          "monthly",
-          "quarterly",
-          "biannually",
-          "annually",
-        ])
-        .describe("Interval for the plan"),
+      amount: z.number().describe("Amount to be charged in subunits"),
+      interval: planIntervalEnum.describe("Interval for the plan"),
       description: z.string().optional().describe("Description of the plan"),
       send_invoices: z
         .boolean()
         .optional()
         .describe(
-          "Set to false if you don't want invoices to be sent to your customers",
+          "Set to false if you don't want invoices to be sent to your customers"
         ),
       send_sms: z
         .boolean()
         .optional()
         .describe(
-          "Set to false if you don't want text messages to be sent to your customers",
+          "Set to false if you don't want text messages to be sent to your customers"
         ),
       currency: z
         .string()
@@ -201,20 +202,10 @@ const paystackSchema = createSchema({
       .object({
         perPage: z.number().optional().describe("Number of records to return"),
         page: z.number().optional().describe("Page number to return"),
-        status: z
-          .enum(["active", "cancelled", "paused", "completed"])
+        status: subscriptionStatusEnum
           .optional()
           .describe("Filter plans by status"),
-        interval: z
-          .enum([
-            "hourly",
-            "daily",
-            "weekly",
-            "monthly",
-            "quarterly",
-            "biannually",
-            "annually",
-          ])
+        interval: planIntervalEnum
           .optional()
           .describe("Filter plans by interval"),
         amount: z.number().optional().describe("Filter plans by amount"),
@@ -249,31 +240,23 @@ const paystackSchema = createSchema({
     }),
     input: z.object({
       name: z.string().optional().describe("Name of the plan"),
-      amount: z.number().optional().describe("Amount to be charged in cents"),
-      interval: z
-        .enum([
-          "hourly",
-          "daily",
-          "weekly",
-          "monthly",
-          "quarterly",
-          "biannually",
-          "annually",
-        ])
+      amount: z
+        .number()
         .optional()
-        .describe("Interval for the plan"),
+        .describe("Amount to be charged in subunits"),
+      interval: planIntervalEnum.optional().describe("Interval for the plan"),
       description: z.string().optional().describe("Description of the plan"),
       send_invoices: z
         .boolean()
         .optional()
         .describe(
-          "Set to false if you don't want invoices to be sent to your customers",
+          "Set to false if you don't want invoices to be sent to your customers"
         ),
       send_sms: z
         .boolean()
         .optional()
         .describe(
-          "Set to false if you don't want text messages to be sent to your customers",
+          "Set to false if you don't want text messages to be sent to your customers"
         ),
       currency: z
         .string()
