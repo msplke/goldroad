@@ -94,6 +94,26 @@ const bankSchema = z.object({
   updatedAt: z.string(),
 });
 
+// Subaccount schema
+const subaccountSchema = z.object({
+  id: z.number(),
+  subaccount_code: z.string(),
+  business_name: z.string(),
+  description: z.string(),
+  primary_contact_name: z.string().nullable(),
+  primary_contact_email: z.string().nullable(),
+  primary_contact_phone: z.string().nullable(),
+  metadata: z.record(z.string(), z.unknown()).nullable(),
+  percentage_charge: z.number(),
+  settlement_bank: z.string(),
+  account_number: z.string(),
+  settlement_schedule: z.enum(["auto", "weekly", "monthly", "manual"]),
+  active: z.boolean(),
+  migrate: z.boolean().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
 // Standard API response format
 const baseResponseSchema = z.object({
   status: z.boolean(),
@@ -289,6 +309,9 @@ const paystackSchema = createSchema({
       data: planSchema,
     }),
   },
+
+  // === BANK ENDPOINT ===
+
   // List banks
   "@get/bank": {
     query: z
@@ -335,6 +358,98 @@ const paystackSchema = createSchema({
           perPage: z.number(),
         })
         .optional(),
+    }),
+  },
+
+  // === Subaccount ENDPOINTS ===
+
+  // Create Subaccount
+  "@post/subaccount": {
+    input: z.object({
+      business_name: z.string().describe("Name of business for subaccount"),
+      settlement_bank: z.string().describe("Bank code for the bank"),
+      account_number: z.string().describe("Bank account number"),
+      percentage_charge: z
+        .number()
+        .describe(
+          "The default percentage charged when receiving on behalf of this subaccount",
+        ),
+      description: z
+        .string()
+        .optional()
+        .describe("A description for this subaccount"),
+      primary_contact_email: z
+        .email()
+        .optional()
+        .describe("A contact email for the subaccount"),
+      primary_contact_name: z
+        .string()
+        .optional()
+        .describe("A name for the contact person for this subaccount"),
+      primary_contact_phone: z
+        .string()
+        .optional()
+        .describe("A phone number to call for this subaccount"),
+      metadata: z
+        .record(z.string(), z.unknown())
+        .optional()
+        .describe("Stringified JSON object of custom data"),
+    }),
+    output: baseResponseSchema.extend({
+      data: subaccountSchema,
+    }),
+  },
+
+  // Update Subaccount
+  "@put/subaccount/:id_or_code": {
+    params: z.object({
+      id_or_code: z.string().describe("Subaccount ID or code"),
+    }),
+    input: z.object({
+      business_name: z
+        .string()
+        .optional()
+        .describe("Name of business for subaccount"),
+      settlement_bank: z.string().optional().describe("Bank code for the bank"),
+      account_number: z.string().optional().describe("Bank account number"),
+      active: z
+        .boolean()
+        .optional()
+        .describe("Activate or deactivate a subaccount"),
+      percentage_charge: z
+        .number()
+        .optional()
+        .describe(
+          "The default percentage charged when receiving on behalf of this subaccount",
+        ),
+      description: z
+        .string()
+        .optional()
+        .describe("A description for this subaccount"),
+      primary_contact_email: z
+        .string()
+        .email()
+        .optional()
+        .describe("A contact email for the subaccount"),
+      primary_contact_name: z
+        .string()
+        .optional()
+        .describe("A name for the contact person for this subaccount"),
+      primary_contact_phone: z
+        .string()
+        .optional()
+        .describe("A phone number to call for this subaccount"),
+      settlement_schedule: z
+        .enum(["auto", "weekly", "monthly", "manual"])
+        .optional()
+        .describe("Any of auto, weekly, monthly, manual"),
+      metadata: z
+        .record(z.string(), z.unknown())
+        .optional()
+        .describe("Stringified JSON object of custom data"),
+    }),
+    output: baseResponseSchema.extend({
+      data: subaccountSchema,
     }),
   },
 });
