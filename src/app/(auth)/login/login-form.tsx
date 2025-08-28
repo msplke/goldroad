@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import { useMemo, useState } from "react";
 
 import { authClient } from "~/auth/client";
 import { Button } from "~/components/ui/button";
@@ -12,13 +12,21 @@ import {
 } from "~/components/ui/card";
 
 export function LoginForm() {
+  const [loading, setLoading] = useState(false);
+
+  const callbackURL = useMemo(() => {
+    if (typeof window === "undefined") return "/dashboard";
+    const raw = new URLSearchParams(window.location.search).get("redirect");
+    return raw?.startsWith("/") ? raw : "/dashboard";
+  }, []);
+
   return (
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
+          <CardTitle>Log in to your account</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Continue with your GitHub account to log in
           </CardDescription>
         </CardHeader>
 
@@ -27,24 +35,29 @@ export function LoginForm() {
             <div className="flex flex-col gap-3">
               <Button
                 onClick={async () => {
-                  await authClient.signIn.social({
-                    provider: "github",
-                    callbackURL: "/dashboard",
-                  });
+                  if (loading) return;
+                  setLoading(true);
+
+                  try {
+                    await authClient.signIn.social({
+                      provider: "github",
+                      callbackURL,
+                    });
+                  } catch (err) {
+                    console.error("GitHub sign-in failed:", err);
+                    // TODO: replace with your toast/notifier
+                    alert("Sign-in failed. Please try again.");
+                  } finally {
+                    setLoading(false);
+                  }
                 }}
-                className="w-full"
                 type="button"
+                className="w-full"
+                disabled={loading}
               >
-                Sign in with GitHub
+                {loading ? "Signing in..." : "Sign in with GitHub"}
               </Button>
             </div>
-          </div>
-
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="underline underline-offset-4">
-              Sign up
-            </Link>
           </div>
         </CardContent>
       </Card>

@@ -15,7 +15,7 @@ export function Features() {
 
         <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => {
-            const Icon = Icons[feature.icon || "checkCircle"];
+            const Icon = Icons[feature.icon] ?? Icons.checkCircle;
 
             return (
               <div

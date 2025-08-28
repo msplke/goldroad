@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { authClient } from "~/auth/client";
 import { Icons } from "~/components/icons";
 import { MaxWidthWrapper } from "~/components/max-width-wrapper";
 import { ModeToggle } from "~/components/mode-toggle";
@@ -13,6 +14,8 @@ import { cn } from "~/lib/utils";
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const links = marketingConfig.mainNav;
+
+  const { data: session } = authClient.useSession();
 
   // prevent body scroll when modal is open
   useEffect(() => {
@@ -70,27 +73,32 @@ export function MobileNav() {
         </ul>
 
         <div className="mt-8 flex items-center justify-between">
-          <div className="flex items-center gap-3 py-3">
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => setOpen(false)}
-            >
-              Sign In
+          {session ? (
+            <Button asChild size="sm" onClick={() => setOpen(false)}>
+              <Link href="/dashboard" className="font-medium capitalize">
+                Dashboard
+              </Link>
             </Button>
+          ) : (
+            <div className="flex items-center gap-3 py-3">
+              <Button
+                asChild
+                size="sm"
+                variant="secondary"
+                onClick={() => setOpen(false)}
+              >
+                <Link href="/login" className="font-medium capitalize">
+                  Sign In
+                </Link>
+              </Button>
 
-            <Button size="sm" onClick={() => setOpen(false)}>
-              Get Started
-            </Button>
-          </div>
-
-          <Link
-            href="/properties"
-            onClick={() => setOpen(false)}
-            className="flex w-full font-medium capitalize"
-          >
-            <Button size="sm">Properties</Button>
-          </Link>
+              <Button asChild size="sm" onClick={() => setOpen(false)}>
+                <Link href="/login" className="font-medium capitalize">
+                  Get Started
+                </Link>
+              </Button>
+            </div>
+          )}
 
           <ModeToggle />
         </div>

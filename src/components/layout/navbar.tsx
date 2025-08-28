@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
 
+import { authClient } from "~/auth/client";
 import { Icons } from "~/components/icons";
 import { MaxWidthWrapper } from "~/components/max-width-wrapper";
 import { ModeToggle } from "~/components/mode-toggle";
@@ -16,6 +17,8 @@ export function NavBar({ scroll = false }: { scroll?: boolean }) {
   const scrolled = useScroll(50);
   const segment = useSelectedLayoutSegment();
   const links = marketingConfig.mainNav;
+
+  const { data: session } = authClient.useSession();
 
   return (
     <header
@@ -53,16 +56,21 @@ export function NavBar({ scroll = false }: { scroll?: boolean }) {
         </div>
 
         <div className="hidden items-center gap-4 md:flex">
-          <Button size="sm" variant="ghost">
-            Sign In
-          </Button>
+          {session ? (
+            <Button asChild size="sm">
+              <Link href="/dashboard">Dashboard</Link>
+            </Button>
+          ) : (
+            <>
+              <Button asChild size="sm" variant="ghost">
+                <Link href="/login">Sign In</Link>
+              </Button>
 
-          <Button size="sm">Get Started</Button>
-
-          {/* <Link href="/dashboard">
-            <Button size="sm">Dashboard</Button>
-          </Link> */}
-
+              <Button asChild size="sm">
+                <Link href="/login">Get Started</Link>
+              </Button>
+            </>
+          )}
           <ModeToggle />
         </div>
       </MaxWidthWrapper>

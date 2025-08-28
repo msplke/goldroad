@@ -33,18 +33,18 @@ export function constructMetadata({
       icon: "/android-chrome-192x192.png",
       shortcut: "/favicon.ico",
     },
-    manifest: `${siteConfig.url}/site.webmanifest`,
-    metadataBase: new URL(siteConfig.url),
+    manifest: `${url}/site.webmanifest`,
+    metadataBase: new URL(url),
     openGraph: {
       title,
       description,
-      siteName: title,
+      siteName: siteConfig.name,
       url,
       type,
       locale: "en-US",
       images: [
         {
-          url: siteConfig.ogImage,
+          url: image,
           width: 1200,
           height: 630,
           alt: siteConfig.name,
