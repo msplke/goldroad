@@ -9,7 +9,7 @@ import {
 } from "~/server/fetch-clients/kit";
 
 export const subscriberRouter = createTRPCRouter({
-  create: publicProcedure // Should be a protected procedure
+  create: publicProcedure
     .input(
       z.object({
         subscriberInfo: kitSubscriberCreateSchema,
