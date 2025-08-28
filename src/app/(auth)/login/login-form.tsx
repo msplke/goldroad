@@ -29,7 +29,7 @@ export function LoginForm() {
                 onClick={async () => {
                   await authClient.signIn.social({
                     provider: "github",
-                    callbackURL: "/",
+                    callbackURL: "/dashboard",
                   });
                 }}
                 className="w-full"

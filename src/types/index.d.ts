@@ -7,6 +7,12 @@ export type NavItem = {
   icon?: keyof typeof Icons;
 };
 
+export type SidebarNavItem = {
+  title: string;
+  items: NavItem[];
+  icon?: keyof typeof Icons;
+};
+
 export type MainNavItem = NavItem;
 
 export type MarketingConfig = {
