@@ -19,7 +19,7 @@ export const subscriberRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // Create subscriber on Kit
+      // Create subscriber on Kit. The API upserts the user if they exist.
       const { data: createSubscriberRes } = await kitClient(
         "@post/subscribers/",
         {
@@ -52,12 +52,20 @@ export const subscriberRouter = createTRPCRouter({
       }
 
       // Add the subscriber to the database
-      await ctx.db.insert(paid_subscriber).values({
-        email: subscriber.email_address,
-        firstName: subscriber.first_name ?? "",
-        paystackSubscriptionCode: input.paystackInfo.subscriptionCode,
-        kitSubscriberId: subscriber.id,
-        status: env.KIT_PAID_TAG_NAME,
-      });
+      await ctx.db
+        .insert(paid_subscriber)
+        .values({
+          email: subscriber.email_address,
+          firstName: subscriber.first_name ?? "",
+          paystackSubscriptionCode: input.paystackInfo.subscriptionCode,
+          kitSubscriberId: subscriber.id,
+          status: env.KIT_PAID_TAG_NAME,
+        })
+        .onConflictDoNothing({
+          target: [
+            paid_subscriber.kitSubscriberId,
+            paid_subscriber.paystackSubscriptionCode,
+          ],
+        });
     }),
 });
