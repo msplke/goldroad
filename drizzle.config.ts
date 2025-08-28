@@ -9,5 +9,6 @@ export default {
   dbCredentials: {
     url: env.DATABASE_URL,
   },
+  casing: "snake_case",
   tablesFilter: ["goldroad_*"],
 } satisfies Config;
