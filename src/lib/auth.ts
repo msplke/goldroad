@@ -2,6 +2,7 @@ import type { BetterAuthOptions } from "better-auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
+import { env } from "~/env";
 import { db } from "~/server/db";
 
 export function initAuth(options: {
@@ -15,8 +16,12 @@ export function initAuth(options: {
     }),
     baseURL: options.baseUrl,
     secret: options.secret,
-    emailAndPassword: {
-      enabled: true,
+
+    socialProviders: {
+      github: {
+        clientId: env.GITHUB_CLIENT_ID,
+        clientSecret: env.GITHUB_CLIENT_SECRET,
+      },
     },
     plugins: [],
   } satisfies BetterAuthOptions;
