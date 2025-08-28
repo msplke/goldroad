@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { env } from "~/env";
 import { api } from "~/trpc/server";
-import { createHmac } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 
 // Define event types using Zod
 const PaymentEventEnum = z.enum([
@@ -51,7 +51,12 @@ export async function POST(req: Request) {
     .update(rawBody)
     .digest("hex");
 
-  if (hash !== req.headers.get("x-paystack-signature")) {
+  const signature = req.headers.get("x-paystack-signature") ?? "";
+
+  if (
+    !(signature.length === hash.length) ||
+    !timingSafeEqual(Buffer.from(hash, "hex"), Buffer.from(signature, "hex"))
+  ) {
     return new Response("Invalid signature", { status: 401 });
   }
 
