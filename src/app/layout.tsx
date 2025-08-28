@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist as FontSans } from "next/font/google";
+import { Geist } from "next/font/google";
 import "~/styles/globals.css";
 
 import { TailwindIndicator } from "~/app/_components/tailwind-indicator";
@@ -7,9 +7,9 @@ import { ThemeProvider } from "~/app/_components/theme-provider";
 import { cn, constructMetadata } from "~/lib/utils";
 import { TRPCReactProvider } from "~/trpc/react";
 
-const fontSans = FontSans({
+const fontSans = Geist({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-geist-sans",
 });
 
 export const metadata: Metadata = constructMetadata();

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Icons } from "~/components/icons";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
@@ -21,6 +23,7 @@ export function Pricing() {
                 per successful transaction
               </div>
             </div>
+
             <ul className="space-y-3 mb-8">
               <li className="flex items-center">
                 <Icons.checkCircle className="h-5 w-5 text-primary mr-3" />
@@ -39,8 +42,11 @@ export function Pricing() {
                 <span>24/7 support</span>
               </li>
             </ul>
-            <Button size="lg" className="w-full text-lg">
-              Start Accepting Payments
+
+            <Button asChild size="lg" className="w-full text-lg">
+              <Link href="/login" aria-label="Start accepting payments">
+                Start Accepting Payments
+              </Link>
             </Button>
           </CardContent>
         </Card>

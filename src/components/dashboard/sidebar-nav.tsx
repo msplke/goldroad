@@ -36,8 +36,9 @@ export function SidebarNav({
                     const Icon = Icons[item.icon ?? "arrowRight"];
 
                     return (
-                      <SidebarMenuItem key={item.title}>
+                      <SidebarMenuItem key={item.href}>
                         <SidebarMenuButton
+                          asChild
                           tooltip={item.title}
                           disabled={item.disabled}
                           className={cn(
@@ -54,9 +55,7 @@ export function SidebarNav({
                           ) : (
                             <Link
                               href={item.href}
-                              className={cn(
-                                "hover:bg-muted flex flex-1 items-center gap-3 rounded-md text-sm font-medium",
-                              )}
+                              className="hover:bg-muted flex flex-1 items-center gap-3 rounded-md text-sm font-medium"
                             >
                               <Icon className="size-4" />
                               <span>{item.title}</span>

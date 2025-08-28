@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Icons } from "~/components/icons";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -16,17 +18,22 @@ export function HeroLanding() {
           Accept recurring payments locally with Paystack, automatically sync
           paying subscribers into your ConvertKit, get payouts to your bank.
         </p>
+
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" className="text-lg px-8">
-            Get Started Free
-            <Icons.arrowRight className="ml-2 h-5 w-5" />
+          <Button asChild size="lg" className="text-lg px-8">
+            <Link href="/login">
+              Get Started Free
+              <Icons.arrowRight className="ml-2 h-5 w-5" />
+            </Link>
           </Button>
+
           <Button
+            asChild
             variant="outline"
             size="lg"
             className="text-lg px-8 bg-transparent"
           >
-            See How It Works
+            <a href="#how-it-works">See How It Works</a>
           </Button>
         </div>
         <p className="text-sm text-muted-foreground mt-4">

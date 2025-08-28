@@ -16,7 +16,7 @@ export const sidebarLinks: SidebarNavItem[] = [
     items: [
       {
         title: "Settings",
-        href: `/settings`,
+        href: `/dashboard/settings`,
         icon: "settings",
         disabled: true,
       },
