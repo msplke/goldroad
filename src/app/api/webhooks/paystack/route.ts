@@ -61,8 +61,13 @@ export async function POST(req: Request) {
   }
 
   // Parse the webhook payload
-  const webhookData = PaystackWebhookBodySchema.parse(JSON.parse(rawBody));
-  const { event } = webhookData;
+  const parsedBody = PaystackWebhookBodySchema.safeParse(JSON.parse(rawBody));
+  if (parsedBody.error) {
+    return new Response("Unexpected request body", { status: 400 });
+  }
+  const webhookBody = parsedBody.data;
+  const event = webhookBody.event;
+  const data = webhookBody.data;
 
   // Check if it's a payment event
   if (PaymentEventEnum.safeParse(event).success) {
@@ -72,7 +77,6 @@ export async function POST(req: Request) {
     // You get autocomplete here!
     switch (paymentEvent) {
       case "subscription.create": {
-        const data = webhookData.data;
         if (!data.subscription_code)
           return new Response("No subscription code", { status: 400 });
 
