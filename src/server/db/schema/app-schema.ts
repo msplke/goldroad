@@ -5,7 +5,7 @@
 import type { PaymentStatus } from "~/env";
 import { createdAt, createTable, updatedAt } from "~/server/db/schema/utils";
 
-export const paid_subscriber = createTable("paid_subscribers", (d) => ({
+export const paidSubscriber = createTable("paid_subscriber", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
   email: d.text("email").unique().notNull(),
   firstName: d.text("first_name"),

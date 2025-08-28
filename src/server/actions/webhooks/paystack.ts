@@ -6,7 +6,7 @@ import type z from "zod";
 
 import { env } from "~/env";
 import { db } from "~/server/db";
-import { paid_subscriber } from "~/server/db/schema/app-schema";
+import { paidSubscriber } from "~/server/db/schema/app-schema";
 import {
   kitClient,
   type kitSubscriberCreateSchema,
@@ -47,7 +47,7 @@ export async function createSubscriber(
 
   // Add the subscriber to the database
   await db
-    .insert(paid_subscriber)
+    .insert(paidSubscriber)
     .values({
       email: subscriber.email_address,
       firstName: subscriber.first_name ?? "",
@@ -56,6 +56,6 @@ export async function createSubscriber(
       status: env.KIT_PAID_TAG_NAME,
     })
     .onConflictDoNothing({
-      target: paid_subscriber.kitSubscriberId,
+      target: paidSubscriber.kitSubscriberId,
     });
 }
