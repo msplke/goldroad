@@ -23,7 +23,6 @@ export function initAuth(options: {
         clientSecret: env.GITHUB_CLIENT_SECRET,
       },
     },
-    plugins: [],
   } satisfies BetterAuthOptions;
 
   return betterAuth(config);
