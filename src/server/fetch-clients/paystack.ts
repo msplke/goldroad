@@ -15,23 +15,28 @@ const customerSchema = z.object({
   customer_code: z.string(),
 });
 
-const planIntervalEnum = z.enum([
+// The application will mainly be concerned with the
+// "monthly" and annually" plans, but the "hourly", "daily" and "weekly"
+// will be supported for testing
+export const planIntervalEnum = z.enum([
   "hourly",
   "daily",
-  "weekly",
+  // "weekly",
   "monthly",
-  "quarterly",
-  "biannually",
+  // "quarterly",
+  // "biannually",
   "annually",
 ]);
 
-const subscriptionStatusEnum = z.enum([
+export const subscriptionStatusEnum = z.enum([
   "active",
   "non-renewing",
   "attention",
   "cancelled",
   "completed",
 ]);
+
+export type SubscriptionStatus = z.infer<typeof subscriptionStatusEnum>;
 
 const planSchema = z.object({
   name: z.string(),
@@ -95,6 +100,37 @@ const bankSchema = z.object({
 });
 
 // Subaccount schema
+export const createSubaccountSchema = z.object({
+  business_name: z.string().describe("Name of business for subaccount"),
+  settlement_bank: z.string().describe("Bank code for the bank"),
+  account_number: z.string().describe("Bank account number"),
+  percentage_charge: z
+    .number()
+    .describe(
+      "The default percentage charged when receiving on behalf of this subaccount",
+    ),
+  description: z
+    .string()
+    .optional()
+    .describe("A description for this subaccount"),
+  primary_contact_email: z
+    .email()
+    .optional()
+    .describe("A contact email for the subaccount"),
+  primary_contact_name: z
+    .string()
+    .optional()
+    .describe("A name for the contact person for this subaccount"),
+  primary_contact_phone: z
+    .string()
+    .optional()
+    .describe("A phone number to call for this subaccount"),
+  metadata: z
+    .record(z.string(), z.unknown())
+    .optional()
+    .describe("Stringified JSON object of custom data"),
+});
+
 const subaccountSchema = z.object({
   id: z.number(),
   subaccount_code: z.string(),
@@ -365,36 +401,7 @@ const paystackSchema = createSchema({
 
   // Create Subaccount
   "@post/subaccount": {
-    input: z.object({
-      business_name: z.string().describe("Name of business for subaccount"),
-      settlement_bank: z.string().describe("Bank code for the bank"),
-      account_number: z.string().describe("Bank account number"),
-      percentage_charge: z
-        .number()
-        .describe(
-          "The default percentage charged when receiving on behalf of this subaccount",
-        ),
-      description: z
-        .string()
-        .optional()
-        .describe("A description for this subaccount"),
-      primary_contact_email: z
-        .email()
-        .optional()
-        .describe("A contact email for the subaccount"),
-      primary_contact_name: z
-        .string()
-        .optional()
-        .describe("A name for the contact person for this subaccount"),
-      primary_contact_phone: z
-        .string()
-        .optional()
-        .describe("A phone number to call for this subaccount"),
-      metadata: z
-        .record(z.string(), z.unknown())
-        .optional()
-        .describe("Stringified JSON object of custom data"),
-    }),
+    input: createSubaccountSchema,
     output: baseResponseSchema.extend({
       data: subaccountSchema,
     }),

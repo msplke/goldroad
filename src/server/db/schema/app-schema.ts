@@ -4,9 +4,9 @@
 // db/schema.ts
 import { relations } from "drizzle-orm";
 
-import type { PaymentStatus } from "~/env";
 import { user } from "~/server/db/schema/auth-schema";
 import { createdAt, createTable, updatedAt } from "~/server/db/schema/utils";
+import type { SubscriptionStatus } from "~/server/fetch-clients/paystack";
 
 export const paidSubscriber = createTable("paid_subscriber", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
@@ -22,8 +22,8 @@ export const paidSubscriber = createTable("paid_subscriber", (d) => ({
     .notNull(),
   status: d
     .varchar("status", { length: 20 })
-    .$type<PaymentStatus>()
-    .default("paid")
+    .$type<SubscriptionStatus>()
+    .default("active")
     .notNull(),
   createdAt,
   updatedAt,
@@ -32,14 +32,19 @@ export const paidSubscriber = createTable("paid_subscriber", (d) => ({
 export const tagInfo = createTable("tag_info", (d) => ({
   id: d.uuid().defaultRandom().primaryKey(),
   creatorId: d
-    .text()
+    .uuid()
     .notNull()
     .references(() => creator.id),
-  kit_active_tag_id: d.bigint({ mode: "number" }).notNull(),
-  kit_non_renewing_tag_id: d.bigint({ mode: "number" }).notNull(),
-  kit_attention_tag_id: d.bigint({ mode: "number" }).notNull(),
-  kit_completed_tag_id: d.bigint({ mode: "number" }).notNull(),
-  kit_cancelled_tag_id: d.bigint({ mode: "number" }).notNull(),
+  kitActiveTagId: d.bigint({ mode: "number" }).notNull(),
+  kitNonRenewingTagId: d.bigint({ mode: "number" }).notNull(),
+  kitAttentionTagId: d.bigint({ mode: "number" }).notNull(),
+  kitCompletedTagId: d.bigint({ mode: "number" }).notNull(),
+  kitCancelledTagId: d.bigint({ mode: "number" }).notNull(),
+  kitMonthlySubscriberTag: d.bigint({ mode: "number" }).notNull(),
+  kitAnnualSubscriberTag: d.bigint({ mode: "number" }).notNull(),
+  // The following subscriber tags are mainly to expedite testing
+  kitDailySubscriberTag: d.bigint({ mode: "number" }).notNull(),
+  kitHourlySubscriberTag: d.bigint({ mode: "number" }).notNull(),
   createdAt,
   updatedAt,
 }));
@@ -52,7 +57,7 @@ export const creator = createTable("creator", (d) => ({
     .references(() => user.id),
   // To be encrypted
   kitApiKey: d.text().notNull(),
-  paystackSubaccountId: d.bigint({ mode: "number" }).notNull(),
+  paystackSubaccountCode: d.text().notNull(),
   createdAt,
   updatedAt,
 }));
