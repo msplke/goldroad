@@ -31,12 +31,17 @@ export const creatorRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      console.log("Creating subaccount...");
       // 1. Create Paystack subaccount
       const subaccountCode = await createPaystackSubaccount(
         input.subaccountCreationInfo,
       );
 
+      console.log("Created subaccount!");
+
       // 2. Add creator to the database
+      console.log("Adding creator to DB...");
+
       const ids = await ctx.db
         .insert(creator)
         .values({
@@ -53,9 +58,14 @@ export const creatorRouter = createTRPCRouter({
           code: "INTERNAL_SERVER_ERROR",
         });
       }
-      // 3. Add subscription status and tier tags to the Kit
+      console.log("Added creator successfully!");
+
+      // 3. Add subscription status and interval tags to the Kit
+      console.log("Adding subscription status and interval tags to kit...");
+
       const tagIdMap = await addStatusAndTierTagsToKit(input.kitApiKey);
 
+      console.log("Adding kit tag ids to tag info table...");
       // 4. Add tags to the tag info table, linking them to the creator
       await ctx.db.insert(tagInfo).values({
         creatorId,
@@ -69,6 +79,8 @@ export const creatorRouter = createTRPCRouter({
         kitDailySubscriberTag: tagIdMap.daily,
         kitHourlySubscriberTag: tagIdMap.hourly,
       });
+      console.log("Successfully added tags.");
+      console.log("Successfully added creator!");
     }),
 });
 
@@ -81,7 +93,7 @@ async function createPaystackSubaccount(
 
   if (error) {
     throw new TRPCError({
-      message: error.message,
+      message: `subaccount creation error: ${error.message}`,
       code: "INTERNAL_SERVER_ERROR",
     });
   }
@@ -107,10 +119,10 @@ async function addStatusAndTierTagsToKit(
     if (!error) {
       if (!tagIdMap) {
         tagIdMap = {
-          [name]: data.id,
+          [name]: data.tag.id,
         };
       } else {
-        tagIdMap[name] = data.id;
+        tagIdMap[name] = data.tag.id;
       }
     }
   }

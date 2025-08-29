@@ -57,7 +57,7 @@ export const kitSchema = createSchema(
       input: z.object({
         name: z.string(),
       }),
-      output: kitTagSchema,
+      output: z.object({ tag: kitTagSchema }),
     },
 
     // List the subscribers for a given tag

@@ -47,6 +47,30 @@ const planSchema = z.object({
   integration: z.number(),
 });
 
+export const createPlanSchema = z.object({
+  name: z.string().describe("Name of the plan"),
+  amount: z.number().describe("Amount to be charged in subunits"),
+  interval: planIntervalEnum.describe("Interval for the plan"),
+  description: z.string().optional().describe("Description of the plan"),
+  send_invoices: z
+    .boolean()
+    .optional()
+    .describe(
+      "Set to false if you don't want invoices to be sent to your customers",
+    ),
+  send_sms: z
+    .boolean()
+    .optional()
+    .describe(
+      "Set to false if you don't want text messages to be sent to your customers",
+    ),
+  currency: z.string().optional().describe("Currency in which amount is set"),
+  invoice_limit: z
+    .number()
+    .optional()
+    .describe("Number of invoices to raise during subscription"),
+});
+
 const authorizationSchema = z.object({
   authorization_code: z.string(),
   bin: z.string(),
@@ -135,15 +159,18 @@ const subaccountSchema = z.object({
   id: z.number(),
   subaccount_code: z.string(),
   business_name: z.string(),
-  description: z.string(),
-  primary_contact_name: z.string().nullable(),
-  primary_contact_email: z.string().nullable(),
-  primary_contact_phone: z.string().nullable(),
-  metadata: z.record(z.string(), z.unknown()).nullable(),
+  description: z.string().optional(),
+  primary_contact_name: z.string().nullable().optional(),
+  primary_contact_email: z.string().nullable().optional(),
+  primary_contact_phone: z.string().nullable().optional(),
+  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
   percentage_charge: z.number(),
   settlement_bank: z.string(),
   account_number: z.string(),
-  settlement_schedule: z.enum(["auto", "weekly", "monthly", "manual"]),
+  settlement_schedule: z
+    .string()
+    // .enum(["auto", "weekly", "monthly", "manual"])
+    .optional(),
   active: z.boolean(),
   migrate: z.boolean().optional(),
   createdAt: z.string(),
@@ -465,7 +492,6 @@ export const paystackClient = createFetch({
   baseURL: PAYSTACK_BASE_URL,
   headers: {
     Authorization: `Bearer ${env.PAYSTACK_SECRET_KEY}`,
-    "Content-Type": "application/json",
   },
   schema: paystackSchema,
   strict: true,
