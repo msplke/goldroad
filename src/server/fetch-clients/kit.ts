@@ -1,8 +1,6 @@
 import { createFetch, createSchema } from "@better-fetch/fetch";
 import { z } from "zod";
 
-import { env } from "~/env";
-
 export const kitStateEnumSchema = z.enum([
   "active",
   "cancelled",
@@ -126,10 +124,17 @@ export const kitSchema = createSchema(
 );
 
 const KIT_BASE_URL = "https://api.kit.com/v4";
+export const KIT_API_KEY_HEADER = "X-Kit-Api-Key";
+
 export const kitClient = createFetch({
   baseURL: KIT_BASE_URL,
-  headers: {
-    "X-Kit-Api-Key": env.KIT_API_KEY,
-  },
   schema: kitSchema,
+
+  onRequest(context) {
+    if (!context.headers.has(KIT_API_KEY_HEADER)) {
+      throw new Error(`❌ kitClient: ${KIT_API_KEY_HEADER} not set`);
+    }
+
+    return context;
+  },
 });
