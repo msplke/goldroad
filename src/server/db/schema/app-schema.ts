@@ -6,7 +6,10 @@ import { relations } from "drizzle-orm";
 
 import { user } from "~/server/db/schema/auth-schema";
 import { createdAt, createTable, updatedAt } from "~/server/db/schema/utils";
-import type { SubscriptionStatus } from "~/server/fetch-clients/paystack";
+import type {
+  PlanInterval,
+  SubscriptionStatus,
+} from "~/server/fetch-clients/paystack";
 
 export const paidSubscriber = createTable("paid_subscriber", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
@@ -64,4 +67,17 @@ export const creator = createTable("creator", (d) => ({
 
 export const creatorRelations = relations(creator, ({ one }) => ({
   tagInfo: one(tagInfo),
+}));
+
+export const plan = createTable("plan", (d) => ({
+  id: d.uuid().defaultRandom(),
+  name: d.text().notNull(),
+  interval: d.text().$type<PlanInterval>().notNull(),
+  kitPlanNameTagId: d.bigint({ mode: "number" }).notNull(),
+  // kitIntervalTagId: d.bigint({ mode: "number" }).notNull(),
+  paystackPlanCode: d.text().notNull(),
+  paystackPaymentPageId: d.bigint({ mode: "number" }).notNull(),
+  paystackPaymentPageUrlSlug: d.text().notNull(),
+  createdAt,
+  updatedAt,
 }));

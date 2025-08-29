@@ -28,6 +28,8 @@ export const planIntervalEnum = z.enum([
   "annually",
 ]);
 
+export type PlanInterval = z.infer<typeof planIntervalEnum>;
+
 export const subscriptionStatusEnum = z.enum([
   "active",
   "non-renewing",
@@ -177,6 +179,73 @@ const subaccountSchema = z.object({
   updatedAt: z.string(),
 });
 
+// Payment Page schema
+const paymentPageSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string().nullable(),
+  amount: z.number().nullable(),
+  slug: z.string(),
+  currency: z.string(),
+  type: z.enum(["fixed", "donation"]),
+  redirect_url: z.string().nullable(),
+  success_message: z.string().nullable(),
+  collect_phone: z.boolean(),
+  active: z.boolean(),
+  published: z.boolean(),
+  migrate: z.boolean().nullable(),
+  notification_email: z.string().nullable(),
+  custom_fields: z
+    .array(
+      z.object({
+        display_name: z.string(),
+        variable_name: z.string(),
+        required: z.boolean(),
+      }),
+    )
+    .nullable(),
+  metadata: z.record(z.string(), z.unknown()).nullable(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export const createPaymentPageSchema = z.object({
+  name: z.string().describe("Name of page"),
+  split_code: z.string(),
+  description: z.string().optional().describe("Description of page"),
+  amount: z
+    .number()
+    .optional()
+    .describe("Amount should be in the subunit of the supported currency"),
+  slug: z
+    .string()
+    .optional()
+    .describe("URL slug you would like to be associated with this page"),
+  metadata: z
+    .record(z.string(), z.unknown())
+    .optional()
+    .describe("Stringified JSON object of custom data"),
+  redirect_url: z
+    .string()
+    .optional()
+    .describe(
+      "If you would like Paystack to redirect someplace upon successful payment, specify the URL here",
+    ),
+  custom_fields: z
+    .array(
+      z.object({
+        display_name: z.string().describe("Field label"),
+        variable_name: z.string().describe("Field variable name"),
+        required: z
+          .boolean()
+          .optional()
+          .describe("Set to true to make field required"),
+      }),
+    )
+    .optional()
+    .describe("If you would like to accept custom fields, specify them here"),
+});
+
 // Standard API response format
 const baseResponseSchema = z.object({
   status: z.boolean(),
@@ -266,32 +335,7 @@ const paystackSchema = createSchema({
 
   // Create Plan
   "@post/plan": {
-    input: z.object({
-      name: z.string().describe("Name of the plan"),
-      amount: z.number().describe("Amount to be charged in subunits"),
-      interval: planIntervalEnum.describe("Interval for the plan"),
-      description: z.string().optional().describe("Description of the plan"),
-      send_invoices: z
-        .boolean()
-        .optional()
-        .describe(
-          "Set to false if you don't want invoices to be sent to your customers",
-        ),
-      send_sms: z
-        .boolean()
-        .optional()
-        .describe(
-          "Set to false if you don't want text messages to be sent to your customers",
-        ),
-      currency: z
-        .string()
-        .optional()
-        .describe("Currency in which amount is set"),
-      invoice_limit: z
-        .number()
-        .optional()
-        .describe("Number of invoices to raise during subscription"),
-    }),
+    input: createPlanSchema,
     output: baseResponseSchema.extend({
       data: planSchema,
     }),
@@ -461,7 +505,6 @@ const paystackSchema = createSchema({
         .optional()
         .describe("A description for this subaccount"),
       primary_contact_email: z
-        .string()
         .email()
         .optional()
         .describe("A contact email for the subaccount"),
@@ -484,6 +527,16 @@ const paystackSchema = createSchema({
     }),
     output: baseResponseSchema.extend({
       data: subaccountSchema,
+    }),
+  },
+
+  // === PAYMENT PAGE ENDPOINTS ===
+
+  // Create Payment Page
+  "@post/page": {
+    input: createPaymentPageSchema,
+    output: baseResponseSchema.extend({
+      data: paymentPageSchema,
     }),
   },
 });
