@@ -2,9 +2,6 @@ import { createEnv } from "@t3-oss/env-nextjs";
 import { vercel } from "@t3-oss/env-nextjs/presets-zod";
 import { z } from "zod";
 
-export const paymentStatus = z.enum(["paid", "cancelled", "past_due"]);
-export type PaymentStatus = z.infer<typeof paymentStatus>;
-
 export const env = createEnv({
   extends: [vercel()],
   shared: {
@@ -22,9 +19,6 @@ export const env = createEnv({
     DATABASE_URL: z.url(),
     GITHUB_CLIENT_ID: z.string(),
     GITHUB_CLIENT_SECRET: z.string(),
-    KIT_API_KEY: z.string(),
-    KIT_PAID_TAG_ID: z.string(),
-    KIT_PAID_TAG_NAME: paymentStatus,
     PAYSTACK_SECRET_KEY: z.string(),
   },
 
@@ -48,9 +42,6 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
-    KIT_API_KEY: process.env.KIT_API_KEY,
-    KIT_PAID_TAG_ID: process.env.KIT_PAID_TAG_ID,
-    KIT_PAID_TAG_NAME: process.env.KIT_PAID_TAG_NAME,
     PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY,
 
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
