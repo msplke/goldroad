@@ -47,6 +47,7 @@ const planSchema = z.object({
   amount: z.number(),
   interval: planIntervalEnum.describe("Interval for the plan"),
   integration: z.number(),
+  id: z.coerce.string(),
 });
 
 export const createPlanSchema = z.object({
@@ -180,21 +181,28 @@ const subaccountSchema = z.object({
 });
 
 // Payment Page schema
+const paymentPageTypeEnum = z.enum([
+  "payment",
+  "subscription",
+  "product",
+  "plan",
+]);
+
 const paymentPageSchema = z.object({
   id: z.number(),
   name: z.string(),
-  description: z.string().nullable(),
-  amount: z.number().nullable(),
+  description: z.string().optional(),
+  amount: z.number().optional(),
   slug: z.string(),
   currency: z.string(),
-  type: z.enum(["fixed", "donation"]),
-  redirect_url: z.string().nullable(),
-  success_message: z.string().nullable(),
+  type: paymentPageTypeEnum.optional(),
+  redirect_url: z.string().optional(),
+  success_message: z.string().optional(),
   collect_phone: z.boolean(),
   active: z.boolean(),
   published: z.boolean(),
-  migrate: z.boolean().nullable(),
-  notification_email: z.string().nullable(),
+  migrate: z.boolean().optional(),
+  notification_email: z.string().optional(),
   custom_fields: z
     .array(
       z.object({
@@ -203,14 +211,17 @@ const paymentPageSchema = z.object({
         required: z.boolean(),
       }),
     )
-    .nullable(),
-  metadata: z.record(z.string(), z.unknown()).nullable(),
+    .optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
 
 export const createPaymentPageSchema = z.object({
   name: z.string().describe("Name of page"),
+  type: paymentPageTypeEnum.optional(),
+  /**The id of the plan to subscribe to */
+  plan: z.string().optional(),
   split_code: z.string(),
   description: z.string().optional().describe("Description of page"),
   amount: z
