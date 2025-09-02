@@ -69,15 +69,38 @@ export const creatorRelations = relations(creator, ({ one }) => ({
   tagInfo: one(tagInfo),
 }));
 
+export const publication = createTable("publication", (d) => ({
+  id: d.uuid().primaryKey().defaultRandom(),
+  name: d.text().notNull(),
+  description: d.text(),
+  creatorId: d
+    .uuid()
+    .notNull()
+    .references(() => creator.id, { onDelete: "cascade" }),
+}));
+
 export const plan = createTable("plan", (d) => ({
-  id: d.uuid().defaultRandom(),
+  id: d.uuid().primaryKey().defaultRandom(),
   name: d.text().notNull(),
   interval: d.text().$type<PlanInterval>().notNull(),
-  kitPlanNameTagId: d.bigint({ mode: "number" }).notNull(),
+  publicationId: d
+    .uuid()
+    .notNull()
+    .references(() => publication.id, { onDelete: "cascade" }),
+  // kitPlanNameTagId: d.bigint({ mode: "number" }).notNull(),
   // kitIntervalTagId: d.bigint({ mode: "number" }).notNull(),
   paystackPlanCode: d.text().notNull(),
   paystackPaymentPageId: d.bigint({ mode: "number" }).notNull(),
   paystackPaymentPageUrlSlug: d.text().notNull(),
   createdAt,
   updatedAt,
+}));
+
+export const planBenefit = createTable("plan_benefit", (d) => ({
+  id: d.uuid().primaryKey().defaultRandom(),
+  planId: d
+    .uuid()
+    .notNull()
+    .references(() => plan.id, { onDelete: "cascade" }),
+  description: d.text().notNull(),
 }));
