@@ -18,7 +18,7 @@ if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 export const db = drizzle(conn, { schema, casing: "snake_case" });
 
 type DbTransactionType = Parameters<typeof db.transaction>[0] extends (
-  tx: infer T
+  tx: infer T,
 ) => unknown
   ? T
   : never;
