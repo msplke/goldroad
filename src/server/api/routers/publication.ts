@@ -55,62 +55,64 @@ export const publicationRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const foundCreator = await getCreator(ctx.db, input.userId);
-      console.log("Checking for existing publication...");
-      await checkForExistingPublication(
-        ctx.db,
-        foundCreator.id,
-        input.publicationInfo.name
-      );
+      return await ctx.db.transaction(async (tx) => {
+        const foundCreator = await getCreator(tx, input.userId);
+        console.log("Checking for existing publication...");
+        await checkForExistingPublication(
+          ctx.db,
+          foundCreator.id,
+          input.publicationInfo.name
+        );
 
-      // Create a Kit tag for the publication
-      console.log("Creating a tag for the publication on Kit...");
-      const tag = await createKitTag(
-        input.publicationInfo.name,
-        foundCreator.kitApiKey
-      );
+        // Create a Kit tag for the publication
+        console.log("Creating a tag for the publication on Kit...");
+        const tag = await createKitTag(
+          input.publicationInfo.name,
+          foundCreator.kitApiKey
+        );
 
-      // Create the publication on the DB
-      console.log("Creating the publication on the DB...");
-      const publicationId = await createPublication(
-        ctx.db,
-        foundCreator.id,
-        tag.id,
-        input.publicationInfo
-      );
+        // Create the publication on the DB
+        console.log("Creating the publication on the DB...");
+        const publicationId = await createPublication(
+          tx,
+          foundCreator.id,
+          tag.id,
+          input.publicationInfo
+        );
 
-      // Create the default monthly and yearly plans
-      const monthlyPlanCreationInfo: CreatePaystackPlanInfo = {
-        name: `${input.publicationInfo.name} - Monthly Plan`,
-        interval: "monthly",
-        amount: DEFAULT_MONTHLY_PLAN_PRICE_IN_KSH,
-      };
+        // Create the default monthly and yearly plans
+        const monthlyPlanCreationInfo: CreatePaystackPlanInfo = {
+          name: `${input.publicationInfo.name} - Monthly Plan`,
+          interval: "monthly",
+          amount: DEFAULT_MONTHLY_PLAN_PRICE_IN_KSH,
+        };
 
-      const annuallyPlanCreationInfo: CreatePaystackPlanInfo = {
-        name: `${input.publicationInfo.name} - Annual Plan`,
-        interval: "annually",
-        amount: DEFAULT_ANNUAL_PLAN_PRICE_IN_KSH,
-      };
+        const annuallyPlanCreationInfo: CreatePaystackPlanInfo = {
+          name: `${input.publicationInfo.name} - Annual Plan`,
+          interval: "annually",
+          amount: DEFAULT_ANNUAL_PLAN_PRICE_IN_KSH,
+        };
 
-      console.log("Creating plans...");
-      await createPlan(ctx.db, {
-        createPaystackPlanInfo: monthlyPlanCreationInfo,
-        publicationId,
-        paystackSubaccountCode: foundCreator.paystackSubaccountCode,
-        creatorId: foundCreator.id,
+        console.log("Creating plans...");
+        await createPlan(tx, {
+          createPaystackPlanInfo: monthlyPlanCreationInfo,
+          publicationId,
+          paystackSubaccountCode: foundCreator.paystackSubaccountCode,
+          creatorId: foundCreator.id,
+        });
+
+        console.log("Created monthly plan.");
+        await createPlan(tx, {
+          createPaystackPlanInfo: annuallyPlanCreationInfo,
+          publicationId,
+          paystackSubaccountCode: foundCreator.paystackSubaccountCode,
+          creatorId: foundCreator.id,
+        });
+
+        console.log("Created annual plan...");
+        console.log("Finished publication creation.");
+        return publicationId;
       });
-
-      console.log("Created monthly plan.");
-      await createPlan(ctx.db, {
-        createPaystackPlanInfo: annuallyPlanCreationInfo,
-        publicationId,
-        paystackSubaccountCode: foundCreator.paystackSubaccountCode,
-        creatorId: foundCreator.id,
-      });
-
-      console.log("Created annual plan...");
-      console.log("Finished publication creation.");
-      return publicationId;
     }),
 });
 
