@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import z from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
@@ -48,15 +48,22 @@ export const publicationRouter = createTRPCRouter({
       z.object({
         userId: z.string(),
         publicationInfo: CreatePublicationInfoSchema,
-      }),
+      })
     )
     .mutation(async ({ ctx, input }) => {
       const foundCreator = await getCreator(ctx.db, input.userId);
+      console.log("Checking for existing publication...");
+      await checkForExistingPublication(
+        ctx.db,
+        foundCreator.id,
+        input.publicationInfo.name
+      );
+
       // Create a Kit tag for the publication
       console.log("Creating a tag for the publication on Kit...");
       const tag = await createKitTag(
         input.publicationInfo.name,
-        foundCreator.kitApiKey,
+        foundCreator.kitApiKey
       );
 
       // Create the publication on the DB
@@ -65,7 +72,7 @@ export const publicationRouter = createTRPCRouter({
         ctx.db,
         foundCreator.id,
         tag.id,
-        input.publicationInfo,
+        input.publicationInfo
       );
 
       // Create the default monthly and yearly plans
@@ -103,11 +110,35 @@ export const publicationRouter = createTRPCRouter({
     }),
 });
 
+/**Returns an empty Promise. Throws an error if a publication with the
+ * provided creator id and publication name exists.
+ */
+async function checkForExistingPublication(
+  db: DbType,
+  creatorId: string,
+  publicationName: string
+) {
+  const existingPublication = await db.query.publication.findFirst({
+    where: and(
+      eq(publication.creatorId, creatorId),
+      eq(publication.name, publicationName)
+    ),
+  });
+
+  if (existingPublication) {
+    throw new TRPCError({
+      code: "CONFLICT",
+      message:
+        "A publication with this name from current creator already exists",
+    });
+  }
+}
+
 async function createPublication(
   db: DbType,
   creatorId: string,
   kitPublicationTagId: number,
-  publicationInfo: z.infer<typeof CreatePublicationInfoSchema>,
+  publicationInfo: z.infer<typeof CreatePublicationInfoSchema>
 ) {
   const result = await db
     .insert(publication)
@@ -134,14 +165,14 @@ async function createPublication(
 async function createPlan(db: DbType, data: PlanCreationData) {
   // 1. Create a Paystack Plan
   console.log(
-    `Creating Paystack Plan for '${data.createPaystackPlanInfo.name}'...`,
+    `Creating Paystack Plan for '${data.createPaystackPlanInfo.name}'...`
   );
   const planData = await createPaystackPlan(data.createPaystackPlanInfo);
 
   // 2. Create a Paystack Payment Page for that plan
   // Create the payment page
   console.log(
-    `Creating Paystack Payment Page for '${data.createPaystackPlanInfo.name}...'`,
+    `Creating Paystack Payment Page for '${data.createPaystackPlanInfo.name}...'`
   );
   const paymentPageData = await createPaymentPage({
     name: data.createPaystackPlanInfo.name,
@@ -193,7 +224,7 @@ async function createKitTag(name: string, kitApiKey: string) {
 }
 
 async function createPaymentPage(
-  createPaymentPageInfo: CreatePaystackPaymentPageInfo,
+  createPaymentPageInfo: CreatePaystackPaymentPageInfo
 ) {
   const { data: response, error } = await paystackClient("@post/page", {
     body: createPaymentPageInfo,
@@ -232,7 +263,7 @@ async function getCreator(db: DbType, userId: string) {
 
   if (!result) {
     throw new TRPCError({
-      message: "Could not create publication",
+      message: "The current user is not a creator",
       code: "INTERNAL_SERVER_ERROR",
     });
   }
