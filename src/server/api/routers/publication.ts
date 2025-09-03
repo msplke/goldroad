@@ -19,8 +19,12 @@ import {
 } from "~/server/fetch-clients/paystack";
 
 const CreatePublicationInfoSchema = z.object({
-  name: z.string(),
-  description: z.string().optional(),
+  name: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-zA-Z0-9\s\-_]+$/, "Invalid characters in name"),
+  description: z.string().min(1).max(500).optional(),
 });
 
 type CreatePaystackPlanInfo = z.infer<typeof createPlanSchema>;
