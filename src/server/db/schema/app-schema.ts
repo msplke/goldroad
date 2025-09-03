@@ -73,6 +73,7 @@ export const publication = createTable("publication", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
   name: d.text().notNull(),
   description: d.text(),
+  kitPublicationTagId: d.bigint({ mode: "number" }).notNull(),
   creatorId: d
     .uuid()
     .notNull()
