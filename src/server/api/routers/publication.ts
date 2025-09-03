@@ -50,9 +50,8 @@ export const publicationRouter = createTRPCRouter({
   create: protectedProcedure
     .input(CreatePublicationInfoSchema)
     .mutation(async ({ ctx, input }) => {
-      const foundCreator = await getCreator(ctx.db, ctx.session.user.id);
-
       return await ctx.db.transaction(async (tx) => {
+        const foundCreator = await getCreator(tx, ctx.session.user.id);
         console.log("Checking for existing publication...");
         await checkForExistingPublication(ctx.db, foundCreator.id, input.name);
 
