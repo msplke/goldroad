@@ -20,3 +20,15 @@ export async function getCreator(db: DbType, userId: string) {
 
   return foundCreator;
 }
+
+export async function checkCreatorExists(db: DbType, userId: string) {
+  const foundCreator = await db.query.creator.findFirst({
+    where: eq(creator.userId, userId),
+  });
+
+  if (!foundCreator) {
+    return false;
+  }
+
+  return true;
+}

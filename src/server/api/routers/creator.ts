@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import z from "zod";
 
-import { getCreator } from "~/server/actions/trpc/creator";
+import { checkCreatorExists, getCreator } from "~/server/actions/trpc/creator";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { creator, tagInfo } from "~/server/db/schema/app-schema";
@@ -26,6 +26,13 @@ const kitTagList = [
 
 export const creatorRouter = createTRPCRouter({
   create: protectedProcedure.mutation(async ({ ctx }) => {
+    if (await checkCreatorExists(ctx.db, ctx.session.user.id)) {
+      throw new TRPCError({
+        message: "This user is already a creator",
+        code: "BAD_REQUEST",
+      });
+    }
+
     console.log("Adding creator to DB...");
 
     const result = await db
@@ -106,7 +113,7 @@ export const creatorRouter = createTRPCRouter({
 });
 
 async function createPaystackSubaccount(
-  subaccountCreationInfo: SubaccountCreationInfo
+  subaccountCreationInfo: SubaccountCreationInfo,
 ) {
   const { data: response, error } = await paystackClient("@post/subaccount", {
     body: subaccountCreationInfo,
@@ -123,7 +130,7 @@ async function createPaystackSubaccount(
 }
 
 async function addStatusAndTierTagsToKit(
-  kitApiKey: string
+  kitApiKey: string,
 ): Promise<Record<KitTag, number>> {
   // The bulk create endpoint on the Kit API requires OAuth,
   // which is not implemented currently,
