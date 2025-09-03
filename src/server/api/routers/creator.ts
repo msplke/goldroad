@@ -47,7 +47,15 @@ export const creatorRouter = createTRPCRouter({
   }),
 
   get: protectedProcedure.query(async ({ ctx }) => {
-    return await getCreator(ctx.db, ctx.session.user.id);
+    const c = await getCreator(ctx.db, ctx.session.user.id);
+    return {
+      id: c.id,
+      userId: c.userId,
+      hasKitApiKey: Boolean(c.kitApiKey),
+      hasBankInfo: Boolean(c.paystackSubaccountCode),
+      createdAt: c.createdAt,
+      updatedAt: c.updatedAt,
+    };
   }),
 
   addOrUpdateKitApiKey: protectedProcedure
@@ -98,7 +106,7 @@ export const creatorRouter = createTRPCRouter({
 });
 
 async function createPaystackSubaccount(
-  subaccountCreationInfo: SubaccountCreationInfo,
+  subaccountCreationInfo: SubaccountCreationInfo
 ) {
   const { data: response, error } = await paystackClient("@post/subaccount", {
     body: subaccountCreationInfo,
@@ -115,7 +123,7 @@ async function createPaystackSubaccount(
 }
 
 async function addStatusAndTierTagsToKit(
-  kitApiKey: string,
+  kitApiKey: string
 ): Promise<Record<KitTag, number>> {
   // The bulk create endpoint on the Kit API requires OAuth,
   // which is not implemented currently,
