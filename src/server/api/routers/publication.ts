@@ -52,7 +52,7 @@ export const publicationRouter = createTRPCRouter({
       z.object({
         userId: z.string(),
         publicationInfo: CreatePublicationInfoSchema,
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       return await ctx.db.transaction(async (tx) => {
@@ -61,14 +61,14 @@ export const publicationRouter = createTRPCRouter({
         await checkForExistingPublication(
           ctx.db,
           foundCreator.id,
-          input.publicationInfo.name
+          input.publicationInfo.name,
         );
 
         // Create a Kit tag for the publication
         console.log("Creating a tag for the publication on Kit...");
         const tag = await createKitTag(
           input.publicationInfo.name,
-          foundCreator.kitApiKey
+          foundCreator.kitApiKey,
         );
 
         // Create the publication on the DB
@@ -77,7 +77,7 @@ export const publicationRouter = createTRPCRouter({
           tx,
           foundCreator.id,
           tag.id,
-          input.publicationInfo
+          input.publicationInfo,
         );
 
         // Create the default monthly and yearly plans
@@ -122,12 +122,12 @@ export const publicationRouter = createTRPCRouter({
 async function checkForExistingPublication(
   db: DbType,
   creatorId: string,
-  publicationName: string
+  publicationName: string,
 ) {
   const existingPublication = await db.query.publication.findFirst({
     where: and(
       eq(publication.creatorId, creatorId),
-      eq(publication.name, publicationName)
+      eq(publication.name, publicationName),
     ),
   });
 
@@ -144,7 +144,7 @@ async function createPublication(
   db: DbType,
   creatorId: string,
   kitPublicationTagId: number,
-  publicationInfo: z.infer<typeof CreatePublicationInfoSchema>
+  publicationInfo: z.infer<typeof CreatePublicationInfoSchema>,
 ) {
   const result = await db
     .insert(publication)
@@ -171,14 +171,14 @@ async function createPublication(
 async function createPlan(db: DbType, data: PlanCreationData) {
   // 1. Create a Paystack Plan
   console.log(
-    `Creating Paystack Plan for '${data.createPaystackPlanInfo.name}'...`
+    `Creating Paystack Plan for '${data.createPaystackPlanInfo.name}'...`,
   );
   const planData = await createPaystackPlan(data.createPaystackPlanInfo);
 
   // 2. Create a Paystack Payment Page for that plan
   // Create the payment page
   console.log(
-    `Creating Paystack Payment Page for '${data.createPaystackPlanInfo.name}...'`
+    `Creating Paystack Payment Page for '${data.createPaystackPlanInfo.name}...'`,
   );
   const paymentPageData = await createPaymentPage({
     name: data.createPaystackPlanInfo.name,
@@ -230,7 +230,7 @@ async function createKitTag(name: string, kitApiKey: string) {
 }
 
 async function createPaymentPage(
-  createPaymentPageInfo: CreatePaystackPaymentPageInfo
+  createPaymentPageInfo: CreatePaystackPaymentPageInfo,
 ) {
   const { data: response, error } = await paystackClient("@post/page", {
     body: createPaymentPageInfo,

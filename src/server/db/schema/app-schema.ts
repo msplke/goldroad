@@ -78,6 +78,8 @@ export const publication = createTable("publication", (d) => ({
     .uuid()
     .notNull()
     .references(() => creator.id, { onDelete: "cascade" }),
+  createdAt,
+  updatedAt,
 }));
 
 export const plan = createTable("plan", (d) => ({
@@ -104,4 +106,6 @@ export const planBenefit = createTable("plan_benefit", (d) => ({
     .notNull()
     .references(() => plan.id, { onDelete: "cascade" }),
   description: d.text().notNull(),
+  createdAt,
+  updatedAt,
 }));
