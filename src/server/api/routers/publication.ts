@@ -247,7 +247,7 @@ async function createPaymentPage(
 async function createPaystackPlan(createPlanInfo: CreatePaystackPlanInfo) {
   const amountInSubunits = createPlanInfo.amount * 100;
   const { data: response, error } = await paystackClient("@post/plan", {
-    body: { ...createPlanInfo, amount: amountInSubunits },
+    body: { ...createPlanInfo, amount: amountInSubunits, currency: "KES" },
   });
 
   if (error) {
