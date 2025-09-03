@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import z from "zod";
 
+import { getCreator } from "~/server/actions/trpc/creator";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { creator, tagInfo } from "~/server/db/schema/app-schema";
@@ -12,7 +13,6 @@ import {
   planIntervalEnum,
   subscriptionStatusEnum,
 } from "~/server/fetch-clients/paystack";
-import { api } from "~/trpc/server";
 
 type SubaccountCreationInfo = z.infer<typeof createSubaccountSchema>;
 
@@ -47,23 +47,13 @@ export const creatorRouter = createTRPCRouter({
   }),
 
   get: protectedProcedure.query(async ({ ctx }) => {
-    const foundCreator = await ctx.db.query.creator.findFirst({
-      where: eq(creator.userId, ctx.session.user.id),
-    });
-
-    if (!foundCreator) {
-      throw new TRPCError({
-        message: "The current user is not a creator",
-        code: "BAD_REQUEST",
-      });
-    }
-
-    return foundCreator;
+    return await getCreator(ctx.db, ctx.session.user.id);
   }),
 
   addOrUpdateKitApiKey: protectedProcedure
     .input(z.object({ kitApiKey: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      const { id: creatorId } = await getCreator(ctx.db, ctx.session.user.id);
       // 1. Perform a test request to see if the API key is valid or not
 
       // 2. Add subscription status and interval tags to the Kit
@@ -73,7 +63,6 @@ export const creatorRouter = createTRPCRouter({
 
       console.log("Adding kit tag ids to tag info table...");
       // 3. Add tags to the tag info table, linking them to the creator
-      const { id: creatorId } = await api.creator.get();
 
       await ctx.db.insert(tagInfo).values({
         creatorId,
@@ -94,6 +83,7 @@ export const creatorRouter = createTRPCRouter({
   addOrUpdateBankAccountInfo: protectedProcedure
     .input(createSubaccountSchema)
     .mutation(async ({ ctx, input }) => {
+      const { id: creatorId } = await getCreator(ctx.db, ctx.session.user.id);
       console.log("Creating subaccount...");
       // 1. Create Paystack subaccount
       const code = await createPaystackSubaccount(input);
@@ -103,7 +93,7 @@ export const creatorRouter = createTRPCRouter({
         .set({
           paystackSubaccountCode: code,
         })
-        .where(eq(creator.id, ctx.session.user.id));
+        .where(eq(creator.id, creatorId));
     }),
 });
 

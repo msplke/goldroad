@@ -2,7 +2,8 @@ import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { getCreator } from "~/server/actions/trpc/creator";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import type { DbType } from "~/server/db";
 import {
   plan,
@@ -16,7 +17,6 @@ import {
   // type PlanInterval,
   paystackClient,
 } from "~/server/fetch-clients/paystack";
-import { api } from "~/trpc/server";
 
 const CreatePublicationInfoSchema = z.object({
   name: z
@@ -47,23 +47,14 @@ export const publicationRouter = createTRPCRouter({
    * when one step fails, every subsequent step should be undone (both database and external API calls).
    * This will be handled later.
    */
-  create: publicProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-        publicationInfo: CreatePublicationInfoSchema,
-      }),
-    )
+  create: protectedProcedure
+    .input(CreatePublicationInfoSchema)
     .mutation(async ({ ctx, input }) => {
-      const foundCreator = await api.creator.get();
+      const foundCreator = await getCreator(ctx.db, ctx.session.user.id);
 
       return await ctx.db.transaction(async (tx) => {
         console.log("Checking for existing publication...");
-        await checkForExistingPublication(
-          ctx.db,
-          foundCreator.id,
-          input.publicationInfo.name,
-        );
+        await checkForExistingPublication(ctx.db, foundCreator.id, input.name);
 
         if (!foundCreator.kitApiKey) {
           throw new TRPCError({
@@ -81,10 +72,7 @@ export const publicationRouter = createTRPCRouter({
 
         // Create a Kit tag for the publication
         console.log("Creating a tag for the publication on Kit...");
-        const tag = await createKitTag(
-          input.publicationInfo.name,
-          foundCreator.kitApiKey,
-        );
+        const tag = await createKitTag(input.name, foundCreator.kitApiKey);
 
         // Create the publication on the DB
         console.log("Creating the publication on the DB...");
@@ -92,18 +80,18 @@ export const publicationRouter = createTRPCRouter({
           tx,
           foundCreator.id,
           tag.id,
-          input.publicationInfo,
+          input,
         );
 
         // Create the default monthly and yearly plans
         const monthlyPlanCreationInfo: CreatePaystackPlanInfo = {
-          name: `${input.publicationInfo.name} - Monthly Plan`,
+          name: `${input.name} - Monthly Plan`,
           interval: "monthly",
           amount: DEFAULT_MONTHLY_PLAN_PRICE_IN_KSH,
         };
 
         const annuallyPlanCreationInfo: CreatePaystackPlanInfo = {
-          name: `${input.publicationInfo.name} - Annual Plan`,
+          name: `${input.name} - Annual Plan`,
           interval: "annually",
           amount: DEFAULT_ANNUAL_PLAN_PRICE_IN_KSH,
         };
