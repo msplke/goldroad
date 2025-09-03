@@ -5,7 +5,6 @@ import z from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import type { DbType } from "~/server/db";
 import {
-  creator,
   plan,
   publication,
   // tagInfo,
@@ -17,6 +16,7 @@ import {
   // type PlanInterval,
   paystackClient,
 } from "~/server/fetch-clients/paystack";
+import { api } from "~/trpc/server";
 
 const CreatePublicationInfoSchema = z.object({
   name: z
@@ -55,14 +55,29 @@ export const publicationRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const foundCreator = await api.creator.get();
+
       return await ctx.db.transaction(async (tx) => {
-        const foundCreator = await getCreator(tx, input.userId);
         console.log("Checking for existing publication...");
         await checkForExistingPublication(
           ctx.db,
           foundCreator.id,
           input.publicationInfo.name,
         );
+
+        if (!foundCreator.kitApiKey) {
+          throw new TRPCError({
+            message: "Creator's Kit API Key is not set",
+            code: "BAD_REQUEST",
+          });
+        }
+
+        if (!foundCreator.paystackSubaccountCode) {
+          throw new TRPCError({
+            message: "Creator's bank information is not set",
+            code: "BAD_REQUEST",
+          });
+        }
 
         // Create a Kit tag for the publication
         console.log("Creating a tag for the publication on Kit...");
@@ -260,19 +275,4 @@ async function createPaystackPlan(createPlanInfo: CreatePaystackPlanInfo) {
   }
 
   return response.data;
-}
-
-async function getCreator(db: DbType, userId: string) {
-  const result = await db.query.creator.findFirst({
-    where: eq(creator.userId, userId),
-  });
-
-  if (!result) {
-    throw new TRPCError({
-      message: "The current user is not a creator",
-      code: "INTERNAL_SERVER_ERROR",
-    });
-  }
-
-  return result;
 }

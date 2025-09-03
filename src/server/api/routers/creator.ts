@@ -1,7 +1,9 @@
 import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
 import z from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { db } from "~/server/db";
 import { creator, tagInfo } from "~/server/db/schema/app-schema";
 import { KIT_API_KEY_HEADER, kitClient } from "~/server/fetch-clients/kit";
 import {
@@ -10,6 +12,7 @@ import {
   planIntervalEnum,
   subscriptionStatusEnum,
 } from "~/server/fetch-clients/paystack";
+import { api } from "~/trpc/server";
 
 type SubaccountCreationInfo = z.infer<typeof createSubaccountSchema>;
 
@@ -22,50 +25,56 @@ const kitTagList = [
 ];
 
 export const creatorRouter = createTRPCRouter({
-  create: protectedProcedure
-    .input(
-      z.object({
-        kitApiKey: z.string(),
-        subaccountCreationInfo: createSubaccountSchema,
+  create: protectedProcedure.mutation(async ({ ctx }) => {
+    console.log("Adding creator to DB...");
+
+    const result = await db
+      .insert(creator)
+      .values({
+        userId: ctx.session.user.id,
       })
-    )
+      .returning({ id: creator.id });
+
+    const newCreator = result[0];
+    if (!newCreator) {
+      throw new TRPCError({
+        message: "Unable to add creator to db",
+        code: "INTERNAL_SERVER_ERROR",
+      });
+    }
+    console.log("Added creator successfully!");
+    return newCreator;
+  }),
+
+  get: protectedProcedure.query(async ({ ctx }) => {
+    const foundCreator = await ctx.db.query.creator.findFirst({
+      where: eq(creator.userId, ctx.session.user.id),
+    });
+
+    if (!foundCreator) {
+      throw new TRPCError({
+        message: "The current user is not a creator",
+        code: "BAD_REQUEST",
+      });
+    }
+
+    return foundCreator;
+  }),
+
+  addOrUpdateKitApiKey: protectedProcedure
+    .input(z.object({ kitApiKey: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      console.log("Creating subaccount...");
-      // 1. Create Paystack subaccount
-      const subaccountCode = await createPaystackSubaccount(
-        input.subaccountCreationInfo
-      );
+      // 1. Perform a test request to see if the API key is valid or not
 
-      console.log("Created subaccount!");
-
-      // 2. Add creator to the database
-      console.log("Adding creator to DB...");
-
-      const ids = await ctx.db
-        .insert(creator)
-        .values({
-          userId: ctx.session.user.id,
-          kitApiKey: input.kitApiKey,
-          paystackSubaccountCode: subaccountCode,
-        })
-        .returning({ id: creator.id });
-
-      const creatorId = ids[0]?.id;
-      if (!creatorId) {
-        throw new TRPCError({
-          message: "Unable to add creator to db",
-          code: "INTERNAL_SERVER_ERROR",
-        });
-      }
-      console.log("Added creator successfully!");
-
-      // 3. Add subscription status and interval tags to the Kit
+      // 2. Add subscription status and interval tags to the Kit
       console.log("Adding subscription status and interval tags to kit...");
 
       const tagIdMap = await addStatusAndTierTagsToKit(input.kitApiKey);
 
       console.log("Adding kit tag ids to tag info table...");
-      // 4. Add tags to the tag info table, linking them to the creator
+      // 3. Add tags to the tag info table, linking them to the creator
+      const { id: creatorId } = await api.creator.get();
+
       await ctx.db.insert(tagInfo).values({
         creatorId,
         kitActiveTagId: tagIdMap.active,
@@ -81,10 +90,25 @@ export const creatorRouter = createTRPCRouter({
       console.log("Successfully added tags.");
       console.log("Successfully added creator!");
     }),
+
+  addOrUpdateBankAccountInfo: protectedProcedure
+    .input(createSubaccountSchema)
+    .mutation(async ({ ctx, input }) => {
+      console.log("Creating subaccount...");
+      // 1. Create Paystack subaccount
+      const code = await createPaystackSubaccount(input);
+      // 2. Update db with subaccount info
+      await ctx.db
+        .update(creator)
+        .set({
+          paystackSubaccountCode: code,
+        })
+        .where(eq(creator.id, ctx.session.user.id));
+    }),
 });
 
 async function createPaystackSubaccount(
-  subaccountCreationInfo: SubaccountCreationInfo
+  subaccountCreationInfo: SubaccountCreationInfo,
 ) {
   const { data: response, error } = await paystackClient("@post/subaccount", {
     body: subaccountCreationInfo,
@@ -101,7 +125,7 @@ async function createPaystackSubaccount(
 }
 
 async function addStatusAndTierTagsToKit(
-  kitApiKey: string
+  kitApiKey: string,
 ): Promise<Record<KitTag, number>> {
   // The bulk create endpoint on the Kit API requires OAuth,
   // which is not implemented currently,

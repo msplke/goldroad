@@ -59,8 +59,8 @@ export const creator = createTable("creator", (d) => ({
     .notNull()
     .references(() => user.id),
   // To be encrypted
-  kitApiKey: d.text().notNull(),
-  paystackSubaccountCode: d.text().notNull(),
+  kitApiKey: d.text(),
+  paystackSubaccountCode: d.text(),
   createdAt,
   updatedAt,
 }));
