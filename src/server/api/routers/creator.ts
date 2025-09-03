@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import z from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { creator, tagInfo } from "~/server/db/schema/app-schema";
 import { KIT_API_KEY_HEADER, kitClient } from "~/server/fetch-clients/kit";
 import {
@@ -22,19 +22,18 @@ const kitTagList = [
 ];
 
 export const creatorRouter = createTRPCRouter({
-  create: publicProcedure
+  create: protectedProcedure
     .input(
       z.object({
-        userId: z.string(),
         kitApiKey: z.string(),
         subaccountCreationInfo: createSubaccountSchema,
-      }),
+      })
     )
     .mutation(async ({ ctx, input }) => {
       console.log("Creating subaccount...");
       // 1. Create Paystack subaccount
       const subaccountCode = await createPaystackSubaccount(
-        input.subaccountCreationInfo,
+        input.subaccountCreationInfo
       );
 
       console.log("Created subaccount!");
@@ -45,7 +44,7 @@ export const creatorRouter = createTRPCRouter({
       const ids = await ctx.db
         .insert(creator)
         .values({
-          userId: input.userId,
+          userId: ctx.session.user.id,
           kitApiKey: input.kitApiKey,
           paystackSubaccountCode: subaccountCode,
         })
@@ -85,7 +84,7 @@ export const creatorRouter = createTRPCRouter({
 });
 
 async function createPaystackSubaccount(
-  subaccountCreationInfo: SubaccountCreationInfo,
+  subaccountCreationInfo: SubaccountCreationInfo
 ) {
   const { data: response, error } = await paystackClient("@post/subaccount", {
     body: subaccountCreationInfo,
@@ -102,7 +101,7 @@ async function createPaystackSubaccount(
 }
 
 async function addStatusAndTierTagsToKit(
-  kitApiKey: string,
+  kitApiKey: string
 ): Promise<Record<KitTag, number>> {
   // The bulk create endpoint on the Kit API requires OAuth,
   // which is not implemented currently,
