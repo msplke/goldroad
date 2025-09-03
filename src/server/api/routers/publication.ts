@@ -10,7 +10,7 @@ import {
   publication,
   // tagInfo,
 } from "~/server/db/schema/app-schema";
-// import { kitClient } from "~/server/fetch-clients/kit";
+import { kitClient } from "~/server/fetch-clients/kit";
 import {
   type createPaymentPageSchema,
   type createPlanSchema,
@@ -38,7 +38,11 @@ const DEFAULT_MONTHLY_PLAN_PRICE_IN_KSH = 200;
 const DEFAULT_ANNUAL_PLAN_PRICE_IN_KSH = 1500;
 
 export const publicationRouter = createTRPCRouter({
-  /** Creates a publication, along with the default monthly and yearly plans for it. */
+  /** Creates a publication, along with the default monthly and yearly plans for it.
+   * Currently, any failure of the steps in between must be cleaned up manually. Ideally,
+   * when one step fails, every subsequent step should be undone (both database and external API calls).
+   * This will be handled later.
+   */
   create: publicProcedure
     .input(
       z.object({
@@ -47,12 +51,20 @@ export const publicationRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const foundCreator = await getCreator(ctx.db, input.userId);
+      // Create a Kit tag for the publication
+      console.log("Creating a tag for the publication on Kit...");
+      const tag = await createKitTag(
+        input.publicationInfo.name,
+        foundCreator.kitApiKey,
+      );
+
       // Create the publication on the DB
       console.log("Creating the publication on the DB...");
-      const foundCreator = await getCreator(ctx.db, input.userId);
       const publicationId = await createPublication(
         ctx.db,
         foundCreator.id,
+        tag.id,
         input.publicationInfo,
       );
 
@@ -94,12 +106,14 @@ export const publicationRouter = createTRPCRouter({
 async function createPublication(
   db: DbType,
   creatorId: string,
+  kitPublicationTagId: number,
   publicationInfo: z.infer<typeof CreatePublicationInfoSchema>,
 ) {
   const result = await db
     .insert(publication)
     .values({
       name: publicationInfo.name,
+      kitPublicationTagId,
       creatorId: creatorId,
       description: publicationInfo.description,
     })
@@ -163,19 +177,20 @@ async function createPlan(db: DbType, data: PlanCreationData) {
 //   return tags;
 // }
 
-// async function createKitTag(name: string) {
-//   const { data: tagData, error } = await kitClient("@post/tags/", {
-//     body: { name },
-//   });
-//   if (error) {
-//     throw new TRPCError({
-//       message: error.message,
-//       code: "INTERNAL_SERVER_ERROR",
-//     });
-//   }
+async function createKitTag(name: string, kitApiKey: string) {
+  const { data: tagData, error } = await kitClient("@post/tags/", {
+    body: { name },
+    headers: { "X-Kit-Api-Key": kitApiKey },
+  });
+  if (error) {
+    throw new TRPCError({
+      message: error.message,
+      code: "INTERNAL_SERVER_ERROR",
+    });
+  }
 
-//   return tagData.tag;
-// }
+  return tagData.tag;
+}
 
 async function createPaymentPage(
   createPaymentPageInfo: CreatePaystackPaymentPageInfo,
