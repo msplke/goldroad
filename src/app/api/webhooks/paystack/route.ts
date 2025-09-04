@@ -1,7 +1,9 @@
+import { tasks } from "@trigger.dev/sdk";
 import { z } from "zod";
 
 import { env } from "~/env";
-import { createSubscriber } from "~/server/actions/webhooks/paystack";
+import { planSchema } from "~/server/fetch-clients/paystack";
+import type { createSubscriberTask } from "~/server/trigger/tasks";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 const PaymentEventEnum = z.enum([
@@ -24,17 +26,19 @@ const PaystackWebhookBodySchema = z.object({
   data: z.object({
     id: z.number(),
     subscription_code: z.string().optional(),
-    status: z.string(),
+    plan: planSchema.optional(),
+    status: z.string().optional(),
     customer: z.object({
       first_name: z.string(),
       last_name: z.string(),
       email: z.email(),
     }),
+    // .optional(),
   }),
 });
 
 const OK_RESPONSE = new Response("OK", { status: 200 });
-const SERVER_ERROR_RESPONSE = new Response("Server Error", { status: 500 });
+// const SERVER_ERROR_RESPONSE = new Response("Server Error", { status: 500 });
 
 export async function POST(req: Request) {
   const rawBody = await req.text();
@@ -53,9 +57,11 @@ export async function POST(req: Request) {
 
   // Parse the webhook payload
   const parsedBody = PaystackWebhookBodySchema.safeParse(JSON.parse(rawBody));
-  if (parsedBody.error) {
+  if (!parsedBody.success) {
+    console.log("Error parsing body:", parsedBody.error);
     return new Response("Unexpected request body", { status: 400 });
   }
+
   const webhookBody = parsedBody.data;
   const event = webhookBody.event;
   const data = webhookBody.data;
@@ -69,25 +75,23 @@ export async function POST(req: Request) {
       case "subscription.create": {
         if (!data.subscription_code)
           return new Response("No subscription code", { status: 400 });
-
+        if (!data.plan) return new Response("No plan info", { status: 400 });
         // Create a new subscriber on Kit and on app db
-        try {
-          // Check if subscriber exists in app db
-          // const subscriber = await getBySubscriptionCode();
-          // if (subscriber) {
-          //   return OK_RESPONSE;
-          // }
-          await createSubscriber(
-            { email_address: data.customer.email },
-            data.subscription_code,
-          );
-        } catch (error) {
-          console.error("Unable to save subscriber");
-          console.error(error);
-          return SERVER_ERROR_RESPONSE;
-        }
 
-        break;
+        const handle = await tasks.trigger<typeof createSubscriberTask>(
+          "webhook:create-subscriber",
+          {
+            subscriberInfo: {
+              email_address: data.customer.email,
+              first_name: data.customer.first_name,
+            },
+            planCode: data.plan.plan_code,
+            subscriptionCode: data.subscription_code,
+          },
+        );
+
+        console.log(`Running create subscriber task with handle: ${handle}`);
+        return OK_RESPONSE;
       }
       case "invoice.payment_succeeded":
         // Handle payment succeeded
