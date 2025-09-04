@@ -9,7 +9,7 @@ import { cn } from "~/lib/utils";
 
 export function SiteFooter({ className }: React.HTMLAttributes<HTMLElement>) {
   return (
-    <footer className={cn("bg-background border-t", className)}>
+    <footer className={cn("border-t bg-background", className)}>
       <MaxWidthWrapper>
         <div className="flex flex-col items-center justify-between gap-2 py-4 md:flex-row">
           <div className="flex flex-col items-center gap-2 md:flex-row md:gap-2">
@@ -20,7 +20,7 @@ export function SiteFooter({ className }: React.HTMLAttributes<HTMLElement>) {
             </p>
           </div>
 
-          <div className="text-primary flex gap-2 text-sm">
+          <div className="flex gap-2 text-primary text-sm">
             {footerItems.map((item) =>
               item.disabled ? (
                 <Button key={item.title} variant="link" disabled>

@@ -12,7 +12,7 @@ export function HeaderSection({ label, title, subtitle }: HeaderSectionProps) {
         {title}
       </h2>
       {subtitle ? (
-        <p className="text-muted-foreground mt-6 text-xl text-balance">
+        <p className="mt-6 text-balance text-muted-foreground text-xl">
           {subtitle}
         </p>
       ) : null}

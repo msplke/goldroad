@@ -22,7 +22,7 @@ export function NavBar({ scroll = false }: { scroll?: boolean }) {
 
   return (
     <header
-      className={`bg-background/60 sticky top-0 z-40 flex w-full justify-center backdrop-blur-xl transition-all ${
+      className={`sticky top-0 z-40 flex w-full justify-center bg-background/60 backdrop-blur-xl transition-all ${
         scroll ? (scrolled ? "border-b" : "bg-transparent") : "border-b"
       }`}
     >
@@ -30,7 +30,7 @@ export function NavBar({ scroll = false }: { scroll?: boolean }) {
         <div className="flex gap-6 md:gap-10">
           <Link href="/" className="flex items-center space-x-2">
             <Icons.logo />
-            <span className="text-lg font-bold">{siteConfig.name}</span>
+            <span className="font-bold text-lg">{siteConfig.name}</span>
           </Link>
 
           {links?.length ? (
@@ -41,7 +41,7 @@ export function NavBar({ scroll = false }: { scroll?: boolean }) {
                   href={link.disabled ? "#" : link.href}
                   prefetch={true}
                   className={cn(
-                    "hover:text-foreground/80 flex items-center text-lg font-medium transition-colors sm:text-sm",
+                    "flex items-center font-medium text-lg transition-colors hover:text-foreground/80 sm:text-sm",
                     link.href.startsWith(`/${segment}`)
                       ? "text-foreground"
                       : "text-foreground/60",
