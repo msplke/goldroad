@@ -28,6 +28,10 @@ export const paidSubscriber = createTable("paid_subscriber", (d) => ({
     .$type<SubscriptionStatus>()
     .default("active")
     .notNull(),
+  planId: d
+    .uuid()
+    .references(() => plan.id)
+    .notNull(),
   createdAt,
   updatedAt,
 }));
