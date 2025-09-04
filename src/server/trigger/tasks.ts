@@ -24,7 +24,7 @@ export const createSubscriberTask = schemaTask({
       // Check if subscriber exists on DB
       const subscriberExists = await getSubscriberInfoBySubscriptionCode(
         db,
-        payload.subscriptionCode
+        payload.subscriptionCode,
       );
 
       if (subscriberExists) {
@@ -35,7 +35,7 @@ export const createSubscriberTask = schemaTask({
         db,
         payload.subscriberInfo,
         payload.subscriptionCode,
-        payload.planCode
+        payload.planCode,
       );
 
       return { message: "Successfully created subscriber" };
