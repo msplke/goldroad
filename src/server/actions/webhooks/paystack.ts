@@ -25,18 +25,8 @@ export async function createSubscriber(
   db: DbType,
   subscriberInfo: z.infer<typeof kitSubscriberCreateSchema>,
   subscriptionCode: string,
-  planCode: string,
+  planCode: string
 ) {
-  // Check if subscriber exists on DB
-  const subscriberExists = await getSubscriberInfoBySubscriptionCode(
-    db,
-    subscriptionCode,
-  );
-
-  if (subscriberExists) {
-    return;
-  }
-
   // Get the id of the tag that shows that a payment has been done
   const { intervalTag, statusTag, publicationTag, planId, kitApiKey } =
     await getCreatorInfoFromPlanCode(db, planCode);
@@ -45,7 +35,7 @@ export async function createSubscriber(
     // This ideally should never be called, since at this point the creator should
     // have filled out all the required details, and thus the Kit API key should be set.
     throw new Error(
-      "Unable to create subscriber. Creator Kit API Key not set!",
+      "Unable to create subscriber. Creator Kit API Key not set!"
     );
   }
 
@@ -58,7 +48,7 @@ export async function createSubscriber(
       headers: {
         "X-Kit-Api-Key": kitApiKey,
       },
-    },
+    }
   );
 
   if (createSubscriberKitRes === null)
@@ -73,17 +63,17 @@ export async function createSubscriber(
     await tagSubscriberOnKit(
       intervalTag.toString(),
       kitSubscriber.id.toString(),
-      kitApiKey,
+      kitApiKey
     ),
     await tagSubscriberOnKit(
       publicationTag.toString(),
       kitSubscriber.id.toString(),
-      kitApiKey,
+      kitApiKey
     ),
     await tagSubscriberOnKit(
       statusTag.toString(),
       kitSubscriber.id.toString(),
-      kitApiKey,
+      kitApiKey
     ),
   ]);
 
@@ -107,13 +97,13 @@ export async function createSubscriber(
 
 export async function getSubscriberInfoBySubscriptionCode(
   db: DbType,
-  paystackSubscriptionCode: string,
+  paystackSubscriptionCode: string
 ) {
   // Check if subscriber exists in app db
   const foundSubscriber = await db.query.paidSubscriber.findFirst({
     where: eq(
       paidSubscriber.paystackSubscriptionCode,
-      paystackSubscriptionCode,
+      paystackSubscriptionCode
     ),
   });
 
@@ -122,7 +112,7 @@ export async function getSubscriberInfoBySubscriptionCode(
 
 async function getCreatorInfoFromPlanCode(
   db: DbType,
-  paystackPlanCode: string,
+  paystackPlanCode: string
 ) {
   const foundPlan = await db.query.plan.findFirst({
     where: eq(plan.paystackPlanCode, paystackPlanCode),
@@ -197,7 +187,7 @@ async function getCreatorInfoFromPlanCode(
 async function tagSubscriberOnKit(
   tag: string,
   subscriberId: string,
-  kitApiKey: string,
+  kitApiKey: string
 ) {
   const { data: tagSubscriberRes } = await kitClient(
     "@post/tags/:tagId/subscribers/:subscriberId",
@@ -210,7 +200,7 @@ async function tagSubscriberOnKit(
         "X-Kit-Api-Key": kitApiKey,
       },
       throws: true,
-    },
+    }
   );
 
   if (!tagSubscriberRes) {
