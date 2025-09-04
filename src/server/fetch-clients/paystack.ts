@@ -40,14 +40,14 @@ export const subscriptionStatusEnum = z.enum([
 
 export type SubscriptionStatus = z.infer<typeof subscriptionStatusEnum>;
 
-const planSchema = z.object({
+export const planSchema = z.object({
+  id: z.coerce.string(),
   name: z.string(),
   plan_code: z.string(),
-  description: z.string().optional(),
+  description: z.string().nullable(),
   amount: z.number(),
   interval: planIntervalEnum.describe("Interval for the plan"),
-  integration: z.number(),
-  id: z.coerce.string(),
+  integration: z.number().optional(),
 });
 
 export const createPlanSchema = z.object({
