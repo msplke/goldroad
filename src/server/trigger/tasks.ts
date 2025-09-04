@@ -1,4 +1,4 @@
-import { logger, schemaTask } from "@trigger.dev/sdk/v3";
+import { logger, schemaTask } from "@trigger.dev/sdk";
 import z from "zod";
 
 import { createSubscriber } from "~/server/actions/webhooks/paystack";
@@ -22,7 +22,7 @@ export const createSubscriberTask = schemaTask({
         db,
         payload.subscriberInfo,
         payload.subscriptionCode,
-        payload.planCode,
+        payload.planCode
       );
     } catch (error) {
       console.error(error);

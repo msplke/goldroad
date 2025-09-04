@@ -33,7 +33,6 @@ const PaystackWebhookBodySchema = z.object({
       last_name: z.string(),
       email: z.email(),
     }),
-    // .optional(),
   }),
 });
 
@@ -87,7 +86,7 @@ export async function POST(req: Request) {
             },
             planCode: data.plan.plan_code,
             subscriptionCode: data.subscription_code,
-          },
+          }
         );
 
         console.log(`Running create subscriber task with handle: ${handle}`);
