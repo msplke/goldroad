@@ -30,7 +30,7 @@ export const paidSubscriber = createTable("paid_subscriber", (d) => ({
     .notNull(),
   planId: d
     .uuid()
-    .references(() => plan.id)
+    .references(() => plan.id, { onDelete: "cascade" })
     .notNull(),
   createdAt,
   updatedAt,
