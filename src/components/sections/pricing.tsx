@@ -6,39 +6,39 @@ import { Card, CardContent } from "~/components/ui/card";
 
 export function Pricing() {
   return (
-    <section id="pricing" className="py-20 px-4 bg-muted/30">
-      <div className="container max-w-2xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+    <section id="pricing" className="bg-muted/30 px-4 py-20">
+      <div className="container mx-auto max-w-2xl text-center">
+        <h2 className="mb-4 font-bold text-3xl md:text-4xl">
           Simple, Transparent Pricing
         </h2>
-        <p className="text-xl text-muted-foreground mb-12">
+        <p className="mb-12 text-muted-foreground text-xl">
           No monthly fees. Pay only when you earn.
         </p>
 
         <Card className="border-2 border-primary shadow-lg">
           <CardContent className="p-8">
-            <div className="text-center mb-6">
-              <div className="text-5xl font-bold text-primary mb-2">5%</div>
-              <div className="text-xl text-muted-foreground">
+            <div className="mb-6 text-center">
+              <div className="mb-2 font-bold text-5xl text-primary">5%</div>
+              <div className="text-muted-foreground text-xl">
                 per successful transaction
               </div>
             </div>
 
-            <ul className="space-y-3 mb-8">
+            <ul className="mb-8 space-y-3">
               <li className="flex items-center">
-                <Icons.checkCircle className="h-5 w-5 text-primary mr-3" />
+                <Icons.checkCircle className="mr-3 h-5 w-5 text-primary" />
                 <span>Unlimited subscribers</span>
               </li>
               <li className="flex items-center">
-                <Icons.checkCircle className="h-5 w-5 text-primary mr-3" />
+                <Icons.checkCircle className="mr-3 h-5 w-5 text-primary" />
                 <span>ConvertKit integration</span>
               </li>
               <li className="flex items-center">
-                <Icons.checkCircle className="h-5 w-5 text-primary mr-3" />
+                <Icons.checkCircle className="mr-3 h-5 w-5 text-primary" />
                 <span>Local bank payouts</span>
               </li>
               <li className="flex items-center">
-                <Icons.checkCircle className="h-5 w-5 text-primary mr-3" />
+                <Icons.checkCircle className="mr-3 h-5 w-5 text-primary" />
                 <span>24/7 support</span>
               </li>
             </ul>

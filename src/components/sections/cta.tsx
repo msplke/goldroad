@@ -3,20 +3,20 @@ import { Button } from "~/components/ui/button";
 
 export function CallToAction() {
   return (
-    <section className="py-20 px-4 bg-primary text-primary-foreground">
-      <div className="container max-w-4xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+    <section className="bg-primary px-4 py-20 text-primary-foreground">
+      <div className="container mx-auto max-w-4xl text-center">
+        <h2 className="mb-4 font-bold text-3xl md:text-4xl">
           Start Accepting Local Payments Today
         </h2>
-        <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
+        <p className="mx-auto mb-8 max-w-2xl text-xl opacity-90">
           Join hundreds of African creators who are already earning with local
           payments and ConvertKit integration.
         </p>
-        <Button size="lg" variant="secondary" className="text-lg px-8">
+        <Button size="lg" variant="secondary" className="px-8 text-lg">
           Get Started Free
           <Icons.arrowRight className="ml-2 h-5 w-5" />
         </Button>
-        <p className="text-sm opacity-75 mt-4">
+        <p className="mt-4 text-sm opacity-75">
           No setup fees. No monthly charges. Start earning in minutes.
         </p>
       </div>

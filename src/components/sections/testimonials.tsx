@@ -2,17 +2,17 @@ import { Card, CardContent } from "~/components/ui/card";
 
 export function Testimonials() {
   return (
-    <section id="testimonials" className="py-20 px-4">
-      <div className="container max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+    <section id="testimonials" className="px-4 py-20">
+      <div className="container mx-auto max-w-6xl">
+        <div className="mb-16 text-center">
+          <h2 className="mb-4 font-bold text-3xl md:text-4xl">
             Trusted by Creators
           </h2>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-muted-foreground text-xl">
             See what our users are saying
           </p>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           <Card className="border-0 shadow-sm">
             <CardContent className="p-6">
               {/* <div className="flex mb-4">
@@ -20,17 +20,17 @@ export function Testimonials() {
                   <Star key={i} className="h-4 w-4 fill-primary text-primary" />
                 ))}
               </div> */}
-              <p className="text-muted-foreground mb-4">
+              <p className="mb-4 text-muted-foreground">
                 "Finally, a solution that works with my local bank. My
                 newsletter subscribers love the seamless experience."
               </p>
               <div className="flex items-center">
-                <div className="h-10 w-10 rounded-full bg-muted mr-3"></div>
+                <div className="mr-3 h-10 w-10 rounded-full bg-muted"></div>
                 <div>
                   <div className="font-semibold">
                     [TESTIMONIAL — AMARA, NEWSLETTER CREATOR]
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-muted-foreground text-sm">
                     Lagos, Nigeria
                   </div>
                 </div>
@@ -44,17 +44,17 @@ export function Testimonials() {
                   <Star key={i} className="h-4 w-4 fill-primary text-primary" />
                 ))}
               </div> */}
-              <p className="text-muted-foreground mb-4">
+              <p className="mb-4 text-muted-foreground">
                 "The ConvertKit integration is perfect. My paying subscribers
                 are automatically tagged and segmented."
               </p>
               <div className="flex items-center">
-                <div className="h-10 w-10 rounded-full bg-muted mr-3"></div>
+                <div className="mr-3 h-10 w-10 rounded-full bg-muted"></div>
                 <div>
                   <div className="font-semibold">
                     [TESTIMONIAL — KWAME, PODCASTER]
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-muted-foreground text-sm">
                     Accra, Ghana
                   </div>
                 </div>
@@ -68,17 +68,17 @@ export function Testimonials() {
                   <Star key={i} className="h-4 w-4 fill-primary text-primary" />
                 ))}
               </div> */}
-              <p className="text-muted-foreground mb-4">
+              <p className="mb-4 text-muted-foreground">
                 "Setup took less than 10 minutes. Now I focus on creating
                 content while payments handle themselves."
               </p>
               <div className="flex items-center">
-                <div className="h-10 w-10 rounded-full bg-muted mr-3"></div>
+                <div className="mr-3 h-10 w-10 rounded-full bg-muted"></div>
                 <div>
                   <div className="font-semibold">
                     [TESTIMONIAL — THANDIWE, WRITER]
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-muted-foreground text-sm">
                     Cape Town, South Africa
                   </div>
                 </div>

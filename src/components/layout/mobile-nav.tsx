@@ -38,25 +38,25 @@ export function MobileNav() {
         aria-label="Toggle navigation menu"
         onClick={() => setOpen(!open)}
         className={cn(
-          "hover:bg-muted active:bg-muted fixed top-2.5 right-2 z-50 rounded-full p-2 transition-colors duration-200 focus:outline-none md:hidden",
+          "fixed top-2.5 right-2 z-50 rounded-full p-2 transition-colors duration-200 hover:bg-muted focus:outline-none active:bg-muted md:hidden",
           open && "hover:bg-muted active:bg-muted",
         )}
       >
         {open ? (
-          <Icons.close className="text-muted-foreground size-5" />
+          <Icons.close className="size-5 text-muted-foreground" />
         ) : (
-          <Icons.menu className="text-muted-foreground size-5" />
+          <Icons.menu className="size-5 text-muted-foreground" />
         )}
       </Button>
 
       <nav
         aria-label="Mobile navigation"
         className={cn(
-          "bg-background fixed inset-0 z-20 hidden w-full overflow-auto px-5 py-16 lg:hidden",
+          "fixed inset-0 z-20 hidden w-full overflow-auto bg-background px-5 py-16 lg:hidden",
           open && "block",
         )}
       >
-        <ul className="divide-muted grid divide-y">
+        <ul className="grid divide-y divide-muted">
           {links?.length
             ? links.map(({ title, href }) => (
                 <li key={href} className="py-3">

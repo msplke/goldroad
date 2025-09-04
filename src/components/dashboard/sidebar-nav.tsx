@@ -48,14 +48,14 @@ export function SidebarNav({
                           )}
                         >
                           {item.disabled ? (
-                            <div className="flex flex-1 cursor-not-allowed items-center gap-3 rounded-md text-sm font-medium opacity-80">
+                            <div className="flex flex-1 cursor-not-allowed items-center gap-3 rounded-md font-medium text-sm opacity-80">
                               <Icon className="size-4" />
                               <span>{item.title}</span>
                             </div>
                           ) : (
                             <Link
                               href={item.href}
-                              className="hover:bg-muted flex flex-1 items-center gap-3 rounded-md text-sm font-medium"
+                              className="flex flex-1 items-center gap-3 rounded-md font-medium text-sm hover:bg-muted"
                             >
                               <Icon className="size-4" />
                               <span>{item.title}</span>
