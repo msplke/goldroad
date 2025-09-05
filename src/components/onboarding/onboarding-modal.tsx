@@ -67,6 +67,7 @@ export function OnboardingModal({
   } = useOnboarding();
 
   const [activeStep, setActiveStep] = useState(initialStep || currentStep);
+  const [publicationId, setPublicationId] = useState<string | null>(null);
   const utils = api.useUtils();
 
   // tRPC mutations with proper error handling
@@ -97,16 +98,29 @@ export function OnboardingModal({
   });
 
   const createPublication = api.publication.create.useMutation({
-    onSuccess: () => {
+    onSuccess: (createdPublicationId) => {
       toast.success("Success. Publication successfully created.");
+      setPublicationId(createdPublicationId);
       utils.creator.get.invalidate();
       markStepComplete(3);
-      markStepComplete(4); // Step 4 is automatically completed when publication is created
-      onOpenChange(false); // Close modal after final step
+      advanceToNextStep(); // Advance to step 4 for plan creation
     },
 
     onError: () => {
       toast.error("Failed to create Publication. Please try again.");
+    },
+  });
+
+  const createPlans = api.plan.create.useMutation({
+    onSuccess: () => {
+      toast.success("Success. Payment plans successfully created.");
+      utils.creator.get.invalidate();
+      markStepComplete(4);
+      onOpenChange(false); // Close modal after final step
+    },
+
+    onError: () => {
+      toast.error("Failed to create Payment Plans. Please try again.");
     },
   });
 
@@ -128,7 +142,11 @@ export function OnboardingModal({
 
   const step4Form = useForm<Step4FormData>({
     resolver: zodResolver(step4Schema),
-    defaultValues: { monthlyAmount: 2000, annualAmount: 20000, benefits: "" },
+    defaultValues: {
+      publicationId: "",
+      monthlyAmount: 200,
+      annualAmount: 2000,
+    },
   });
 
   const advanceToNextStep = () => {
@@ -139,6 +157,13 @@ export function OnboardingModal({
       onOpenChange(false);
     }
   };
+
+  // Update step 4 form when publication is created
+  useEffect(() => {
+    if (publicationId) {
+      step4Form.setValue("publicationId", publicationId);
+    }
+  }, [publicationId, step4Form]);
 
   // Update active step when modal opens with a specific step
   useEffect(() => {
@@ -182,11 +207,15 @@ export function OnboardingModal({
   };
 
   const handleStep4Submit = (data: Step4FormData) => {
-    // Step 4 is automatically handled when creating publication in step 3
-    // But we could extend this to update pricing if needed
-    console.log("Step 4 data:", data);
-    markStepComplete(4);
-    onOpenChange(false);
+    if (!publicationId) {
+      toast.error("Publication ID is missing. Please complete step 3 first.");
+      return;
+    }
+    createPlans.mutate({
+      publicationId,
+      monthlyAmount: data.monthlyAmount,
+      annualAmount: data.annualAmount,
+    });
   };
 
   if (!currentStepConfig) return null;
@@ -196,9 +225,13 @@ export function OnboardingModal({
   const isLoading =
     addKitApiKey.isPending ||
     addBankInfo.isPending ||
-    createPublication.isPending;
+    createPublication.isPending ||
+    createPlans.isPending;
   const error =
-    addKitApiKey.error || addBankInfo.error || createPublication.error;
+    addKitApiKey.error ||
+    addBankInfo.error ||
+    createPublication.error ||
+    createPlans.error;
 
   const handlePrev = () => {
     if (canGoPrev) {

@@ -5,19 +5,8 @@ import z from "zod";
 import { getCreator } from "~/server/actions/trpc/creator";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import type { DbType } from "~/server/db";
-import {
-  creator,
-  plan,
-  publication,
-  // tagInfo,
-} from "~/server/db/schema/app-schema";
+import { publication } from "~/server/db/schema/app-schema";
 import { kitClient } from "~/server/fetch-clients/kit";
-import {
-  type createPaymentPageSchema,
-  type createPlanSchema,
-  // type PlanInterval,
-  paystackClient,
-} from "~/server/fetch-clients/paystack";
 
 const CreatePublicationInfoSchema = z.object({
   name: z
@@ -28,26 +17,8 @@ const CreatePublicationInfoSchema = z.object({
   description: z.string().min(1).max(500).optional(),
 });
 
-type CreatePaystackPlanInfo = z.infer<typeof createPlanSchema>;
-type CreatePaystackPaymentPageInfo = z.infer<typeof createPaymentPageSchema>;
-
-/** Packages the arguments required for the `createPlan` function below */
-type PlanCreationData = {
-  paystackSubaccountCode: string;
-  createPaystackPlanInfo: CreatePaystackPlanInfo;
-  publicationId: string;
-  creatorId: string;
-};
-
-const DEFAULT_MONTHLY_PLAN_PRICE_IN_KSH = 200;
-const DEFAULT_ANNUAL_PLAN_PRICE_IN_KSH = 1500;
-
 export const publicationRouter = createTRPCRouter({
-  /** Creates a publication, along with the default monthly and yearly plans for it.
-   * Currently, any failure of the steps in between must be cleaned up manually. Ideally,
-   * when one step fails, every subsequent step should be undone (both database and external API calls).
-   * This will be handled later.
-   */
+  /** Creates a publication with a Kit tag. Plans are created separately via the plan router. */
   create: protectedProcedure
     .input(CreatePublicationInfoSchema)
     .mutation(async ({ ctx, input }) => {
@@ -59,13 +30,6 @@ export const publicationRouter = createTRPCRouter({
         if (!foundCreator.kitApiKey) {
           throw new TRPCError({
             message: "Creator's Kit API Key is not set",
-            code: "BAD_REQUEST",
-          });
-        }
-
-        if (!foundCreator.paystackSubaccountCode) {
-          throw new TRPCError({
-            message: "Creator's bank information is not set",
             code: "BAD_REQUEST",
           });
         }
@@ -83,50 +47,39 @@ export const publicationRouter = createTRPCRouter({
           input,
         );
 
-        // Create the default monthly and yearly plans
-        const monthlyPlanCreationInfo: CreatePaystackPlanInfo = {
-          name: `${input.name} - Monthly Plan`,
-          interval: "monthly",
-          amount: DEFAULT_MONTHLY_PLAN_PRICE_IN_KSH,
-        };
-
-        const annuallyPlanCreationInfo: CreatePaystackPlanInfo = {
-          name: `${input.name} - Annual Plan`,
-          interval: "annually",
-          amount: DEFAULT_ANNUAL_PLAN_PRICE_IN_KSH,
-        };
-
-        console.log("Creating plans...");
-        await createPlan(tx, {
-          createPaystackPlanInfo: monthlyPlanCreationInfo,
-          publicationId,
-          paystackSubaccountCode: foundCreator.paystackSubaccountCode,
-          creatorId: foundCreator.id,
-        });
-
-        console.log("Created monthly plan.");
-        await createPlan(tx, {
-          createPaystackPlanInfo: annuallyPlanCreationInfo,
-          publicationId,
-          paystackSubaccountCode: foundCreator.paystackSubaccountCode,
-          creatorId: foundCreator.id,
-        });
-
-        console.log("Created annual plan...");
-
-        // Mark publication and payment plans setup as complete
-        await tx
-          .update(creator)
-          .set({
-            hasCompletedPublicationSetup: true,
-            hasCompletedPaymentPlansSetup: true,
-            onboardingCompletedAt: new Date(),
-          })
-          .where(eq(creator.userId, ctx.session.user.id));
-
         console.log("Finished publication creation.");
         return publicationId;
       });
+    }),
+
+  /** Get all publications for the current creator */
+  getByCreator: protectedProcedure.query(async ({ ctx }) => {
+    const foundCreator = await getCreator(ctx.db, ctx.session.user.id);
+
+    const publications = await ctx.db.query.publication.findMany({
+      where: eq(publication.creatorId, foundCreator.id),
+      orderBy: publication.createdAt,
+    });
+
+    return publications;
+  }),
+
+  /** Get a publication by its slug (public endpoint) */
+  getBySlug: protectedProcedure
+    .input(z.object({ slug: z.string().min(4, "Slug is required") }))
+    .query(async ({ ctx, input }) => {
+      const foundPublication = await ctx.db.query.publication.findFirst({
+        where: eq(publication.slug, input.slug),
+      });
+
+      if (!foundPublication) {
+        throw new TRPCError({
+          message: "Publication not found",
+          code: "NOT_FOUND",
+        });
+      }
+
+      return foundPublication;
     }),
 });
 
@@ -161,20 +114,19 @@ async function createPublication(
   publicationInfo: z.infer<typeof CreatePublicationInfoSchema>,
 ) {
   // Generate a URL-friendly slug from the publication name
-  const slug = publicationInfo.name
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
+  const baseSlug = generateSlugFromName(publicationInfo.name);
+
+  // Ensure slug uniqueness by checking existing publications and appending a number if needed
+  const uniqueSlug = await ensureUniqueSlug(db, baseSlug);
 
   const result = await db
     .insert(publication)
     .values({
       name: publicationInfo.name,
+      description: publicationInfo.description,
+      slug: uniqueSlug,
       kitPublicationTagId,
       creatorId: creatorId,
-      description: publicationInfo.description,
-      slug,
     })
     .returning({ id: publication.id });
 
@@ -189,53 +141,6 @@ async function createPublication(
 
   return publicationId;
 }
-
-async function createPlan(db: DbType, data: PlanCreationData) {
-  // 1. Create a Paystack Plan
-  console.log(
-    `Creating Paystack Plan for '${data.createPaystackPlanInfo.name}'...`,
-  );
-  const planData = await createPaystackPlan(data.createPaystackPlanInfo);
-
-  // 2. Create a Paystack Payment Page for that plan
-  // Create the payment page
-  console.log(
-    `Creating Paystack Payment Page for '${data.createPaystackPlanInfo.name}...'`,
-  );
-  const paymentPageData = await createPaymentPage({
-    name: data.createPaystackPlanInfo.name,
-    type: "subscription",
-    // 3. Link the plan and the creator's subaccount to the payment page
-    plan: planData.id,
-    split_code: data.paystackSubaccountCode,
-  });
-
-  // 4. Add the plan to the database
-  await db.insert(plan).values({
-    name: data.createPaystackPlanInfo.name,
-    interval: data.createPaystackPlanInfo.interval,
-    amount: data.createPaystackPlanInfo.amount,
-    paystackPaymentPageId: paymentPageData.id,
-    paystackPaymentPageUrlSlug: paymentPageData.slug,
-    paystackPlanCode: planData.plan_code,
-    publicationId: data.publicationId,
-  });
-}
-
-// async function getCreatorTags(db: DbType, creatorId: string) {
-//   const tags = await db.query.tagInfo.findFirst({
-//     where: eq(tagInfo.creatorId, creatorId),
-//   });
-
-//   if (!tags) {
-//     throw new TRPCError({
-//       message: "Could not find tags for creator",
-//       code: "INTERNAL_SERVER_ERROR",
-//     });
-//   }
-
-//   return tags;
-// }
 
 async function createKitTag(name: string, kitApiKey: string) {
   const { data: tagData, error } = await kitClient("@post/tags/", {
@@ -252,35 +157,46 @@ async function createKitTag(name: string, kitApiKey: string) {
   return tagData.tag;
 }
 
-async function createPaymentPage(
-  createPaymentPageInfo: CreatePaystackPaymentPageInfo,
-) {
-  const { data: response, error } = await paystackClient("@post/page", {
-    body: createPaymentPageInfo,
-  });
+function generateSlugFromName(name: string): string {
+  let slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
 
-  if (error) {
-    throw new TRPCError({
-      message: error.message,
-      code: "INTERNAL_SERVER_ERROR",
-    });
+  // Handle edge case where name results in empty slug or very short slug
+  if (slug.length === 0) {
+    slug = "publication";
+  } else if (slug.length < 3) {
+    slug = `publication-${slug}`;
   }
 
-  return response.data;
+  return slug;
 }
 
-async function createPaystackPlan(createPlanInfo: CreatePaystackPlanInfo) {
-  const amountInSubunits = createPlanInfo.amount * 100;
-  const { data: response, error } = await paystackClient("@post/plan", {
-    body: { ...createPlanInfo, amount: amountInSubunits, currency: "KES" },
-  });
+async function ensureUniqueSlug(db: DbType, baseSlug: string): Promise<string> {
+  let slug = baseSlug;
+  let counter = 1;
 
-  if (error) {
-    throw new TRPCError({
-      message: error.message,
-      code: "INTERNAL_SERVER_ERROR",
+  while (true) {
+    const existingPublication = await db.query.publication.findFirst({
+      where: eq(publication.slug, slug),
     });
-  }
 
-  return response.data;
+    if (!existingPublication) {
+      return slug; // Slug is unique, we can use it
+    }
+
+    // If slug exists, try with a number suffix
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+
+    // Prevent infinite loops by setting a reasonable limit
+    if (counter > 1000) {
+      throw new TRPCError({
+        message: "Unable to generate unique slug after 1000 attempts",
+        code: "INTERNAL_SERVER_ERROR",
+      });
+    }
+  }
 }
