@@ -1,8 +1,10 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 import { auth } from "~/auth/server";
 import { AppSidebar } from "~/components/dashboard/app-sidebar";
+import { UserDropdown } from "~/components/dashboard/user-dropdown";
 import { MaxWidthWrapper } from "~/components/max-width-wrapper";
 import { ModeToggle } from "~/components/mode-toggle";
 import {
@@ -10,6 +12,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "~/components/ui/sidebar";
+import { OnboardingProvider } from "~/hooks/use-onboarding";
 
 export default async function Layout({
   children,
@@ -24,28 +27,35 @@ export default async function Layout({
     redirect("/login");
   }
 
-  const user = session.user as { name: string; email: string };
-
   return (
-    <SidebarProvider>
-      <AppSidebar user={user} />
-      <SidebarInset>
-        <header className="bg-background sticky top-0 z-50 flex h-14 lg:h-[60px]">
-          <MaxWidthWrapper className="flex max-w-7xl items-center gap-x-3">
-            <div className="w-full flex-1">
-              <SidebarTrigger />
-            </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <OnboardingProvider>
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarInset>
+            {/* Header */}
+            <header className="sticky top-0 z-50 flex h-14 w-full border-b bg-background bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:h-[60px]">
+              <MaxWidthWrapper className="flex max-w-7xl items-center justify-between px-4">
+                <div className="flex items-center gap-4">
+                  <SidebarTrigger />
+                </div>
 
-            <ModeToggle />
-          </MaxWidthWrapper>
-        </header>
+                <div className="flex items-center gap-2">
+                  <ModeToggle />
+                  <UserDropdown />
+                </div>
+              </MaxWidthWrapper>
+            </header>
 
-        <main className="flex-1">
-          <MaxWidthWrapper className="flex h-full max-w-7xl flex-col gap-4 lg:gap-6">
-            {children}
-          </MaxWidthWrapper>
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
+            {/* Main Content */}
+            <main className="flex-1 p-6">
+              <MaxWidthWrapper className="flex h-full max-w-7xl flex-col gap-4 lg:gap-6">
+                {children}
+              </MaxWidthWrapper>
+            </main>
+          </SidebarInset>
+        </SidebarProvider>
+      </OnboardingProvider>
+    </Suspense>
   );
 }

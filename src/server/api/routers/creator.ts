@@ -60,6 +60,9 @@ export const creatorRouter = createTRPCRouter({
       userId: c.userId,
       hasKitApiKey: Boolean(c.kitApiKey),
       hasBankInfo: Boolean(c.paystackSubaccountCode),
+      hasCompletedPublicationSetup: Boolean(c.hasCompletedPublicationSetup),
+      hasCompletedPaymentPlansSetup: Boolean(c.hasCompletedPaymentPlansSetup),
+      onboardingCompletedAt: c.onboardingCompletedAt,
       createdAt: c.createdAt,
       updatedAt: c.updatedAt,
     };
@@ -91,7 +94,17 @@ export const creatorRouter = createTRPCRouter({
         kitDailySubscriberTag: tagIdMap.daily,
         kitHourlySubscriberTag: tagIdMap.hourly,
       });
-      console.log("Successfully added tags.");
+
+      // 4. Update creator with encrypted API key and mark Kit setup complete
+      await ctx.db
+        .update(creator)
+        .set({
+          kitApiKey: input.kitApiKey, // TODO: Encrypt this
+          hasCompletedKitSetup: true,
+        })
+        .where(eq(creator.id, creatorId));
+
+      console.log("Successfully added tags and API key.");
       console.log("Successfully added creator!");
     }),
 
@@ -102,11 +115,12 @@ export const creatorRouter = createTRPCRouter({
       console.log("Creating subaccount...");
       // 1. Create Paystack subaccount
       const code = await createPaystackSubaccount(input);
-      // 2. Update db with subaccount info
+      // 2. Update db with subaccount code only
       await ctx.db
         .update(creator)
         .set({
           paystackSubaccountCode: code,
+          hasCompletedBankSetup: true,
         })
         .where(eq(creator.id, creatorId));
     }),

@@ -65,6 +65,12 @@ export const creator = createTable("creator", (d) => ({
   // To be encrypted
   kitApiKey: d.text(),
   paystackSubaccountCode: d.text(),
+  // Onboarding progress tracking
+  hasCompletedKitSetup: d.boolean().default(false),
+  hasCompletedBankSetup: d.boolean().default(false),
+  hasCompletedPublicationSetup: d.boolean().default(false),
+  hasCompletedPaymentPlansSetup: d.boolean().default(false),
+  onboardingCompletedAt: d.timestamp(),
   createdAt,
   updatedAt,
 }));
@@ -77,6 +83,7 @@ export const publication = createTable("publication", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
   name: d.text().notNull(),
   description: d.text(),
+  slug: d.text().unique().notNull(), // For /p/[publication-slug] URLs
   kitPublicationTagId: d.bigint({ mode: "number" }).notNull(),
   creatorId: d
     .uuid()
@@ -90,6 +97,7 @@ export const plan = createTable("plan", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
   name: d.text().notNull(),
   interval: d.text().$type<PlanInterval>().notNull(),
+  amount: d.integer().notNull(), // Plan amount in Ksh.
   publicationId: d
     .uuid()
     .notNull()

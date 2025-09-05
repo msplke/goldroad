@@ -12,7 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "~/components/ui/sidebar";
-import { cn } from "~/lib/utils";
+import { useOnboarding } from "~/hooks/use-onboarding";
 import type { SidebarNavItem } from "~/types";
 
 export function SidebarNav({
@@ -20,7 +20,8 @@ export function SidebarNav({
 }: {
   sidebarLinks: SidebarNavItem[];
 }) {
-  const path = usePathname();
+  const pathname = usePathname();
+  const { isComplete } = useOnboarding();
 
   return (
     <nav>
@@ -34,28 +35,34 @@ export function SidebarNav({
                 <SidebarMenu>
                   {section.items.map((item) => {
                     const Icon = Icons[item.icon ?? "arrowRight"];
+                    const isActive = pathname === item.href;
+                    const isDisabled = item.requiresOnboarding && !isComplete;
 
                     return (
                       <SidebarMenuItem key={item.href}>
                         <SidebarMenuButton
                           asChild
-                          tooltip={item.title}
-                          disabled={item.disabled}
-                          className={cn(
-                            path === item.href
-                              ? "bg-muted"
-                              : "text-muted-foreground hover:text-accent-foreground",
-                          )}
+                          isActive={isActive}
+                          tooltip={
+                            isDisabled
+                              ? "Complete onboarding to access"
+                              : item.title
+                          }
+                          className={
+                            isDisabled
+                              ? "cursor-not-allowed opacity-50 hover:bg-transparent"
+                              : ""
+                          }
                         >
-                          {item.disabled ? (
-                            <div className="flex flex-1 cursor-not-allowed items-center gap-3 rounded-md font-medium text-sm opacity-80">
+                          {isDisabled ? (
+                            <div className="flex w-full items-center gap-3 rounded-md font-medium text-sm">
                               <Icon className="size-4" />
                               <span>{item.title}</span>
                             </div>
                           ) : (
                             <Link
                               href={item.href}
-                              className="flex flex-1 items-center gap-3 rounded-md font-medium text-sm hover:bg-muted"
+                              className="flex w-full items-center gap-3 rounded-md font-medium text-sm hover:bg-muted"
                             >
                               <Icon className="size-4" />
                               <span>{item.title}</span>

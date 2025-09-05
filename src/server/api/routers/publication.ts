@@ -6,6 +6,7 @@ import { getCreator } from "~/server/actions/trpc/creator";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import type { DbType } from "~/server/db";
 import {
+  creator,
   plan,
   publication,
   // tagInfo,
@@ -112,6 +113,17 @@ export const publicationRouter = createTRPCRouter({
         });
 
         console.log("Created annual plan...");
+
+        // Mark publication and payment plans setup as complete
+        await tx
+          .update(creator)
+          .set({
+            hasCompletedPublicationSetup: true,
+            hasCompletedPaymentPlansSetup: true,
+            onboardingCompletedAt: new Date(),
+          })
+          .where(eq(creator.userId, ctx.session.user.id));
+
         console.log("Finished publication creation.");
         return publicationId;
       });
@@ -148,6 +160,13 @@ async function createPublication(
   kitPublicationTagId: number,
   publicationInfo: z.infer<typeof CreatePublicationInfoSchema>,
 ) {
+  // Generate a URL-friendly slug from the publication name
+  const slug = publicationInfo.name
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
   const result = await db
     .insert(publication)
     .values({
@@ -155,6 +174,7 @@ async function createPublication(
       kitPublicationTagId,
       creatorId: creatorId,
       description: publicationInfo.description,
+      slug,
     })
     .returning({ id: publication.id });
 
@@ -194,6 +214,7 @@ async function createPlan(db: DbType, data: PlanCreationData) {
   await db.insert(plan).values({
     name: data.createPaystackPlanInfo.name,
     interval: data.createPaystackPlanInfo.interval,
+    amount: data.createPaystackPlanInfo.amount,
     paystackPaymentPageId: paymentPageData.id,
     paystackPaymentPageUrlSlug: paymentPageData.slug,
     paystackPlanCode: planData.plan_code,

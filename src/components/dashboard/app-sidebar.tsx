@@ -1,30 +1,24 @@
 "use client";
 
-import { NavUser } from "~/components/dashboard/nav-user";
+import { SidebarHead } from "~/components/dashboard/sidebar-head";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
+  SidebarHeader,
 } from "~/components/ui/sidebar";
 import { sidebarLinks } from "~/config/dashboard";
 import { SidebarNav } from "./sidebar-nav";
 
-type AppSidebarProps = {
-  user: {
-    name: string;
-    email: string;
-  };
-};
-
-export function AppSidebar({ user }: AppSidebarProps) {
+export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <SidebarHead />
+      </SidebarHeader>
+
       <SidebarContent>
         <SidebarNav sidebarLinks={sidebarLinks} />
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={user} />
-      </SidebarFooter>
     </Sidebar>
   );
 }
