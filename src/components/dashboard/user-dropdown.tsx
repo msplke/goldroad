@@ -2,7 +2,9 @@
 
 import { LogOut, Settings } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
+import { authClient } from "~/auth/client";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
@@ -23,6 +25,8 @@ interface UserDropdownProps {
 }
 
 export function UserDropdown({ user }: UserDropdownProps) {
+  const router = useRouter();
+
   // Default user data for demo purposes
   const userData = user || {
     name: "[USER_NAME]",
@@ -30,9 +34,14 @@ export function UserDropdown({ user }: UserDropdownProps) {
     initials: "U",
   };
 
-  const handleLogout = () => {
-    // TODO: Implement logout logic
-    console.log("Logout clicked");
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/");
+        },
+      },
+    });
   };
 
   return (
