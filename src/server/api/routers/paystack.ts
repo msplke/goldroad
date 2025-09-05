@@ -14,7 +14,7 @@ export const paystackRouter = createTRPCRouter({
       z.object({
         country: countryEnum.default("kenya"),
         currency: currencyEnum.default("KES"),
-      })
+      }),
     )
     .query(async ({ input }) => {
       const { data: response, error } = await paystackClient("@get/bank", {
