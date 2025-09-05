@@ -5,7 +5,6 @@ import type { UseFormReturn } from "react-hook-form";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -38,9 +37,6 @@ export function AddKitApiKeyForm({
               <FormControl>
                 <Input placeholder="Your API key" type="password" {...field} />
               </FormControl>
-              <FormDescription>
-                Your API key will be encrypted and stored securely.
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
