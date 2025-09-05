@@ -1,4 +1,5 @@
 import { creatorRouter } from "~/server/api/routers/creator";
+import { paystackRouter } from "~/server/api/routers/paystack";
 import { planRouter } from "~/server/api/routers/plan";
 import { publicationRouter } from "~/server/api/routers/publication";
 // import { subscriberRouter } from "~/server/api/routers/subscriber";
@@ -13,6 +14,7 @@ export const appRouter = createTRPCRouter({
   creator: creatorRouter,
   plan: planRouter,
   publication: publicationRouter,
+  paystack: paystackRouter,
   // subscriber: subscriberRouter,
 });
 

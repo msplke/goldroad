@@ -28,6 +28,15 @@ export const planIntervalEnum = z.enum([
   "annually",
 ]);
 
+export const countryEnum = z.enum([
+  "ghana",
+  "kenya",
+  "nigeria",
+  "south africa",
+]);
+
+export const currencyEnum = z.enum(["XOF", "NGN", "KES", "GHS", "ZAR"]);
+
 export type PlanInterval = z.infer<typeof planIntervalEnum>;
 
 export const subscriptionStatusEnum = z.enum([
@@ -59,13 +68,13 @@ export const createPlanSchema = z.object({
     .boolean()
     .optional()
     .describe(
-      "Set to false if you don't want invoices to be sent to your customers",
+      "Set to false if you don't want invoices to be sent to your customers"
     ),
   send_sms: z
     .boolean()
     .optional()
     .describe(
-      "Set to false if you don't want text messages to be sent to your customers",
+      "Set to false if you don't want text messages to be sent to your customers"
     ),
   currency: z.string().optional().describe("Currency in which amount is set"),
   invoice_limit: z
@@ -122,8 +131,6 @@ const bankSchema = z.object({
   currency: z.string(),
   type: z.string(),
   is_deleted: z.boolean(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
 });
 
 // Subaccount schema
@@ -134,7 +141,7 @@ export const createSubaccountSchema = z.object({
   percentage_charge: z
     .number()
     .describe(
-      "The default percentage charged when receiving on behalf of this subaccount",
+      "The default percentage charged when receiving on behalf of this subaccount"
     ),
   description: z
     .string()
@@ -209,7 +216,7 @@ const paymentPageSchema = z.object({
         display_name: z.string(),
         variable_name: z.string(),
         required: z.boolean(),
-      }),
+      })
     )
     .optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
@@ -240,7 +247,7 @@ export const createPaymentPageSchema = z.object({
     .string()
     .optional()
     .describe(
-      "If you would like Paystack to redirect someplace upon successful payment, specify the URL here",
+      "If you would like Paystack to redirect someplace upon successful payment, specify the URL here"
     ),
   custom_fields: z
     .array(
@@ -251,7 +258,7 @@ export const createPaymentPageSchema = z.object({
           .boolean()
           .optional()
           .describe("Set to true to make field required"),
-      }),
+      })
     )
     .optional()
     .describe("If you would like to accept custom fields, specify them here"),
@@ -406,13 +413,13 @@ const paystackSchema = createSchema({
         .boolean()
         .optional()
         .describe(
-          "Set to false if you don't want invoices to be sent to your customers",
+          "Set to false if you don't want invoices to be sent to your customers"
         ),
       send_sms: z
         .boolean()
         .optional()
         .describe(
-          "Set to false if you don't want text messages to be sent to your customers",
+          "Set to false if you don't want text messages to be sent to your customers"
         ),
       currency: z
         .string()
@@ -438,8 +445,9 @@ const paystackSchema = createSchema({
           .string()
           .optional()
           .describe(
-            "The country to obtain the list of supported banks. e.g country=ghana or country=nigeria",
+            "The country to obtain the list of supported banks. e.g country=ghana or country=nigeria"
           ),
+        currency: z.string().optional().describe("Currency e.g GHS, NGN"),
         use_cursor: z
           .boolean()
           .optional()
@@ -509,7 +517,7 @@ const paystackSchema = createSchema({
         .number()
         .optional()
         .describe(
-          "The default percentage charged when receiving on behalf of this subaccount",
+          "The default percentage charged when receiving on behalf of this subaccount"
         ),
       description: z
         .string()
