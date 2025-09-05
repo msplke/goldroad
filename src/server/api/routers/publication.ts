@@ -25,7 +25,19 @@ export const publicationRouter = createTRPCRouter({
       return await ctx.db.transaction(async (tx) => {
         const foundCreator = await getCreator(tx, ctx.session.user.id);
         console.log("Checking for existing publication...");
-        await checkForExistingPublication(ctx.db, foundCreator.id, input.name);
+        const existingPublication = await checkForExistingPublication(
+          ctx.db,
+          foundCreator.id,
+          input.name
+        );
+
+        if (existingPublication) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message:
+              "A publication with this name from current creator already exists",
+          });
+        }
 
         if (!foundCreator.kitApiKey) {
           throw new TRPCError({
@@ -44,7 +56,7 @@ export const publicationRouter = createTRPCRouter({
           tx,
           foundCreator.id,
           tag.id,
-          input,
+          input
         );
 
         console.log("Finished publication creation.");
@@ -89,29 +101,23 @@ export const publicationRouter = createTRPCRouter({
 async function checkForExistingPublication(
   db: DbType,
   creatorId: string,
-  publicationName: string,
+  publicationName: string
 ) {
   const existingPublication = await db.query.publication.findFirst({
     where: and(
       eq(publication.creatorId, creatorId),
-      eq(publication.name, publicationName),
+      eq(publication.name, publicationName)
     ),
   });
 
-  if (existingPublication) {
-    throw new TRPCError({
-      code: "CONFLICT",
-      message:
-        "A publication with this name from current creator already exists",
-    });
-  }
+  return existingPublication;
 }
 
 async function createPublication(
   db: DbType,
   creatorId: string,
   kitPublicationTagId: number,
-  publicationInfo: z.infer<typeof CreatePublicationInfoSchema>,
+  publicationInfo: z.infer<typeof CreatePublicationInfoSchema>
 ) {
   // Generate a URL-friendly slug from the publication name
   const baseSlug = generateSlugFromName(publicationInfo.name);
