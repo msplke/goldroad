@@ -111,7 +111,7 @@ export function OnboardingModal({
     },
   });
 
-  const createPlans = api.plan.create.useMutation({
+  const createPlans = api.plan.createMonthlyAndYearlyPlans.useMutation({
     onSuccess: () => {
       toast.success("Success. Payment plans successfully created.");
       utils.creator.get.invalidate();

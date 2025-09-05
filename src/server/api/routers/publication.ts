@@ -28,7 +28,7 @@ export const publicationRouter = createTRPCRouter({
         const existingPublication = await checkForExistingPublication(
           ctx.db,
           foundCreator.id,
-          input.name
+          input.name,
         );
 
         if (existingPublication) {
@@ -56,7 +56,7 @@ export const publicationRouter = createTRPCRouter({
           tx,
           foundCreator.id,
           tag.id,
-          input
+          input,
         );
 
         console.log("Finished publication creation.");
@@ -101,12 +101,12 @@ export const publicationRouter = createTRPCRouter({
 async function checkForExistingPublication(
   db: DbType,
   creatorId: string,
-  publicationName: string
+  publicationName: string,
 ) {
   const existingPublication = await db.query.publication.findFirst({
     where: and(
       eq(publication.creatorId, creatorId),
-      eq(publication.name, publicationName)
+      eq(publication.name, publicationName),
     ),
   });
 
@@ -117,7 +117,7 @@ async function createPublication(
   db: DbType,
   creatorId: string,
   kitPublicationTagId: number,
-  publicationInfo: z.infer<typeof CreatePublicationInfoSchema>
+  publicationInfo: z.infer<typeof CreatePublicationInfoSchema>,
 ) {
   // Generate a URL-friendly slug from the publication name
   const baseSlug = generateSlugFromName(publicationInfo.name);
