@@ -35,7 +35,7 @@ type PlanCreationData = {
 
 export const planRouter = createTRPCRouter({
   /** Creates monthly and annual plans for a publication */
-  create: protectedProcedure
+  createMonthlyAndYearlyPlans: protectedProcedure
     .input(CreatePlanInfoSchema)
     .mutation(async ({ ctx, input }) => {
       return await ctx.db.transaction(async (tx) => {
@@ -60,6 +60,18 @@ export const planRouter = createTRPCRouter({
           throw new TRPCError({
             message: "Publication not found or access denied",
             code: "NOT_FOUND",
+          });
+        }
+
+        // Check whether plans already exist for this publication
+        const existingPlans = await ctx.db.query.plan.findMany({
+          where: eq(plan.publicationId, input.publicationId),
+        });
+
+        if (existingPlans.length > 0) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Plans already exist for this publication",
           });
         }
 
