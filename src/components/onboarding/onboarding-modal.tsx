@@ -195,7 +195,6 @@ export function OnboardingModal({
       settlement_bank: data.bankCode,
       account_number: data.accountNumber,
       business_name: data.accountName,
-      percentage_charge: 95,
     });
   };
 
