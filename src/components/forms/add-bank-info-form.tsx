@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import type { Step2FormData } from "~/lib/validators/onboarding";
+import { api } from "~/trpc/react";
 
 type AddBankInfoFormProps = {
   step2Form: UseFormReturn<Step2FormData>;
@@ -29,6 +30,8 @@ export function AddBankInfoForm({
   step2Form,
   handleStep2SubmitAction,
 }: AddBankInfoFormProps) {
+  const { data: response, isLoading, isError } = api.paystack.bank.useQuery({});
+
   return (
     <Form {...step2Form}>
       <form
@@ -41,61 +44,50 @@ export function AddBankInfoForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Bank</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                disabled={isLoading}
+              >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select your bank" />
+                    <SelectValue
+                      placeholder={
+                        isLoading ? "Loading banks..." : "Select your bank"
+                      }
+                    />
                   </SelectTrigger>
                 </FormControl>
 
                 <SelectContent>
-                  {[
-                    { value: "044", label: "Access Bank" },
-                    { value: "014", label: "Afribank" },
-                    { value: "023", label: "Citibank" },
-                    { value: "050", label: "Ecobank" },
-                    { value: "011", label: "First Bank" },
-                    {
-                      value: "214",
-                      label: "First City Monument Bank",
-                    },
-                    { value: "070", label: "Fidelity Bank" },
-                    {
-                      value: "058",
-                      label: "Guaranty Trust Bank",
-                    },
-                    { value: "030", label: "Heritage Bank" },
-                    { value: "082", label: "Keystone Bank" },
-                    { value: "076", label: "Polaris Bank" },
-                    {
-                      value: "221",
-                      label: "Stanbic IBTC Bank",
-                    },
-                    {
-                      value: "068",
-                      label: "Standard Chartered",
-                    },
-                    { value: "232", label: "Sterling Bank" },
-                    { value: "032", label: "Union Bank" },
-                    {
-                      value: "033",
-                      label: "United Bank for Africa",
-                    },
-                    { value: "215", label: "Unity Bank" },
-                    { value: "035", label: "Wema Bank" },
-                    { value: "057", label: "Zenith Bank" },
-                  ].map((bank) => (
-                    <SelectItem key={bank.value} value={bank.value}>
-                      {bank.label}
+                  {isLoading ? (
+                    <SelectItem value="loading" disabled>
+                      Loading banks...
                     </SelectItem>
-                  ))}
+                  ) : isError ? (
+                    <SelectItem value="error" disabled>
+                      Failed to load banks
+                    </SelectItem>
+                  ) : (
+                    response?.map((bank) => {
+                      return (
+                        <SelectItem key={bank.id} value={bank.code}>
+                          {bank.name}
+                        </SelectItem>
+                      );
+                    })
+                  )}
                 </SelectContent>
               </Select>
               <FormMessage />
+              {isError && (
+                <p className="mt-1 text-red-500 text-sm">
+                  Failed to load banks. Please try again later.
+                </p>
+              )}
             </FormItem>
           )}
         />
-
         <FormField
           control={step2Form.control}
           name="accountNumber"
