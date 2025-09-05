@@ -26,9 +26,5 @@ export async function checkCreatorExists(db: DbType, userId: string) {
     where: eq(creator.userId, userId),
   });
 
-  if (!foundCreator) {
-    return false;
-  }
-
-  return true;
+  return foundCreator;
 }
