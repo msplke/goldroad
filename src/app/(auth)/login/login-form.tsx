@@ -20,6 +20,24 @@ export function LoginForm() {
     return raw?.startsWith("/") ? raw : "/dashboard";
   }, []);
 
+  async function handleGitHubLogin() {
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      await authClient.signIn.social({
+        provider: "github",
+        callbackURL,
+      });
+    } catch (err) {
+      console.error("GitHub sign-in failed:", err);
+      // TODO: replace with your toast/notifier
+      alert("Sign-in failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <Card>
@@ -34,23 +52,7 @@ export function LoginForm() {
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-3">
               <Button
-                onClick={async () => {
-                  if (loading) return;
-                  setLoading(true);
-
-                  try {
-                    await authClient.signIn.social({
-                      provider: "github",
-                      callbackURL,
-                    });
-                  } catch (err) {
-                    console.error("GitHub sign-in failed:", err);
-                    // TODO: replace with your toast/notifier
-                    alert("Sign-in failed. Please try again.");
-                  } finally {
-                    setLoading(false);
-                  }
-                }}
+                onClick={() => handleGitHubLogin()}
                 type="button"
                 className="w-full"
                 disabled={loading}
