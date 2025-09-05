@@ -6,7 +6,7 @@ export const step1Schema = z.object({
 });
 
 export const step2Schema = z.object({
-  bankCode: z.string().length(3, "Please select a bank"),
+  bankCode: z.string().min(1, "Please select a bank"),
   accountNumber: z
     .string()
     .min(10, "Account number must be at least 10 digits"),
