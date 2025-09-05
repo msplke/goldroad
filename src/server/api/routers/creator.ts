@@ -93,14 +93,29 @@ export const creatorRouter = createTRPCRouter({
   addOrUpdateKitApiKey: protectedProcedure
     .input(z.object({ kitApiKey: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      // 1. Perform a test request to see if the API key is valid or not
+      console.log("Verifying Kit API key is valid...");
+      const { error } = await kitClient("@get/tags/", {
+        query: { per_page: 1 },
+        headers: {
+          [KIT_API_KEY_HEADER]: input.kitApiKey,
+        },
+      });
+
+      if (error?.status === 401) {
+        console.error(`${error.statusText}`);
+        throw new TRPCError({
+          message: `Kit API key is invalid`,
+          code: "BAD_REQUEST",
+        });
+      }
+
+      // 2. Check if tag info already exists for this creator with the given
+      //    api key
       const { id: creatorId, kitApiKey: creatorKitApiKey } = await getCreator(
         ctx.db,
         ctx.session.user.id
       );
-      // 1. Perform a test request to see if the API key is valid or not
-
-      // 2. Check if tag info already exists for this creator with the given
-      //    api key
       if (input.kitApiKey === creatorKitApiKey) {
         // No changes needed, return early
         console.log("No changes needed, returning early...");
