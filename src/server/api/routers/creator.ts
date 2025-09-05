@@ -114,7 +114,7 @@ export const creatorRouter = createTRPCRouter({
       //    api key
       const { id: creatorId, kitApiKey: creatorKitApiKey } = await getCreator(
         ctx.db,
-        ctx.session.user.id
+        ctx.session.user.id,
       );
       if (input.kitApiKey === creatorKitApiKey) {
         // No changes needed, return early
@@ -165,10 +165,20 @@ export const creatorRouter = createTRPCRouter({
       console.log("Successfully added creator!");
     }),
 
-  addOrUpdateBankAccountInfo: protectedProcedure
+  addBankAccountInfo: protectedProcedure
     .input(createSubaccountSchema)
     .mutation(async ({ ctx, input }) => {
-      const { id: creatorId } = await getCreator(ctx.db, ctx.session.user.id);
+      const { id: creatorId, paystackSubaccountCode } = await getCreator(
+        ctx.db,
+        ctx.session.user.id,
+      );
+
+      // Check if subaccount already exists
+      if (paystackSubaccountCode) {
+        console.log("Subaccount already exists, skipping creation.");
+        return;
+      }
+
       console.log("Creating subaccount...");
       // 1. Create Paystack subaccount
       const code = await createPaystackSubaccount(input);
@@ -183,7 +193,7 @@ export const creatorRouter = createTRPCRouter({
 });
 
 async function createPaystackSubaccount(
-  subaccountCreationInfo: SubaccountCreationInfo
+  subaccountCreationInfo: SubaccountCreationInfo,
 ) {
   const { data: response, error } = await paystackClient("@post/subaccount", {
     body: subaccountCreationInfo,
@@ -200,7 +210,7 @@ async function createPaystackSubaccount(
 }
 
 async function addStatusAndTierTagsToKit(
-  kitApiKey: string
+  kitApiKey: string,
 ): Promise<Record<KitTag, number>> {
   // The bulk create endpoint on the Kit API requires OAuth,
   // which is not implemented currently,

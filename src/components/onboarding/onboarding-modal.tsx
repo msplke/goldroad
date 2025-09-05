@@ -84,7 +84,7 @@ export function OnboardingModal({
     },
   });
 
-  const addBankInfo = api.creator.addOrUpdateBankAccountInfo.useMutation({
+  const addBankInfo = api.creator.addBankAccountInfo.useMutation({
     onSuccess: () => {
       toast.success("Success. Bank details successfully added.");
       utils.creator.get.invalidate();
