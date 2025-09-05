@@ -5,6 +5,10 @@ import { env } from "~/env";
 
 const PAYSTACK_BASE_URL = "https://api.paystack.co";
 
+/**The amount being taken by the business as a percentage of the total transaction
+ * when a payment is made to a subaccount*/
+const SUBACCOUNT_PERCENTAGE_CHARGE = 5; // i.e. subaccount gets 95% of the transaction
+
 // Common response shapes
 const customerSchema = z.object({
   first_name: z.string(),
@@ -140,6 +144,7 @@ export const createSubaccountSchema = z.object({
   account_number: z.string().describe("Bank account number"),
   percentage_charge: z
     .number()
+    .default(SUBACCOUNT_PERCENTAGE_CHARGE)
     .describe(
       "The default percentage charged when receiving on behalf of this subaccount",
     ),
