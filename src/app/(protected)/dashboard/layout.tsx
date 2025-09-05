@@ -13,6 +13,7 @@ import {
   SidebarTrigger,
 } from "~/components/ui/sidebar";
 import { OnboardingProvider } from "~/hooks/use-onboarding";
+import { api } from "~/trpc/server";
 
 export default async function Layout({
   children,
@@ -27,6 +28,16 @@ export default async function Layout({
     redirect("/login");
   }
 
+  try {
+    const creator = await api.creator.get();
+    if (!creator) {
+      await api.creator.create();
+    }
+  } catch (error) {
+    console.log(error);
+    return <div>Something went wrong. Try to refresh.</div>;
+  }
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <OnboardingProvider>
@@ -34,7 +45,7 @@ export default async function Layout({
           <AppSidebar />
           <SidebarInset>
             {/* Header */}
-            <header className="sticky top-0 z-50 flex h-14 w-full border-b bg-background bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:h-[60px]">
+            <header className="sticky top-0 z-50 flex h-14 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:h-[60px]">
               <MaxWidthWrapper className="flex max-w-7xl items-center justify-between px-4">
                 <div className="flex items-center gap-4">
                   <SidebarTrigger />

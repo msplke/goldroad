@@ -58,8 +58,11 @@ export const creatorRouter = createTRPCRouter({
     return newCreator;
   }),
 
+  /**Returns `null` if a creator is not found. */
   get: protectedProcedure.query(async ({ ctx }) => {
-    const c = await getCreator(ctx.db, ctx.session.user.id);
+    const c = await checkCreatorExists(ctx.db, ctx.session.user.id);
+
+    if (!c) return null;
 
     // Check if creator has publications (infer publication setup completion)
     const hasPublications = await ctx.db.query.publication.findFirst({
