@@ -93,18 +93,33 @@ export const creatorRouter = createTRPCRouter({
   addOrUpdateKitApiKey: protectedProcedure
     .input(z.object({ kitApiKey: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const { id: creatorId } = await getCreator(ctx.db, ctx.session.user.id);
+      const { id: creatorId, kitApiKey: creatorKitApiKey } = await getCreator(
+        ctx.db,
+        ctx.session.user.id
+      );
       // 1. Perform a test request to see if the API key is valid or not
 
-      // 2. Add subscription status and interval tags to the Kit
+      // 2. Check if tag info already exists for this creator with the given
+      //    api key
+      if (input.kitApiKey === creatorKitApiKey) {
+        // No changes needed, return early
+        console.log("No changes needed, returning early...");
+        return;
+      }
+
+      // 3. Add subscription status and interval tags to the Kit
       console.log("Adding subscription status and interval tags to kit...");
 
       const tagIdMap = await addStatusAndTierTagsToKit(input.kitApiKey);
 
       console.log("Adding kit tag ids to tag info table...");
-      // 3. Add tags to the tag info table, linking them to the creator
+      // 4. Add tags to the tag info table, linking them to the creator
+      // Check if tag info already exists for this creator
+      const existingTagInfo = await ctx.db.query.tagInfo.findFirst({
+        where: eq(tagInfo.creatorId, creatorId),
+      });
 
-      await ctx.db.insert(tagInfo).values({
+      const values = {
         creatorId,
         kitActiveTagId: tagIdMap.active,
         kitNonRenewingTagId: tagIdMap["non-renewing"],
@@ -115,7 +130,13 @@ export const creatorRouter = createTRPCRouter({
         kitAnnualSubscriberTag: tagIdMap.annually,
         kitDailySubscriberTag: tagIdMap.daily,
         kitHourlySubscriberTag: tagIdMap.hourly,
-      });
+      };
+
+      if (existingTagInfo) {
+        await ctx.db.update(tagInfo).set(values);
+      } else {
+        await ctx.db.insert(tagInfo).values(values);
+      }
 
       // 4. Update creator with encrypted API key
       await ctx.db
@@ -147,7 +168,7 @@ export const creatorRouter = createTRPCRouter({
 });
 
 async function createPaystackSubaccount(
-  subaccountCreationInfo: SubaccountCreationInfo,
+  subaccountCreationInfo: SubaccountCreationInfo
 ) {
   const { data: response, error } = await paystackClient("@post/subaccount", {
     body: subaccountCreationInfo,
@@ -164,7 +185,7 @@ async function createPaystackSubaccount(
 }
 
 async function addStatusAndTierTagsToKit(
-  kitApiKey: string,
+  kitApiKey: string
 ): Promise<Record<KitTag, number>> {
   // The bulk create endpoint on the Kit API requires OAuth,
   // which is not implemented currently,
