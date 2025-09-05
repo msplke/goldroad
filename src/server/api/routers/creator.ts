@@ -5,7 +5,12 @@ import z from "zod";
 import { checkCreatorExists, getCreator } from "~/server/actions/trpc/creator";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
-import { creator, tagInfo } from "~/server/db/schema/app-schema";
+import {
+  creator,
+  plan,
+  publication,
+  tagInfo,
+} from "~/server/db/schema/app-schema";
 import { KIT_API_KEY_HEADER, kitClient } from "~/server/fetch-clients/kit";
 import {
   createSubaccountSchema,
@@ -55,14 +60,28 @@ export const creatorRouter = createTRPCRouter({
 
   get: protectedProcedure.query(async ({ ctx }) => {
     const c = await getCreator(ctx.db, ctx.session.user.id);
+
+    // Check if creator has publications (infer publication setup completion)
+    const hasPublications = await ctx.db.query.publication.findFirst({
+      where: eq(publication.creatorId, c.id),
+    });
+
+    // Check if creator has plans (infer payment plans setup completion)
+    let hasPlans = false;
+    if (hasPublications) {
+      const planExists = await ctx.db.query.plan.findFirst({
+        where: eq(plan.publicationId, hasPublications.id),
+      });
+      hasPlans = !!planExists;
+    }
+
     return {
       id: c.id,
       userId: c.userId,
       hasKitApiKey: Boolean(c.kitApiKey),
       hasBankInfo: Boolean(c.paystackSubaccountCode),
-      hasCompletedPublicationSetup: Boolean(c.hasCompletedPublicationSetup),
-      hasCompletedPaymentPlansSetup: Boolean(c.hasCompletedPaymentPlansSetup),
-      onboardingCompletedAt: c.onboardingCompletedAt,
+      hasCompletedPublicationSetup: Boolean(hasPublications),
+      hasCompletedPaymentPlansSetup: hasPlans,
       createdAt: c.createdAt,
       updatedAt: c.updatedAt,
     };
@@ -95,12 +114,11 @@ export const creatorRouter = createTRPCRouter({
         kitHourlySubscriberTag: tagIdMap.hourly,
       });
 
-      // 4. Update creator with encrypted API key and mark Kit setup complete
+      // 4. Update creator with encrypted API key
       await ctx.db
         .update(creator)
         .set({
           kitApiKey: input.kitApiKey, // TODO: Encrypt this
-          hasCompletedKitSetup: true,
         })
         .where(eq(creator.id, creatorId));
 
@@ -120,7 +138,6 @@ export const creatorRouter = createTRPCRouter({
         .update(creator)
         .set({
           paystackSubaccountCode: code,
-          hasCompletedBankSetup: true,
         })
         .where(eq(creator.id, creatorId));
     }),

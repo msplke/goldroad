@@ -19,13 +19,13 @@ export const step3Schema = z.object({
 });
 
 export const step4Schema = z.object({
+  publicationId: z.uuid("Invalid publication ID"),
   monthlyAmount: z
     .number()
     .min(100, "Monthly amount must be at least Ksh. 100"),
   annualAmount: z
     .number()
     .min(1000, "Annual amount must be at least Ksh. 1000"),
-  benefits: z.string().min(10, "Please describe subscriber benefits"),
 });
 
 export type Step1FormData = z.infer<typeof step1Schema>;

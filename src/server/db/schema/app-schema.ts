@@ -65,12 +65,6 @@ export const creator = createTable("creator", (d) => ({
   // To be encrypted
   kitApiKey: d.text(),
   paystackSubaccountCode: d.text(),
-  // Onboarding progress tracking
-  hasCompletedKitSetup: d.boolean().default(false),
-  hasCompletedBankSetup: d.boolean().default(false),
-  hasCompletedPublicationSetup: d.boolean().default(false),
-  hasCompletedPaymentPlansSetup: d.boolean().default(false),
-  onboardingCompletedAt: d.timestamp(),
   createdAt,
   updatedAt,
 }));

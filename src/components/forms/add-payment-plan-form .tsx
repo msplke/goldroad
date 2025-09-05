@@ -11,7 +11,6 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { Textarea } from "~/components/ui/textarea";
 import type { Step4FormData } from "~/lib/validators/onboarding";
 
 type AddPaymentPlanFormProps = {
@@ -29,6 +28,18 @@ export function AddPaymentPlanForm({
         onSubmit={step4Form.handleSubmit(handleStep4SubmitAction)}
         className="space-y-4"
       >
+        {/* Hidden field for publication ID */}
+        <FormField
+          control={step4Form.control}
+          name="publicationId"
+          render={({ field }) => (
+            <FormItem className="hidden">
+              <FormControl>
+                <Input type="hidden" {...field} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
         <FormField
           control={step4Form.control}
           name="monthlyAmount"
@@ -59,23 +70,6 @@ export function AddPaymentPlanForm({
                   placeholder="50000"
                   {...field}
                   onChange={(e) => field.onChange(+e.target.value)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={step4Form.control}
-          name="benefits"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Subscriber Benefits</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="• Exclusive content&#10;• Early access&#10;• Community access"
-                  rows={4}
-                  {...field}
                 />
               </FormControl>
               <FormMessage />
