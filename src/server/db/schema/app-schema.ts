@@ -41,7 +41,7 @@ export const tagInfo = createTable("tag_info", (d) => ({
   creatorId: d
     .uuid()
     .notNull()
-    .references(() => creator.id),
+    .references(() => creator.id, { onDelete: "cascade" }),
   kitActiveTagId: d.bigint({ mode: "number" }).notNull(),
   kitNonRenewingTagId: d.bigint({ mode: "number" }).notNull(),
   kitAttentionTagId: d.bigint({ mode: "number" }).notNull(),
@@ -61,7 +61,7 @@ export const creator = createTable("creator", (d) => ({
   userId: d
     .text()
     .notNull()
-    .references(() => user.id),
+    .references(() => user.id, { onDelete: "cascade" }),
   // To be encrypted
   kitApiKey: d.text(),
   paystackSubaccountCode: d.text(),
