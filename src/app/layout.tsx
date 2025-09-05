@@ -4,6 +4,7 @@ import "~/styles/globals.css";
 
 import { TailwindIndicator } from "~/app/_components/tailwind-indicator";
 import { ThemeProvider } from "~/app/_components/theme-provider";
+import { Toaster } from "~/components/ui/sonner";
 import { cn, constructMetadata } from "~/lib/utils";
 import { TRPCReactProvider } from "~/trpc/react";
 
@@ -29,6 +30,7 @@ export default function RootLayout({
           <TRPCReactProvider>{children}</TRPCReactProvider>
 
           <TailwindIndicator />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

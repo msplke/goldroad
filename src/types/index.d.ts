@@ -9,7 +9,12 @@ export type NavItem = {
 
 export type SidebarNavItem = {
   title: string;
-  items: NavItem[];
+  items: {
+    title: string;
+    href: string;
+    icon?: keyof typeof Icons;
+    requiresOnboarding: boolean;
+  }[];
   icon?: keyof typeof Icons;
 };
 
