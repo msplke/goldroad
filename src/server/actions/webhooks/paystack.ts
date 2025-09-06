@@ -96,6 +96,77 @@ export async function createSubscriber(
     });
 }
 
+export async function handleSubscriptionCancelled(
+  db: DbType,
+  subscriptionCode: string,
+  planCode: string,
+) {
+  const foundSubscriber = await getSubscriberInfoBySubscriptionCode(
+    db,
+    subscriptionCode,
+  );
+
+  if (!foundSubscriber) {
+    console.log(
+      `No subscriber found for subscription code ${subscriptionCode}`,
+    );
+    return;
+  }
+
+  const { kitApiKey, creatorId } = await getCreatorInfoFromPlanCode(
+    db,
+    planCode,
+  );
+
+  if (!kitApiKey) {
+    throw new Error(
+      "Unable to cancel subscriber. Creator Kit API Key not set!",
+    );
+  }
+
+  const decryptedKitApiKey = decryptSecret(kitApiKey);
+
+  const foundTagInfo = await db.query.tagInfo.findFirst({
+    where: eq(tagInfo.creatorId, creatorId),
+  });
+
+  if (!foundTagInfo) {
+    throw new Error("Unable to retrieve tag info");
+  }
+
+  // Remove the current active tag from the subscriber
+  await kitClient("@delete/tags/:tagId/subscribers/:subscriberId", {
+    params: {
+      tagId: foundTagInfo.kitActiveTagId.toString(),
+      subscriberId: foundSubscriber.kitSubscriberId.toString(),
+    },
+    headers: {
+      "X-Kit-Api-Key": decryptedKitApiKey,
+    },
+    throws: true,
+  });
+
+  // Add the non-renewing tag to the subscriber
+  await kitClient("@post/tags/:tagId/subscribers/:subscriberId", {
+    params: {
+      tagId: foundTagInfo.kitNonRenewingTagId.toString(),
+      subscriberId: foundSubscriber.kitSubscriberId.toString(),
+    },
+    headers: {
+      "X-Kit-Api-Key": decryptedKitApiKey,
+    },
+    throws: true,
+  });
+
+  // Update the subscriber status on the app db
+  await db
+    .update(paidSubscriber)
+    .set({
+      status: "non-renewing",
+    })
+    .where(eq(paidSubscriber.id, foundSubscriber.id));
+}
+
 export async function handleSubscriptionDisabled(
   db: DbType,
   subscriptionCode: string,
@@ -121,7 +192,12 @@ export async function handleSubscriptionDisabled(
     );
   }
 
-  // Delete the subscriber from Kit
+  // Unsubscribe the subscriber on Kit
+  // There's currently no way to delete a subscriber on Kit through the API. Additionally
+  // the API does not allow one to resubscribe a deleted subscriber.
+  // (https://developers.kit.com/api-reference/subscribers/create-a-subscriber)
+  // This means that once a subscriber is unsubscribed, manual action will be required
+  // from the creator if they would like to resubscribe them.
   await kitClient("@post/subscribers/:subscriberId/unsubscribe", {
     params: {
       subscriberId: foundSubscriber.kitSubscriberId.toString(),
@@ -223,6 +299,7 @@ async function getCreatorInfoFromPlanCode(
 
   return {
     intervalTag,
+    creatorId: foundPublication.creatorId,
     publicationTag: foundPublication.kitPublicationTagId,
     statusTag: foundTagInfo.kitActiveTagId,
     planId: foundPlan.id,
