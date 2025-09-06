@@ -198,7 +198,7 @@ async function tagSubscriberOnKit(
         subscriberId: subscriberId,
       },
       headers: {
-        "X-Kit-Api-Key": kitApiKey,
+        "X-Kit-Api-Key": decryptSecret(kitApiKey),
       },
       throws: true,
     },
