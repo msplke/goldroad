@@ -96,6 +96,51 @@ export async function createSubscriber(
     });
 }
 
+export async function handleSubscriptionDisabled(
+  db: DbType,
+  subscriptionCode: string,
+  planCode: string,
+) {
+  const foundSubscriber = await getSubscriberInfoBySubscriptionCode(
+    db,
+    subscriptionCode,
+  );
+
+  if (!foundSubscriber) {
+    console.log(
+      `No subscriber found for subscription code ${subscriptionCode}`,
+    );
+    return;
+  }
+
+  const { kitApiKey } = await getCreatorInfoFromPlanCode(db, planCode);
+
+  if (!kitApiKey) {
+    throw new Error(
+      "Unable to cancel subscriber. Creator Kit API Key not set!",
+    );
+  }
+
+  // Delete the subscriber from Kit
+  await kitClient("@post/subscribers/:subscriberId/unsubscribe", {
+    params: {
+      subscriberId: foundSubscriber.kitSubscriberId.toString(),
+    },
+    headers: {
+      "X-Kit-Api-Key": decryptSecret(kitApiKey),
+    },
+    throws: true,
+  });
+
+  // Update the subscriber status on the app db
+  await db
+    .update(paidSubscriber)
+    .set({
+      status: "cancelled",
+    })
+    .where(eq(paidSubscriber.id, foundSubscriber.id));
+}
+
 export async function getSubscriberInfoBySubscriptionCode(
   db: DbType,
   paystackSubscriptionCode: string,

@@ -3,7 +3,10 @@ import { z } from "zod";
 
 import { env } from "~/env";
 import { planSchema } from "~/server/fetch-clients/paystack";
-import type { createSubscriberTask } from "~/server/trigger/tasks";
+import type {
+  createSubscriberTask,
+  subscriptionDisabledTask,
+} from "~/server/trigger/tasks";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 const PaymentEventEnum = z.enum([
@@ -90,7 +93,7 @@ export async function POST(req: Request) {
         );
 
         console.log(`Running create subscriber task with handle: ${handle}`);
-        return OK_RESPONSE;
+        break;
       }
       case "invoice.payment_succeeded":
         // Handle payment succeeded
@@ -105,9 +108,24 @@ export async function POST(req: Request) {
     const cancelEvent = event as CancelEvent;
 
     switch (cancelEvent) {
-      case "subscription.disable":
-        // Handle subscription disable
+      case "subscription.disable": {
+        if (!data.subscription_code)
+          return new Response("No subscription code", { status: 400 });
+
+        if (!data.plan) return new Response("No plan info", { status: 400 });
+
+        const handle = await tasks.trigger<typeof subscriptionDisabledTask>(
+          "webhook:handle-subscription-completed",
+          {
+            subscriptionCode: data.subscription_code || "",
+            planCode: data.plan?.plan_code || "",
+          },
+        );
+        console.log(
+          `Running handle subscription completed task with handle: ${handle}`,
+        );
         break;
+      }
       case "subscription.cancelled":
         // Handle subscription cancelled
         break;
