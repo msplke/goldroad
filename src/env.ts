@@ -19,14 +19,16 @@ export const env = createEnv({
     DATABASE_URL: z.url(),
     GITHUB_CLIENT_ID: z.string(),
     GITHUB_CLIENT_SECRET: z.string(),
-    PAYSTACK_SECRET_KEY: z.string(),
-    TRIGGER_SECRET_KEY: z.string(),
+    GOOGLE_CLIENT_ID: z.string(),
+    GOOGLE_CLIENT_SECRET: z.string(),
     KIT_API_KEY_ENCRYPTION_SECRET: z
       .string()
       .regex(
         /^[0-9a-fA-F]{64}$/,
         "Key should be 64 characters long and in hexadecimal format",
       ),
+    PAYSTACK_SECRET_KEY: z.string(),
+    TRIGGER_SECRET_KEY: z.string(),
   },
 
   /**
@@ -49,9 +51,11 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    KIT_API_KEY_ENCRYPTION_SECRET: process.env.KIT_API_KEY_ENCRYPTION_SECRET,
     PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY,
     TRIGGER_SECRET_KEY: process.env.TRIGGER_SECRET_KEY,
-    KIT_API_KEY_ENCRYPTION_SECRET: process.env.KIT_API_KEY_ENCRYPTION_SECRET,
 
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
