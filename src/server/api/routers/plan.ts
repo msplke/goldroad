@@ -49,7 +49,7 @@ export const planRouter = createTRPCRouter({
         }
 
         // Verify the publication belongs to this creator
-        const publicationResult = await ctx.db.query.publication.findFirst({
+        const publicationResult = await tx.query.publication.findFirst({
           where: eq(publication.id, input.publicationId),
         });
 
@@ -64,7 +64,7 @@ export const planRouter = createTRPCRouter({
         }
 
         // Check whether plans already exist for this publication
-        const existingPlans = await ctx.db.query.plan.findMany({
+        const existingPlans = await tx.query.plan.findMany({
           where: eq(plan.publicationId, input.publicationId),
         });
 

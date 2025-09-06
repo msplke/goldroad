@@ -46,8 +46,8 @@ export function AddBankInfoForm({
               <FormLabel>Bank</FormLabel>
               <Select
                 onValueChange={field.onChange}
-                defaultValue={field.value}
-                disabled={isLoading}
+                value={field.value}
+                disabled={isLoading || isError}
               >
                 <FormControl>
                   <SelectTrigger>

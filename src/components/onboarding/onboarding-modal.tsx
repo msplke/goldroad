@@ -14,7 +14,7 @@ import { toast } from "sonner";
 
 import { AddBankInfoForm } from "~/components/forms/add-bank-info-form";
 import { AddKitApiKeyForm } from "~/components/forms/add-kit-api-key-form";
-import { AddPaymentPlanForm } from "~/components/forms/add-payment-plan-form ";
+import { AddPaymentPlanForm } from "~/components/forms/add-payment-plan-form";
 import { AddPublicationForm } from "~/components/forms/add-publication-form";
 import { Button } from "~/components/ui/button";
 import {

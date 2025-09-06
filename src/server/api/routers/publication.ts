@@ -14,8 +14,10 @@ const CreatePublicationInfoSchema = z.object({
     .min(1)
     .max(100)
     .regex(/^[a-zA-Z0-9\s\-_]+$/, "Invalid characters in name"),
-  description: z.string().min(1).max(500).optional(),
+  description: z.string().max(500).optional(),
 });
+
+// TODO: Use one validation schema on front and back end
 
 export const publicationRouter = createTRPCRouter({
   /** Creates a publication with a Kit tag. Plans are created separately via the plan router. */
@@ -26,7 +28,7 @@ export const publicationRouter = createTRPCRouter({
         const foundCreator = await getCreator(tx, ctx.session.user.id);
         console.log("Checking for existing publication...");
         const existingPublication = await checkForExistingPublication(
-          ctx.db,
+          tx,
           foundCreator.id,
           input.name,
         );
