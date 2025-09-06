@@ -4,6 +4,7 @@ import z from "zod";
 import {
   createSubscriber,
   getSubscriberInfoBySubscriptionCode,
+  handleSubscriptionCancelled,
   handleSubscriptionDisabled,
 } from "~/server/actions/webhooks/paystack";
 import { db } from "~/server/db";
@@ -25,7 +26,7 @@ export const createSubscriberTask = schemaTask({
       // Check if subscriber exists on DB
       const subscriberExists = await getSubscriberInfoBySubscriptionCode(
         db,
-        payload.subscriptionCode
+        payload.subscriptionCode,
       );
 
       if (subscriberExists) {
@@ -36,7 +37,7 @@ export const createSubscriberTask = schemaTask({
         db,
         payload.subscriberInfo,
         payload.subscriptionCode,
-        payload.planCode
+        payload.planCode,
       );
 
       return { message: "Successfully created subscriber" };
@@ -59,10 +60,33 @@ export const subscriptionDisabledTask = schemaTask({
       await handleSubscriptionDisabled(
         db,
         payload.subscriptionCode,
-        payload.planCode
+        payload.planCode,
       );
     } catch (error) {
       logger.error("Error occurred, unable to handle subscription.disabled", {
+        error,
+      });
+      throw error;
+    }
+  },
+});
+
+export const subscriptionCancelledTask = schemaTask({
+  id: "webhook:handle-subscription-cancelled",
+  schema: z.object({
+    subscriptionCode: z.string(),
+    planCode: z.string(),
+  }),
+  run: async (payload, { ctx }) => {
+    logger.log("Handling subscription.cancelled...", { ctx });
+    try {
+      await handleSubscriptionCancelled(
+        db,
+        payload.subscriptionCode,
+        payload.planCode,
+      );
+    } catch (error) {
+      logger.error("Error occurred, unable to handle subscription.cancelled", {
         error,
       });
       throw error;
