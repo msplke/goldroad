@@ -37,26 +37,29 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(
 const defaultSteps: OnboardingStep[] = [
   {
     id: 1,
-    title: "Setup ConvertKit",
-    description: "Add your ConvertKit API key (encrypted)",
+    title: "Setup Kit",
+    description:
+      "Add your Kit API key to automatically sync paying subscribers with your Kit account",
     completed: false,
   },
   {
     id: 2,
     title: "Provide Bank Details",
-    description: "Bank and account number for payouts",
+    description:
+      "Add your bank account information to receive payouts from subscriptions",
     completed: false,
   },
   {
     id: 3,
     title: "Create Publication",
-    description: "Set up your publication name and description",
+    description:
+      "Set up your publication with a name and description for your subscribers",
     completed: false,
   },
   {
     id: 4,
     title: "Setup Payment Plans",
-    description: "Configure monthly and annual subscription plans",
+    description: "Configure your monthly and annual subscription pricing",
     completed: false,
   },
 ];
