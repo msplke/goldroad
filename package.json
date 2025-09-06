@@ -13,6 +13,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "dev": "next dev --turbopack",
+    "trigger:dev": "trigger dev",
     "deploy:trigger-prod": "trigger deploy",
     "preview": "next build && next start",
     "start": "next start",
