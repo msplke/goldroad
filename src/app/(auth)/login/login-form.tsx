@@ -1,7 +1,10 @@
 "use client";
+
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
+import { Icons } from "~/components/icons";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -20,43 +23,56 @@ export function LoginForm() {
     return raw?.startsWith("/") ? raw : "/dashboard";
   }, []);
 
-  async function handleGitHubLogin() {
+  const handleSocialLogin = async (provider: "github" | "google") => {
     if (loading) return;
     setLoading(true);
 
     try {
       await authClient.signIn.social({
-        provider: "github",
+        provider,
         callbackURL,
       });
+      // If we reach here, sign-in was successful but redirect hasn't happened yet
+      // Keep loading state true to prevent duplicate clicks
     } catch (err) {
-      console.error("GitHub sign-in failed:", err);
-      // TODO: replace with your toast/notifier
-      alert("Sign-in failed. Please try again.");
-    } finally {
-      setLoading(false);
+      console.error(`${provider} sign-in failed:`, err);
+      toast.error("Sign-in failed. Please try again.");
+      setLoading(false); // Only reset loading on error
     }
-  }
+  };
 
   return (
     <div className="flex flex-col gap-6">
       <Card>
-        <CardHeader>
-          <CardTitle>Log in to your account</CardTitle>
+        <CardHeader className="text-center">
+          <CardTitle className="text-xl">Welcome</CardTitle>
           <CardDescription>
-            Continue with your GitHub account to log in
+            Login with your Google or GitHub account
           </CardDescription>
         </CardHeader>
 
         <CardContent>
           <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4">
               <Button
-                onClick={() => handleGitHubLogin()}
                 type="button"
+                variant="outline"
+                onClick={() => handleSocialLogin("google")}
                 className="w-full"
                 disabled={loading}
               >
+                <Icons.google />
+                {loading ? "Signing in..." : "Sign in with Google"}
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleSocialLogin("github")}
+                className="w-full"
+                disabled={loading}
+              >
+                <Icons.gitHub />
                 {loading ? "Signing in..." : "Sign in with GitHub"}
               </Button>
             </div>
