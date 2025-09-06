@@ -59,26 +59,37 @@ export function OnboardingModal({
 }: OnboardingModalProps) {
   const {
     currentStep,
-    markStepComplete,
     steps,
     totalSteps,
-    getNextIncompleteStep,
     completedSteps,
+    setCurrentStep,
+    isComplete,
   } = useOnboarding();
 
-  const [activeStep, setActiveStep] = useState(initialStep || currentStep);
   const [publicationId, setPublicationId] = useState<string | null>(null);
   const utils = api.useUtils();
 
-  // tRPC mutations with proper error handling
+  // Set initial step when modal opens
+  useEffect(() => {
+    if (open && initialStep) {
+      setCurrentStep(initialStep);
+    }
+  }, [open, initialStep, setCurrentStep]);
+
+  // Close modal when onboarding is complete
+  useEffect(() => {
+    if (isComplete) {
+      onOpenChange(false);
+    }
+  }, [isComplete, onOpenChange]);
+
+  // tRPC mutations - simplified to only handle server updates
   const addKitApiKey = api.creator.addOrUpdateKitApiKey.useMutation({
     onSuccess: () => {
       toast.success("Success. Kit API Key successfully added.");
+      // The useOnboarding hook will automatically advance when creator data refetches
       utils.creator.get.invalidate();
-      markStepComplete(1);
-      advanceToNextStep();
     },
-
     onError: () => {
       toast.error("Failed to add Kit API Key. Please try again.");
     },
@@ -88,10 +99,7 @@ export function OnboardingModal({
     onSuccess: () => {
       toast.success("Success. Bank details successfully added.");
       utils.creator.get.invalidate();
-      markStepComplete(2);
-      advanceToNextStep();
     },
-
     onError: () => {
       toast.error("Failed to add Bank Details. Please try again.");
     },
@@ -102,10 +110,7 @@ export function OnboardingModal({
       toast.success("Success. Publication successfully created.");
       setPublicationId(createdPublicationId);
       utils.creator.get.invalidate();
-      markStepComplete(3);
-      advanceToNextStep(); // Advance to step 4 for plan creation
     },
-
     onError: () => {
       toast.error("Failed to create Publication. Please try again.");
     },
@@ -115,10 +120,8 @@ export function OnboardingModal({
     onSuccess: () => {
       toast.success("Success. Payment plans successfully created.");
       utils.creator.get.invalidate();
-      markStepComplete(4);
-      onOpenChange(false); // Close modal after final step
+      // Modal will close automatically via isComplete useEffect
     },
-
     onError: () => {
       toast.error("Failed to create Payment Plans. Please try again.");
     },
@@ -149,15 +152,6 @@ export function OnboardingModal({
     },
   });
 
-  const advanceToNextStep = () => {
-    const nextStep = getNextIncompleteStep();
-    if (nextStep && nextStep <= totalSteps) {
-      setActiveStep(nextStep);
-    } else {
-      onOpenChange(false);
-    }
-  };
-
   // Update step 4 form when publication is created
   useEffect(() => {
     if (publicationId) {
@@ -165,16 +159,9 @@ export function OnboardingModal({
     }
   }, [publicationId, step4Form]);
 
-  // Update active step when modal opens with a specific step
-  useEffect(() => {
-    if (open && initialStep) {
-      setActiveStep(initialStep);
-    }
-  }, [open, initialStep]);
-
-  const currentStepConfig = stepConfigs.find((step) => step.id === activeStep);
-  const isLastStep = activeStep === totalSteps;
-  const canGoPrev = activeStep > 1;
+  const currentStepConfig = stepConfigs.find((step) => step.id === currentStep);
+  const isLastStep = currentStep === totalSteps;
+  const canGoPrev = currentStep > 1;
 
   const canAccessStep = (stepId: number) => {
     const stepConfig = stepConfigs.find((s) => s.id === stepId);
@@ -185,12 +172,20 @@ export function OnboardingModal({
     );
   };
 
-  // Form submission handlers
+  // Form submission handlers - simplified with completion checks
   const handleStep1Submit = (data: Step1FormData) => {
+    if (completedSteps.includes(1)) {
+      toast.info("ConvertKit integration already completed!");
+      return;
+    }
     addKitApiKey.mutate({ kitApiKey: data.apiKey });
   };
 
   const handleStep2Submit = (data: Step2FormData) => {
+    if (completedSteps.includes(2)) {
+      toast.info("Bank details already provided!");
+      return;
+    }
     addBankInfo.mutate({
       settlement_bank: data.bankCode,
       account_number: data.accountNumber,
@@ -199,6 +194,10 @@ export function OnboardingModal({
   };
 
   const handleStep3Submit = (data: Step3FormData) => {
+    if (completedSteps.includes(3)) {
+      toast.info("Publication already created!");
+      return;
+    }
     createPublication.mutate({
       name: data.publicationName,
       description: data.publicationDescription,
@@ -206,6 +205,10 @@ export function OnboardingModal({
   };
 
   const handleStep4Submit = (data: Step4FormData) => {
+    if (completedSteps.includes(4)) {
+      toast.info("Payment plans already set up! Setup complete!");
+      return;
+    }
     if (!publicationId) {
       toast.error("Publication ID is missing. Please complete step 3 first.");
       return;
@@ -220,7 +223,7 @@ export function OnboardingModal({
   if (!currentStepConfig) return null;
 
   const StepIcon = currentStepConfig.icon;
-  const stepAccessible = canAccessStep(activeStep);
+  const stepAccessible = canAccessStep(currentStep);
   const isLoading =
     addKitApiKey.isPending ||
     addBankInfo.isPending ||
@@ -234,7 +237,7 @@ export function OnboardingModal({
 
   const handlePrev = () => {
     if (canGoPrev) {
-      setActiveStep(activeStep - 1);
+      setCurrentStep(currentStep - 1);
     }
   };
 
@@ -251,7 +254,7 @@ export function OnboardingModal({
             Setup Your Creator Dashboard
           </DialogTitle>
           <DialogDescription>
-            Step {activeStep} of {totalSteps}: Complete your account setup to
+            Step {currentStep} of {totalSteps}: Complete your account setup to
             start accepting payments
           </DialogDescription>
         </DialogHeader>
@@ -266,7 +269,7 @@ export function OnboardingModal({
                     "flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors",
                     step.completed
                       ? "border-primary bg-primary text-primary-foreground"
-                      : step.id === activeStep
+                      : step.id === currentStep
                         ? "border-primary text-primary"
                         : "border-muted text-muted-foreground",
                   )}
@@ -311,28 +314,42 @@ export function OnboardingModal({
                 </div>
               ) : (
                 <>
-                  {activeStep === 1 && (
+                  {/* Show completion state for completed steps */}
+                  {completedSteps.includes(currentStep) ? (
+                    <div className="py-8 text-center">
+                      <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-primary" />
+                      <p className="mb-4 font-medium text-primary">
+                        This step is already completed!
+                      </p>
+                      <p className="text-muted-foreground text-sm">
+                        You can move to the next step or modify this information
+                        if needed.
+                      </p>
+                    </div>
+                  ) : null}
+
+                  {currentStep === 1 && (
                     <AddKitApiKeyForm
                       step1Form={step1Form}
                       handleStep1SubmitAction={handleStep1Submit}
                     />
                   )}
 
-                  {activeStep === 2 && (
+                  {currentStep === 2 && (
                     <AddBankInfoForm
                       step2Form={step2Form}
                       handleStep2SubmitAction={handleStep2Submit}
                     />
                   )}
 
-                  {activeStep === 3 && (
+                  {currentStep === 3 && (
                     <AddPublicationForm
                       step3Form={step3Form}
                       handleStep3SubmitAction={handleStep3Submit}
                     />
                   )}
 
-                  {activeStep === 4 && (
+                  {currentStep === 4 && (
                     <AddPaymentPlanForm
                       step4Form={step4Form}
                       handleStep4SubmitAction={handleStep4Submit}
@@ -394,7 +411,7 @@ export function OnboardingModal({
               </Button>
               <Button
                 onClick={() => {
-                  switch (activeStep) {
+                  switch (currentStep) {
                     case 1:
                       step1Form.handleSubmit(handleStep1Submit)();
                       break;
@@ -414,6 +431,8 @@ export function OnboardingModal({
               >
                 {isLoading ? (
                   "Processing..."
+                ) : completedSteps.includes(currentStep) ? (
+                  "Update Info"
                 ) : isLastStep ? (
                   "Complete Setup"
                 ) : (
