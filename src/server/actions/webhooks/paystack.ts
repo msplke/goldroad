@@ -5,6 +5,7 @@ import "server-only";
 
 import type z from "zod";
 
+import { decryptSecret } from "~/server/crypto/kit-secrets";
 import type { DbType } from "~/server/db";
 import {
   creator,
@@ -46,7 +47,7 @@ export async function createSubscriber(
       body: subscriberInfo,
       throws: true,
       headers: {
-        "X-Kit-Api-Key": kitApiKey,
+        "X-Kit-Api-Key": decryptSecret(kitApiKey),
       },
     },
   );
