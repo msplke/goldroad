@@ -3,6 +3,7 @@
 
 // db/schema.ts
 import { relations } from "drizzle-orm";
+import { unique } from "drizzle-orm/pg-core";
 
 import { user } from "~/server/db/schema/auth-schema";
 import { createdAt, createTable, updatedAt } from "~/server/db/schema/utils";
@@ -87,23 +88,29 @@ export const publication = createTable("publication", (d) => ({
   updatedAt,
 }));
 
-export const plan = createTable("plan", (d) => ({
-  id: d.uuid().primaryKey().defaultRandom(),
-  name: d.text().notNull(),
-  interval: d.text().$type<PlanInterval>().notNull(),
-  amount: d.integer().notNull(), // Plan amount in Ksh.
-  publicationId: d
-    .uuid()
-    .notNull()
-    .references(() => publication.id, { onDelete: "cascade" }),
-  // kitPlanNameTagId: d.bigint({ mode: "number" }).notNull(),
-  // kitIntervalTagId: d.bigint({ mode: "number" }).notNull(),
-  paystackPlanCode: d.text().notNull(),
-  paystackPaymentPageId: d.bigint({ mode: "number" }).notNull(),
-  paystackPaymentPageUrlSlug: d.text().notNull(),
-  createdAt,
-  updatedAt,
-}));
+export const plan = createTable(
+  "plan",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    name: d.text().notNull(),
+    interval: d.text().$type<PlanInterval>().notNull(),
+    amount: d.integer().notNull(), // Plan amount in Ksh.
+    publicationId: d
+      .uuid()
+      .notNull()
+      .references(() => publication.id, { onDelete: "cascade" }),
+    // kitPlanNameTagId: d.bigint({ mode: "number" }).notNull(),
+    // kitIntervalTagId: d.bigint({ mode: "number" }).notNull(),
+    paystackPlanCode: d.text().notNull(),
+    paystackPaymentPageId: d.bigint({ mode: "number" }).notNull(),
+    paystackPaymentPageUrlSlug: d.text().notNull(),
+    createdAt,
+    updatedAt,
+  }),
+  (t) => [
+    unique("unique_publication_interval").on(t.publicationId, t.interval),
+  ],
+);
 
 export const planBenefit = createTable("plan_benefit", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),

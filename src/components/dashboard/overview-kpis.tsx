@@ -45,7 +45,7 @@ export function OverviewKPIs() {
           <Card
             key={kpi.title}
             className={cn(
-              "group hover:-translate-y-1 relative overflow-hidden border-0 bg-gradient-to-br transition-all duration-300 hover:shadow-black/5 hover:shadow-lg",
+              "group hover:-translate-y-1 relative overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-black/5 hover:shadow-lg",
               kpi.bgColor,
               kpi.borderColor,
               "slide-in-from-bottom-4 animate-in duration-500",
