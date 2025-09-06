@@ -4,6 +4,7 @@ import z from "zod";
 
 import { checkCreatorExists, getCreator } from "~/server/actions/trpc/creator";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { decryptSecret, encryptSecret } from "~/server/crypto/kit-secrets";
 import { db } from "~/server/db";
 import {
   creator,
@@ -116,7 +117,15 @@ export const creatorRouter = createTRPCRouter({
         ctx.db,
         ctx.session.user.id,
       );
-      if (input.kitApiKey === creatorKitApiKey) {
+
+      const decryptedKitApiKey = creatorKitApiKey
+        ? decryptSecret(creatorKitApiKey)
+        : null;
+
+      if (
+        decryptedKitApiKey !== null &&
+        input.kitApiKey === decryptedKitApiKey
+      ) {
         // No changes needed, return early
         console.log("No changes needed, returning early...");
         return;
@@ -157,7 +166,7 @@ export const creatorRouter = createTRPCRouter({
       await ctx.db
         .update(creator)
         .set({
-          kitApiKey: input.kitApiKey, // TODO: Encrypt this
+          kitApiKey: encryptSecret(input.kitApiKey),
         })
         .where(eq(creator.id, creatorId));
 

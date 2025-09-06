@@ -4,6 +4,7 @@ import z from "zod";
 
 import { getCreator } from "~/server/actions/trpc/creator";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { decryptSecret } from "~/server/crypto/kit-secrets";
 import type { DbType } from "~/server/db";
 import { publication } from "~/server/db/schema/app-schema";
 import { kitClient } from "~/server/fetch-clients/kit";
@@ -50,7 +51,10 @@ export const publicationRouter = createTRPCRouter({
 
         // Create a Kit tag for the publication
         console.log("Creating a tag for the publication on Kit...");
-        const tag = await createKitTag(input.name, foundCreator.kitApiKey);
+        const tag = await createKitTag(
+          input.name,
+          decryptSecret(foundCreator.kitApiKey),
+        );
 
         // Create the publication on the DB
         console.log("Creating the publication on the DB...");
