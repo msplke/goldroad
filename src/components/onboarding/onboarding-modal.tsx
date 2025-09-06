@@ -1,13 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle2,
-  ExternalLink,
-  Shield,
-} from "lucide-react";
+import { ArrowRight, CheckCircle2, ExternalLink, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -86,44 +80,48 @@ export function OnboardingModal({
   // tRPC mutations - simplified to only handle server updates
   const addKitApiKey = api.creator.addOrUpdateKitApiKey.useMutation({
     onSuccess: () => {
-      toast.success("Success. Kit API Key successfully added.");
+      toast.success("Kit integration completed successfully!");
       // The useOnboarding hook will automatically advance when creator data refetches
       utils.creator.get.invalidate();
     },
     onError: () => {
-      toast.error("Failed to add Kit API Key. Please try again.");
+      toast.error(
+        "Failed to save Kit API key. Please ensure your Kit API key is valid and try again.",
+      );
     },
   });
 
   const addBankInfo = api.creator.addBankAccountInfo.useMutation({
     onSuccess: () => {
-      toast.success("Success. Bank details successfully added.");
+      toast.success("Bank account information saved successfully!");
       utils.creator.get.invalidate();
     },
     onError: () => {
-      toast.error("Failed to add Bank Details. Please try again.");
+      toast.error(
+        "Failed to save bank account details. Please ensure they are valid and try again.",
+      );
     },
   });
 
   const createPublication = api.publication.create.useMutation({
     onSuccess: (createdPublicationId) => {
-      toast.success("Success. Publication successfully created.");
+      toast.success("Publication created successfully!");
       setPublicationId(createdPublicationId);
       utils.creator.get.invalidate();
     },
     onError: () => {
-      toast.error("Failed to create Publication. Please try again.");
+      toast.error("Failed to create publication. Please try again.");
     },
   });
 
   const createPlans = api.plan.createMonthlyAndYearlyPlans.useMutation({
     onSuccess: () => {
-      toast.success("Success. Payment plans successfully created.");
+      toast.success("Payment plans created successfully! Setup complete!");
       utils.creator.get.invalidate();
       // Modal will close automatically via isComplete useEffect
     },
     onError: () => {
-      toast.error("Failed to create Payment Plans. Please try again.");
+      toast.error("Failed to create payment plans. Please try again.");
     },
   });
 
@@ -161,7 +159,6 @@ export function OnboardingModal({
 
   const currentStepConfig = stepConfigs.find((step) => step.id === currentStep);
   const isLastStep = currentStep === totalSteps;
-  const canGoPrev = currentStep > 1;
 
   const canAccessStep = (stepId: number) => {
     const stepConfig = stepConfigs.find((s) => s.id === stepId);
@@ -175,7 +172,9 @@ export function OnboardingModal({
   // Form submission handlers - simplified with completion checks
   const handleStep1Submit = (data: Step1FormData) => {
     if (completedSteps.includes(1)) {
-      toast.info("ConvertKit integration already completed!");
+      toast.info(
+        "Kit integration is already set up and can only be modified from the settings page.",
+      );
       return;
     }
     addKitApiKey.mutate({ kitApiKey: data.apiKey });
@@ -183,7 +182,9 @@ export function OnboardingModal({
 
   const handleStep2Submit = (data: Step2FormData) => {
     if (completedSteps.includes(2)) {
-      toast.info("Bank details already provided!");
+      toast.info(
+        "Bank account information is already saved and can only be modified from the settings page.",
+      );
       return;
     }
     addBankInfo.mutate({
@@ -195,7 +196,9 @@ export function OnboardingModal({
 
   const handleStep3Submit = (data: Step3FormData) => {
     if (completedSteps.includes(3)) {
-      toast.info("Publication already created!");
+      toast.info(
+        "Publication is already created and can only be modified from the settings page.",
+      );
       return;
     }
     createPublication.mutate({
@@ -206,7 +209,7 @@ export function OnboardingModal({
 
   const handleStep4Submit = (data: Step4FormData) => {
     if (completedSteps.includes(4)) {
-      toast.info("Payment plans already set up! Setup complete!");
+      toast.info("Payment plans are already set up! Your setup is complete.");
       return;
     }
     if (!publicationId) {
@@ -234,12 +237,6 @@ export function OnboardingModal({
     addBankInfo.error ||
     createPublication.error ||
     createPlans.error;
-
-  const handlePrev = () => {
-    if (canGoPrev) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
 
   const handleSkip = () => {
     onOpenChange(false);
@@ -322,8 +319,9 @@ export function OnboardingModal({
                         This step is already completed!
                       </p>
                       <p className="text-muted-foreground text-sm">
-                        You can move to the next step or modify this information
-                        if needed.
+                        This information is locked to prevent duplicate
+                        submissions. To make changes, please visit the settings
+                        page.
                       </p>
                     </div>
                   ) : null}
@@ -395,15 +393,8 @@ export function OnboardingModal({
 
           {/* Navigation */}
           <div className="flex items-center justify-between">
-            <Button
-              variant="outline"
-              onClick={handlePrev}
-              disabled={!canGoPrev || isLoading}
-              className="flex items-center gap-2 bg-transparent"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Previous
-            </Button>
+            {/* Empty div for flex spacing */}
+            <div />
 
             <div className="flex items-center gap-2">
               <Button variant="ghost" onClick={handleSkip} disabled={isLoading}>
@@ -432,12 +423,12 @@ export function OnboardingModal({
                 {isLoading ? (
                   "Processing..."
                 ) : completedSteps.includes(currentStep) ? (
-                  "Update Info"
+                  "View Details"
                 ) : isLastStep ? (
                   "Complete Setup"
                 ) : (
                   <>
-                    Next
+                    Continue
                     <ArrowRight className="h-4 w-4" />
                   </>
                 )}
