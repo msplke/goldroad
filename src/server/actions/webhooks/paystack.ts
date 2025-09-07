@@ -113,10 +113,16 @@ export async function handleSubscriptionCancelled(
     return;
   }
 
-  const { kitApiKey, creatorId } = await getCreatorInfoFromPlanCode(
+  const { kitApiKey, creatorId, planId } = await getCreatorInfoFromPlanCode(
     db,
     planCode,
   );
+
+  if (foundSubscriber.planId !== planId) {
+    throw new Error(
+      `Plan ID mismatch for subscriber. Subscriber plan ID: ${foundSubscriber.planId}, Plan ID from Paystack webhook: ${planId}`,
+    );
+  }
 
   if (!kitApiKey) {
     throw new Error(
