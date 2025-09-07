@@ -1,7 +1,3 @@
-// Example model schema from the Drizzle docs
-// https://orm.drizzle.team/docs/sql-schema-declaration
-
-// db/schema.ts
 import { relations } from "drizzle-orm";
 import { unique } from "drizzle-orm/pg-core";
 
@@ -14,18 +10,12 @@ import type {
 
 export const paidSubscriber = createTable("paid_subscriber", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
-  email: d.text("email").unique().notNull(),
-  firstName: d.text("first_name"),
-  paystackSubscriptionCode: d
-    .text("paystack_subscription_code")
-    .unique()
-    .notNull(),
-  kitSubscriberId: d
-    .bigint("kit_subscriber_id", { mode: "number" })
-    .unique()
-    .notNull(),
+  email: d.text().unique().notNull(),
+  firstName: d.text(),
+  paystackSubscriptionCode: d.text().unique().notNull(),
+  kitSubscriberId: d.bigint({ mode: "number" }).unique().notNull(),
   status: d
-    .varchar("status", { length: 20 })
+    .varchar({ length: 20 })
     .$type<SubscriptionStatus>()
     .default("active")
     .notNull(),
@@ -33,6 +23,8 @@ export const paidSubscriber = createTable("paid_subscriber", (d) => ({
     .uuid()
     .references(() => plan.id, { onDelete: "cascade" })
     .notNull(),
+  nextPaymentDate: d.timestamp({ mode: "date" }),
+  totalRevenue: d.integer().notNull(), // Amount in Ksh.
   createdAt,
   updatedAt,
 }));

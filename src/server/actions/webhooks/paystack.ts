@@ -27,6 +27,8 @@ export async function createSubscriber(
   subscriberInfo: z.infer<typeof kitSubscriberCreateSchema>,
   subscriptionCode: string,
   planCode: string,
+  amount: number,
+  nextPaymentDate: Date,
 ) {
   // Get the id of the tag that shows that a payment has been done
   const { intervalTag, statusTag, publicationTag, planId, kitApiKey } =
@@ -90,6 +92,8 @@ export async function createSubscriber(
       paystackSubscriptionCode: subscriptionCode,
       kitSubscriberId: kitSubscriber.id,
       status: "active",
+      totalRevenue: amount,
+      nextPaymentDate,
     })
     .onConflictDoNothing({
       target: paidSubscriber.paystackSubscriptionCode,
@@ -169,6 +173,7 @@ export async function handleSubscriptionCancelled(
     .update(paidSubscriber)
     .set({
       status: "non-renewing",
+      nextPaymentDate: null,
     })
     .where(eq(paidSubscriber.id, foundSubscriber.id));
 }
