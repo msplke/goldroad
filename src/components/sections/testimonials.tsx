@@ -45,8 +45,8 @@ export function Testimonials() {
                 ))}
               </div> */}
               <p className="mb-4 text-muted-foreground">
-                "The ConvertKit integration is perfect. My paying subscribers
-                are automatically tagged and segmented."
+                "The Kit integration is perfect. My paying subscribers are
+                automatically tagged and segmented."
               </p>
               <div className="flex items-center">
                 <div className="mr-3 h-10 w-10 rounded-full bg-muted"></div>

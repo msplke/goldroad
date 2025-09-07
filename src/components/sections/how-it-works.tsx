@@ -17,7 +17,7 @@ export function HowItWorks() {
               Connect Your Accounts
             </h3>
             <p className="text-muted-foreground">
-              Link your Paystack and ConvertKit accounts in minutes
+              Link your Paystack and Kit accounts in minutes
             </p>
           </div>
           <div className="text-center">

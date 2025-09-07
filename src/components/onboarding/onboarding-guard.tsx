@@ -46,10 +46,11 @@ export function OnboardingGuard({ children, fallback }: OnboardingGuardProps) {
             You need to complete the onboarding process to access this feature.
           </CardDescription>
         </CardHeader>
+
         <CardContent className="space-y-4">
           <p className="text-center text-muted-foreground text-sm">
-            This section requires you to have set up your ConvertKit
-            integration, bank details, publication, and payment plans.
+            This section requires you to have set up your Kit integration, bank
+            details, publication, and payment plans.
           </p>
           <div className="flex gap-2">
             <Button variant="outline" asChild className="flex-1">

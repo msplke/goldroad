@@ -9,14 +9,14 @@ export function HeroLanding() {
     <section className="px-4 py-20">
       <div className="container mx-auto max-w-4xl text-center">
         <Badge variant="secondary" className="mb-6">
-          No Stripe needed. ConvertKit-compatible.
+          No Stripe needed. Kit-compatible.
         </Badge>
         <h1 className="mb-6 text-balance font-bold text-4xl md:text-6xl">
           Accept Local Recurring Payments
         </h1>
         <p className="mx-auto mb-8 max-w-2xl text-balance text-muted-foreground text-xl">
           Accept recurring payments locally with Paystack, automatically sync
-          paying subscribers into your ConvertKit, get payouts to your bank.
+          paying subscribers into your Kit, get payouts to your bank.
         </p>
 
         <div className="flex flex-col justify-center gap-4 sm:flex-row">

@@ -28,20 +28,20 @@ export const stepConfigs: StepConfig[] = [
     id: 1,
     icon: Mail,
     content: {
-      title: "Setup ConvertKit Integration",
+      title: "Set up Kit Integration",
       description:
-        "Connect your ConvertKit account to automatically sync paying subscribers.",
+        "Connect your Kit account to automatically sync paying subscribers.",
       fields: [
         {
           name: "apiKey",
-          label: "ConvertKit API Key",
+          label: "Kit API Key",
           placeholder: "Your API key",
           type: "password",
         },
       ],
       helpText:
-        "Your API key will be encrypted and stored securely. Get it from ConvertKit Account Settings > Advanced.",
-      helpLink: "https://app.convertkit.com/account_settings/advanced_settings",
+        "Your API key will be encrypted and stored securely. Get it from Account (top-right) → Settings → Developer (V4 Keys).",
+      helpLink: "https://app.kit.com/account_settings/developer_settings",
     },
   },
   {
@@ -120,7 +120,7 @@ export const stepConfigs: StepConfig[] = [
       ],
       helpText:
         "This information will be displayed on your public pricing page and payment forms.",
-      requiresPrevious: [1, 2], // Requires ConvertKit and Bank Details to be completed
+      requiresPrevious: [1, 2], // Requires Kit and Bank Details to be completed
     },
   },
   {
