@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { constructMetadata } from "~/lib/utils";
+import { db } from "~/server/db";
 import { api } from "~/trpc/server";
 
 interface PageProps {
@@ -24,18 +25,18 @@ interface PageProps {
   };
 }
 
-function slugToTitle(slug: string): string {
-  return slug
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-export function generateMetadata({ params }: PageProps): Metadata {
-  const publicationName = slugToTitle(params.slug);
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const foundPublication = await db.query.publication.findFirst({
+    where: (publication, { eq }) => eq(publication.slug, params.slug),
+    columns: { name: true },
+  });
 
   return constructMetadata({
-    title: `Subscribe to ${publicationName}`,
+    title: foundPublication
+      ? `Subscribe to ${foundPublication.name}`
+      : "Publication not found",
   });
 }
 
