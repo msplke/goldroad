@@ -29,6 +29,8 @@ const PaystackWebhookBodySchema = z.object({
     id: z.number(),
     subscription_code: z.string().optional(),
     plan: planSchema.optional(),
+    next_payment_date: z.coerce.date().nullable().optional(),
+    amount: z.number().optional(),
     status: z.string().optional(),
     customer: z.object({
       first_name: z.string(),
@@ -79,6 +81,10 @@ export async function POST(req: Request) {
         if (!data.subscription_code)
           return new Response("No subscription code", { status: 400 });
         if (!data.plan) return new Response("No plan info", { status: 400 });
+        if (!data.next_payment_date)
+          return new Response("No next payment date", { status: 400 });
+        if (!data.amount)
+          return new Response("No amount info", { status: 400 });
         // Create a new subscriber on Kit and on app db
 
         const handle = await tasks.trigger<typeof createSubscriberTask>(
@@ -88,6 +94,8 @@ export async function POST(req: Request) {
               email_address: data.customer.email,
               first_name: data.customer.first_name,
             },
+            nextPaymentDate: data.next_payment_date,
+            amount: data.amount / 100, // Convert from subunits to units
             planCode: data.plan.plan_code,
             subscriptionCode: data.subscription_code,
           },
