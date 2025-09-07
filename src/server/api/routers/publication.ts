@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
 
+import { generateSlugFromName } from "~/lib/utils";
 import { getCreator } from "~/server/actions/trpc/creator";
 import {
   createTRPCRouter,
@@ -21,6 +22,30 @@ const CreatePublicationInfoSchema = z.object({
     .max(100)
     .regex(/^[a-zA-Z0-9\s\-_]+$/, "Invalid characters in name"),
   description: z.string().max(500).optional(),
+});
+
+const UpdatePublicationInfoSchema = z.object({
+  id: z.uuid("Invalid publication ID"),
+  name: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-zA-Z0-9\s\-_]+$/, "Invalid characters in name"),
+  description: z.string().max(500).optional(),
+  slug: z
+    .string()
+    .min(3, "Slug must be at least 3 characters")
+    .max(100, "Slug must be less than 100 characters")
+    .regex(
+      /^[a-z0-9-]+$/,
+      "Slug can only contain lowercase letters, numbers, and hyphens",
+    )
+    .refine((slug) => !slug.startsWith("-") && !slug.endsWith("-"), {
+      message: "Slug cannot start or end with a hyphen",
+    })
+    .refine((slug) => !slug.includes("--"), {
+      message: "Slug cannot contain consecutive hyphens",
+    }),
 });
 
 // TODO: Use one validation schema on front and back end
@@ -74,6 +99,94 @@ export const publicationRouter = createTRPCRouter({
         return publicationId;
       });
     }),
+
+  /** Update publication details */
+  update: protectedProcedure
+    .input(UpdatePublicationInfoSchema)
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.transaction(async (tx) => {
+        const foundCreator = await getCreator(tx, ctx.session.user.id);
+
+        // Check if publication exists and belongs to the current creator
+        const existingPublication = await tx.query.publication.findFirst({
+          where: and(
+            eq(publication.id, input.id),
+            eq(publication.creatorId, foundCreator.id),
+          ),
+        });
+
+        if (!existingPublication) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message:
+              "Publication not found or you don't have permission to edit it",
+          });
+        }
+
+        // Check if another publication with the same name exists (excluding current one)
+        if (input.name !== existingPublication.name) {
+          const duplicatePublication = await tx.query.publication.findFirst({
+            where: and(
+              eq(publication.creatorId, foundCreator.id),
+              eq(publication.name, input.name),
+            ),
+          });
+
+          if (duplicatePublication) {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "A publication with this name already exists",
+            });
+          }
+        }
+
+        // Check if another publication with the same slug exists (excluding current one)
+        if (input.slug !== existingPublication.slug) {
+          const duplicateSlugPublication = await tx.query.publication.findFirst(
+            {
+              where: eq(publication.slug, input.slug),
+            },
+          );
+
+          if (duplicateSlugPublication) {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "A publication with this slug already exists",
+            });
+          }
+        }
+
+        // Update the publication
+        await tx
+          .update(publication)
+          .set({
+            name: input.name,
+            description: input.description,
+            slug: input.slug,
+          })
+          .where(eq(publication.id, input.id));
+
+        return { success: true };
+      });
+    }),
+
+  /** Get current creator's publication (for editing) */
+  getForEdit: protectedProcedure.query(async ({ ctx }) => {
+    const foundCreator = await getCreator(ctx.db, ctx.session.user.id);
+
+    const foundPublication = await ctx.db.query.publication.findFirst({
+      where: eq(publication.creatorId, foundCreator.id),
+    });
+
+    if (!foundPublication) {
+      throw new TRPCError({
+        message: "No publication found for this creator",
+        code: "NOT_FOUND",
+      });
+    }
+
+    return foundPublication;
+  }),
 
   /** Get all publications for the current creator */
   getByCreator: protectedProcedure.query(async ({ ctx }) => {
@@ -228,23 +341,6 @@ async function createKitTag(name: string, kitApiKey: string) {
   }
 
   return tagData.tag;
-}
-
-function generateSlugFromName(name: string): string {
-  let slug = name
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-
-  // Handle edge case where name results in empty slug or very short slug
-  if (slug.length === 0) {
-    slug = "publication";
-  } else if (slug.length < 3) {
-    slug = `publication-${slug}`;
-  }
-
-  return slug;
 }
 
 async function ensureUniqueSlug(db: DbType, baseSlug: string): Promise<string> {
