@@ -75,3 +75,20 @@ export function getBaseUrl() {
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   return `http://localhost:${process.env.PORT ?? 3000}`; // Dev SSR should use localhost
 }
+
+export function generateSlugFromName(name: string): string {
+  let slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  // Handle edge case where name results in empty slug or very short slug
+  if (slug.length === 0) {
+    slug = "publication";
+  } else if (slug.length < 3) {
+    slug = `publication-${slug}`;
+  }
+
+  return slug;
+}
