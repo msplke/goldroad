@@ -1,36 +1,21 @@
-"use client";
+// import { BankDetailsForm } from "~/components/dashboard/settings/bank-details-form";
+import { KitSettingsForm } from "~/components/dashboard/settings/kit-settings-form";
+import { PersonalDetailsForm } from "~/components/dashboard/settings/personal-details-form";
 
 export default function SettingsPage() {
   return (
-    <div className="space-y-8">
-      <div className="space-y-2">
+    <div className="space-y-6">
+      <div>
         <h1 className="font-bold text-3xl tracking-tight">Settings</h1>
-        <p className="text-lg text-muted-foreground">
-          Manage your account settings, Kit integration, and bank details.
+        <p className="text-muted-foreground">
+          Manage your account settings, integrations, and payment details.
         </p>
       </div>
 
-      <div className="space-y-6">
-        <div className="rounded-lg border bg-card p-6">
-          <h3 className="mb-4 font-semibold text-lg">Personal Details</h3>
-          <div className="text-muted-foreground">
-            Update your name, email, and profile information.
-          </div>
-        </div>
-
-        <div className="rounded-lg border bg-card p-6">
-          <h3 className="mb-4 font-semibold text-lg">Kit Integration</h3>
-          <div className="text-muted-foreground">
-            Manage your Kit API key and integration settings.
-          </div>
-        </div>
-
-        <div className="rounded-lg border bg-card p-6">
-          <h3 className="mb-4 font-semibold text-lg">Bank Details</h3>
-          <div className="text-muted-foreground">
-            Update your bank account information for payouts.
-          </div>
-        </div>
+      <div className="grid gap-6">
+        <PersonalDetailsForm />
+        <KitSettingsForm />
+        {/* <BankDetailsForm /> */}
       </div>
     </div>
   );
