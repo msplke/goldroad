@@ -19,17 +19,19 @@ import { constructMetadata } from "~/lib/utils";
 import { db } from "~/server/db";
 import { api } from "~/trpc/server";
 
-interface PageProps {
-  params: {
-    slug: string;
-  };
-}
+type Params = {
+  slug: string;
+};
 
 export async function generateMetadata({
   params,
-}: PageProps): Promise<Metadata> {
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+
   const foundPublication = await db.query.publication.findFirst({
-    where: (publication, { eq }) => eq(publication.slug, params.slug),
+    where: (publication, { eq }) => eq(publication.slug, slug),
     columns: { name: true },
   });
 
@@ -42,16 +44,21 @@ export async function generateMetadata({
 
 export default async function PublicationSubscriptionPage({
   params,
-}: PageProps) {
+}: {
+  params: Promise<Params>;
+}) {
+  const { slug } = await params;
+
   try {
-    const data = await api.publication.getBySlug({ slug: params.slug });
+    const data = await api.publication.getBySlug({ slug });
 
     return (
       <div className="min-h-screen bg-background text-foreground">
         <div className="mx-auto max-w-6xl px-6 py-16">
-          <MaxWidthWrapper className="flex absolute top-0 p-4 justify-end">
+          <MaxWidthWrapper className="absolute top-0 flex justify-end p-4">
             <ModeToggle />
           </MaxWidthWrapper>
+
           {/* Header */}
           <div className="mb-12 text-center">
             <Icons.logo className="mx-auto mb-4 h-10 w-10" />
@@ -66,15 +73,14 @@ export default async function PublicationSubscriptionPage({
             )}
           </div>
 
-          {/* Subscription Plans */}
           <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold">Choose a subscription plan</h2>
+            <h2 className="font-bold text-3xl">Choose a subscription plan</h2>
           </div>
 
           {/* Plans Grid */}
           <div className="flex justify-center">
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
-              {data.plans.map((plan, index) => (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              {data.plans.map((plan, _index) => (
                 <Card key={plan.id} className="min-w-[280px] max-w-sm">
                   <CardHeader className="text-center">
                     <CardTitle className="capitalize">
@@ -111,7 +117,7 @@ export default async function PublicationSubscriptionPage({
               ))}
             </div>
           </div>
-          {/* Back Link */}
+
           <div className="mt-8 text-center text-sm">
             Powered by{" "}
             <Link href="/" className="underline">
@@ -121,7 +127,7 @@ export default async function PublicationSubscriptionPage({
         </div>
       </div>
     );
-  } catch (error) {
+  } catch (_error) {
     notFound();
   }
 }
