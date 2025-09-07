@@ -6,8 +6,7 @@ export default function SettingsPage() {
       <div className="space-y-2">
         <h1 className="font-bold text-3xl tracking-tight">Settings</h1>
         <p className="text-lg text-muted-foreground">
-          Manage your account settings, ConvertKit integration, and bank
-          details.
+          Manage your account settings, Kit integration, and bank details.
         </p>
       </div>
 
@@ -20,9 +19,9 @@ export default function SettingsPage() {
         </div>
 
         <div className="rounded-lg border bg-card p-6">
-          <h3 className="mb-4 font-semibold text-lg">ConvertKit Integration</h3>
+          <h3 className="mb-4 font-semibold text-lg">Kit Integration</h3>
           <div className="text-muted-foreground">
-            Manage your ConvertKit API key and integration settings.
+            Manage your Kit API key and integration settings.
           </div>
         </div>
 

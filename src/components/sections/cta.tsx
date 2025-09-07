@@ -10,7 +10,7 @@ export function CallToAction() {
         </h2>
         <p className="mx-auto mb-8 max-w-2xl text-xl opacity-90">
           Join hundreds of African creators who are already earning with local
-          payments and ConvertKit integration.
+          payments and Kit integration.
         </p>
         <Button size="lg" variant="secondary" className="px-8 text-lg">
           Get Started Free

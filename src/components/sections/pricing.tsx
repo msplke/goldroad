@@ -31,7 +31,7 @@ export function Pricing() {
               </li>
               <li className="flex items-center">
                 <Icons.checkCircle className="mr-3 h-5 w-5 text-primary" />
-                <span>ConvertKit integration</span>
+                <span>Kit integration</span>
               </li>
               <li className="flex items-center">
                 <Icons.checkCircle className="mr-3 h-5 w-5 text-primary" />

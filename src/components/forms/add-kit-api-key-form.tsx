@@ -33,7 +33,7 @@ export function AddKitApiKeyForm({
           name="apiKey"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>ConvertKit API Key</FormLabel>
+              <FormLabel>Kit API Key</FormLabel>
               <FormControl>
                 <Input placeholder="Your API key" type="password" {...field} />
               </FormControl>
