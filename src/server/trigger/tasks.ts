@@ -16,6 +16,8 @@ export const createSubscriberTask = schemaTask({
     subscriberInfo: kitSubscriberCreateSchema,
     subscriptionCode: z.string(),
     planCode: z.string(),
+    nextPaymentDate: z.date(),
+    amount: z.number(),
   }),
   // Set an optional maxDuration to prevent tasks from running indefinitely
   maxDuration: 420, // Stop executing after 420 secs (7 mins) of compute
@@ -38,6 +40,8 @@ export const createSubscriberTask = schemaTask({
         payload.subscriberInfo,
         payload.subscriptionCode,
         payload.planCode,
+        payload.amount,
+        payload.nextPaymentDate,
       );
 
       return { message: "Successfully created subscriber" };
