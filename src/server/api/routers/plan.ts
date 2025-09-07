@@ -22,6 +22,11 @@ const CreatePlanInfoSchema = z.object({
     .min(1000, "Annual amount must be at least Ksh. 1000"),
 });
 
+const UpdatePlanInfoSchema = z.object({
+  planId: z.uuid("Invalid plan ID"),
+  amount: z.number().min(100, "Amount must be at least Ksh. 100"),
+});
+
 type CreatePaystackPlanInfo = z.infer<typeof createPlanSchema>;
 type CreatePaystackPaymentPageInfo = z.infer<typeof createPaymentPageSchema>;
 
@@ -139,6 +144,71 @@ export const planRouter = createTRPCRouter({
       });
 
       return plans;
+    }),
+
+  /** Update a plan's pricing */
+  updatePricing: protectedProcedure
+    .input(UpdatePlanInfoSchema)
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.transaction(async (tx) => {
+        const foundCreator = await getCreator(tx, ctx.session.user.id);
+
+        // Get the plan and verify ownership
+        const foundPlan = await tx.query.plan.findFirst({
+          where: eq(plan.id, input.planId),
+          with: {
+            publication: true,
+          },
+        });
+
+        if (!foundPlan) {
+          throw new TRPCError({
+            message: "Plan not found",
+            code: "NOT_FOUND",
+          });
+        }
+
+        // Verify the plan's publication belongs to this creator
+        if (foundPlan.publication.creatorId !== foundCreator.id) {
+          throw new TRPCError({
+            message: "You don't have permission to edit this plan",
+            code: "FORBIDDEN",
+          });
+        }
+
+        // Update the plan on Paystack first
+        console.log(
+          `Updating Paystack plan ${foundPlan.paystackPlanCode} with new amount ${input.amount}...`,
+        );
+        const amountInSubunits = input.amount * 100;
+        const { data: paystackResponse, error: paystackError } =
+          await paystackClient("@put/plan/:id_or_code", {
+            params: { id_or_code: foundPlan.paystackPlanCode },
+            body: {
+              amount: amountInSubunits,
+            },
+          });
+
+        if (paystackError || !paystackResponse) {
+          throw new TRPCError({
+            message: `Failed to update plan on Paystack: ${paystackError?.message || "Unknown error"}`,
+            code: "INTERNAL_SERVER_ERROR",
+          });
+        }
+
+        // Update the plan in our database
+        await tx
+          .update(plan)
+          .set({
+            amount: input.amount,
+          })
+          .where(eq(plan.id, input.planId));
+
+        console.log(
+          "Plan updated successfully on both Paystack and local database",
+        );
+        return { success: true };
+      });
     }),
 });
 

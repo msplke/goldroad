@@ -435,9 +435,7 @@ const paystackSchema = createSchema({
         .optional()
         .describe("Number of invoices to raise during subscription"),
     }),
-    output: baseResponseSchema.extend({
-      data: planSchema,
-    }),
+    output: baseResponseSchema,
   },
 
   // === BANK ENDPOINT ===

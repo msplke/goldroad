@@ -3,6 +3,7 @@
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 
+import { EditPlanPricingForm } from "~/components/forms/edit-plan-pricing-form";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -92,14 +93,6 @@ export function PublicationPlans({ publicationId }: PublicationPlansProps) {
     );
   }
 
-  const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat("en-KE", {
-      style: "currency",
-      currency: "KES",
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
-
   const formatInterval = (interval: string) => {
     return interval === "monthly" ? "Monthly" : "Annual";
   };
@@ -109,8 +102,7 @@ export function PublicationPlans({ publicationId }: PublicationPlansProps) {
       <CardHeader>
         <CardTitle>Payment Plans</CardTitle>
         <CardDescription>
-          Your active subscription plans. Subscribers can choose from these
-          options.
+          Manage your subscription plans. Click the edit icon to update pricing.
         </CardDescription>
       </CardHeader>
 
@@ -120,17 +112,21 @@ export function PublicationPlans({ publicationId }: PublicationPlansProps) {
             key={plan.id}
             className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between"
           >
-            <div className="space-y-1">
+            <div className="space-y-3">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2">
                 <h4 className="font-medium">{plan.name}</h4>
                 <Badge variant="secondary" className="w-fit">
                   {formatInterval(plan.interval)}
                 </Badge>
               </div>
-              <p className="text-muted-foreground text-sm">
-                {formatAmount(plan.amount)} per{" "}
-                {plan.interval === "monthly" ? "month" : "year"}
-              </p>
+              <EditPlanPricingForm
+                plan={{
+                  id: plan.id,
+                  name: plan.name,
+                  amount: plan.amount,
+                  interval: plan.interval,
+                }}
+              />
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <Button
@@ -154,9 +150,10 @@ export function PublicationPlans({ publicationId }: PublicationPlansProps) {
 
         <div className="rounded-lg bg-muted/50 p-4">
           <p className="text-muted-foreground text-sm">
-            <strong>Note:</strong> Plan pricing and details are configured
-            during setup and cannot be modified directly. Contact support if you
-            need to make changes to your plans.
+            <strong>Note:</strong> Pricing changes are automatically synced with
+            Paystack and will apply to new subscribers. Existing subscribers
+            will continue with their current pricing until they renew their
+            subscription.
           </p>
         </div>
       </CardContent>
