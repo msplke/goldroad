@@ -3,10 +3,15 @@ import { and, eq } from "drizzle-orm";
 import z from "zod";
 
 import { getCreator } from "~/server/actions/trpc/creator";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import { decryptSecret } from "~/server/crypto/kit-secrets";
 import type { DbType } from "~/server/db";
-import { publication } from "~/server/db/schema/app-schema";
+import { user } from "~/server/db/schema";
+import { creator, plan, publication } from "~/server/db/schema/app-schema";
 import { kitClient } from "~/server/fetch-clients/kit";
 
 const CreatePublicationInfoSchema = z.object({
@@ -83,7 +88,7 @@ export const publicationRouter = createTRPCRouter({
   }),
 
   /** Get a publication by its slug (public endpoint) */
-  getBySlug: protectedProcedure
+  getBySlug: publicProcedure
     .input(z.object({ slug: z.string().min(4, "Slug is required") }))
     .query(async ({ ctx, input }) => {
       const foundPublication = await ctx.db.query.publication.findFirst({
@@ -97,7 +102,63 @@ export const publicationRouter = createTRPCRouter({
         });
       }
 
-      return foundPublication;
+      const foundCreator = await ctx.db.query.creator.findFirst({
+        where: eq(creator.id, foundPublication.creatorId),
+        columns: { id: true, userId: true },
+      });
+
+      if (!foundCreator) {
+        throw new TRPCError({
+          message: "Creator for publication not found",
+          code: "NOT_FOUND",
+        });
+      }
+
+      const foundUser = await ctx.db.query.user.findFirst({
+        where: eq(user.id, foundCreator.userId),
+        columns: { name: true },
+      });
+
+      if (!foundUser) {
+        throw new TRPCError({
+          message: "User for creator not found",
+          code: "NOT_FOUND",
+        });
+      }
+
+      const plans = await ctx.db.query.plan.findMany({
+        where: eq(plan.publicationId, foundPublication.id),
+        columns: {
+          id: true,
+          name: true,
+          interval: true,
+          amount: true,
+          paystackPaymentPageUrlSlug: true,
+        },
+        with: {
+          planBenefits: {
+            columns: { id: true, description: true },
+          },
+        },
+      });
+
+      if (plans.length === 0) {
+        throw new TRPCError({
+          message: "Plans for publication not found",
+          code: "NOT_FOUND",
+        });
+      }
+
+      return {
+        creatorName: foundUser.name,
+        publication: {
+          name: foundPublication.name,
+          description: foundPublication.description,
+          slug: foundPublication.slug,
+          createdAt: foundPublication.createdAt,
+        },
+        plans,
+      };
     }),
 });
 

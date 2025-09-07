@@ -114,3 +114,14 @@ export const planBenefit = createTable("plan_benefit", (d) => ({
   createdAt,
   updatedAt,
 }));
+
+export const planRelations = relations(plan, ({ many }) => ({
+  planBenefits: many(planBenefit),
+}));
+
+export const planBenefitRelations = relations(planBenefit, ({ one }) => ({
+  plan: one(plan, {
+    fields: [planBenefit.planId],
+    references: [plan.id],
+  }),
+}));
