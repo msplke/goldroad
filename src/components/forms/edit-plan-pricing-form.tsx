@@ -94,7 +94,6 @@ export function EditPlanPricingForm({ plan }: EditPlanPricingProps) {
                   <Input
                     type="number"
                     min={100}
-                    step={10}
                     placeholder="Amount in KES"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}

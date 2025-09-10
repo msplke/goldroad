@@ -50,7 +50,7 @@ export function OnboardingGuard({ children, fallback }: OnboardingGuardProps) {
         <CardContent className="space-y-4">
           <p className="text-center text-muted-foreground text-sm">
             This section requires you to have set up your Kit integration, bank
-            details, publication, and payment plans.
+            account information, publication, and payment plans.
           </p>
           <div className="flex gap-2">
             <Button variant="outline" asChild className="flex-1">
