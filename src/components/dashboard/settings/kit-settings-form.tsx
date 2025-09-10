@@ -1,9 +1,17 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle, ExternalLink, Mail, Save, Shield } from "lucide-react";
+import {
+  CheckCircle,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  Mail,
+  Save,
+  Shield,
+} from "lucide-react";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -36,6 +44,8 @@ const kitSettingsSchema = z.object({
 type KitSettingsFormData = z.infer<typeof kitSettingsSchema>;
 
 export function KitSettingsForm() {
+  const [showApiKey, setShowApiKey] = useState(false);
+
   const { data: creator, isLoading: isLoadingCreator } =
     api.creator.get.useQuery();
   const utils = api.useUtils();
@@ -120,16 +130,36 @@ export function KitSettingsForm() {
                 <FormItem>
                   <FormLabel>Kit API Key</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
-                      placeholder={
-                        isConnected
-                          ? "Enter new API key to update"
-                          : "Enter your Kit API key"
-                      }
-                      disabled={isLoading}
-                      {...field}
-                    />
+                    <div className="relative">
+                      <Input
+                        type={showApiKey ? "text" : "password"}
+                        placeholder={
+                          isConnected
+                            ? "Enter new API key to update"
+                            : "Enter your Kit API key"
+                        }
+                        disabled={isLoading}
+                        className="pr-10"
+                        {...field}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowApiKey(!showApiKey)}
+                        disabled={isLoading}
+                      >
+                        {showApiKey ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                        <span className="sr-only">
+                          {showApiKey ? "Hide API key" : "Show API key"}
+                        </span>
+                      </Button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                   <div className="space-y-2">

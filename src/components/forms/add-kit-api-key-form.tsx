@@ -1,7 +1,10 @@
 "use client";
 
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
+import { Button } from "~/components/ui/button";
 import {
   Form,
   FormControl,
@@ -22,6 +25,8 @@ export function AddKitApiKeyForm({
   step1Form,
   handleStep1SubmitAction,
 }: AddKitApiKeyFormProps) {
+  const [showApiKey, setShowApiKey] = useState(false);
+
   return (
     <Form {...step1Form}>
       <form
@@ -35,7 +40,30 @@ export function AddKitApiKeyForm({
             <FormItem>
               <FormLabel>Kit API Key</FormLabel>
               <FormControl>
-                <Input placeholder="Your API key" type="password" {...field} />
+                <div className="relative">
+                  <Input
+                    placeholder="Your API key"
+                    type={showApiKey ? "text" : "password"}
+                    className="pr-10"
+                    {...field}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                  >
+                    {showApiKey ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                    <span className="sr-only">
+                      {showApiKey ? "Hide API key" : "Show API key"}
+                    </span>
+                  </Button>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
