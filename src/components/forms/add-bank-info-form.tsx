@@ -43,7 +43,7 @@ export function AddBankInfoForm({
           name="bankCode"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Bank</FormLabel>
+              <FormLabel>Bank/Mobile Money</FormLabel>
               <Select
                 onValueChange={field.onChange}
                 value={field.value}
@@ -93,7 +93,7 @@ export function AddBankInfoForm({
           name="accountNumber"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Account Number</FormLabel>
+              <FormLabel>Account Number/Mobile Number</FormLabel>
               <FormControl>
                 <Input placeholder="1234567890" {...field} />
               </FormControl>
