@@ -39,10 +39,6 @@ export function PublicationShareLink({
     }
   };
 
-  const openInNewTab = () => {
-    window.open(shareUrl, "_blank", "noopener,noreferrer");
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -52,6 +48,7 @@ export function PublicationShareLink({
           publication and subscribe.
         </CardDescription>
       </CardHeader>
+
       <CardContent className="space-y-4">
         <div className="flex gap-2">
           <Input value={shareUrl} readOnly className="flex-1" />
@@ -67,13 +64,10 @@ export function PublicationShareLink({
               <Copy className="h-4 w-4" />
             )}
           </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={openInNewTab}
-            title="Open in new tab"
-          >
-            <ExternalLink className="h-4 w-4" />
+          <Button asChild size="icon" variant="outline" title="Open in new tab">
+            <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="h-4 w-4" />
+            </a>
           </Button>
         </div>
 
@@ -91,9 +85,11 @@ export function PublicationShareLink({
               </>
             )}
           </Button>
-          <Button variant="outline" onClick={openInNewTab} className="flex-1">
-            <ExternalLink className="mr-2 h-4 w-4" />
-            Preview
+          <Button variant="outline" asChild className="flex-1">
+            <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="mr-2 h-4 w-4" />
+              Preview
+            </a>
           </Button>
         </div>
       </CardContent>

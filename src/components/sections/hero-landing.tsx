@@ -16,7 +16,7 @@ export function HeroLanding() {
         </h1>
         <p className="mx-auto mb-8 max-w-2xl text-balance text-muted-foreground text-xl">
           Accept recurring payments locally with Paystack, automatically sync
-          paying subscribers into your Kit, get payouts to your bank.
+          paying subscribers into your Kit account, get payouts to your bank.
         </p>
 
         <div className="flex flex-col justify-center gap-4 sm:flex-row">
