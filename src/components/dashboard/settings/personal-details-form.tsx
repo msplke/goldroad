@@ -32,7 +32,7 @@ const personalDetailsSchema = z.object({
     .string()
     .min(1, "Name is required")
     .max(100, "Name must be less than 100 characters"),
-  email: z.string().email("Please enter a valid email address"),
+  // email: z.string().email("Please enter a valid email address"),
 });
 
 type PersonalDetailsFormData = z.infer<typeof personalDetailsSchema>;
@@ -58,7 +58,7 @@ export function PersonalDetailsForm() {
     resolver: zodResolver(personalDetailsSchema),
     defaultValues: {
       name: "",
-      email: "",
+      // email: "",
     },
   });
 
@@ -67,7 +67,7 @@ export function PersonalDetailsForm() {
     if (user) {
       form.reset({
         name: user.name,
-        email: user.email,
+        // email: user.email,
       });
     }
   }, [user, form]);
@@ -138,7 +138,7 @@ export function PersonalDetailsForm() {
                 )}
               />
 
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
@@ -157,7 +157,7 @@ export function PersonalDetailsForm() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
             </div>
 
             <Button
