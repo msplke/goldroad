@@ -41,7 +41,7 @@ export const stepConfigs: StepConfig[] = [
       ],
       helpText:
         "Your API key will be encrypted and stored securely. Get it from Account (top-right) → Settings → Developer (V4 Keys).",
-      helpLink: "https://app.kit.com/account_settings/developer_settings",
+      helpLink: "https://help.kit.com/en/articles/9902901-kit-api-overview",
     },
   },
   {
