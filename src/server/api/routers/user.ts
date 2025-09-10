@@ -11,7 +11,7 @@ const updatePersonalDetailsSchema = z.object({
     .string()
     .min(1, "Name is required")
     .max(100, "Name must be less than 100 characters"),
-  email: z.email("Please enter a valid email address"),
+  // email: z.email("Please enter a valid email address"),
 });
 
 export const userRouter = createTRPCRouter({
@@ -45,30 +45,29 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       try {
         // Check if email is being changed and if it already exists for another user
-        if (input.email !== ctx.session.user.email) {
-          const existingUser = await db
-            .select({ id: user.id })
-            .from(user)
-            .where(eq(user.email, input.email))
-            .limit(1);
+        // if (input.email !== ctx.session.user.email) {
+        //   const existingUser = await db
+        //     .select({ id: user.id })
+        //     .from(user)
+        //     .where(eq(user.email, input.email))
+        //     .limit(1);
 
-          if (
-            existingUser.length > 0 &&
-            existingUser[0]?.id !== ctx.session.user.id
-          ) {
-            throw new TRPCError({
-              code: "CONFLICT",
-              message: "An account with this email address already exists",
-            });
-          }
-        }
+        //   if (
+        //     existingUser.length > 0 &&
+        //     existingUser[0]?.id !== ctx.session.user.id
+        //   ) {
+        //     throw new TRPCError({
+        //       code: "CONFLICT",
+        //       message: "An account with this email address already exists",
+        //     });
+        //   }
+        // }
 
         const updatedUser = await db
           .update(user)
           .set({
             name: input.name,
-            email: input.email,
-            updatedAt: new Date(),
+            // email: input.email,
           })
           .where(eq(user.id, ctx.session.user.id))
           .returning({
