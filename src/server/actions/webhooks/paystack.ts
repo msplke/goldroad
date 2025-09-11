@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import "server-only";
 
 /** These are actions that are to be executed only in Paystack webhooks */
@@ -260,7 +260,7 @@ export async function updateOnSuccessfulSubsequentPayment(
     .update(paidSubscriber)
     .set({
       status: "active",
-      totalRevenue: foundSubscriber.totalRevenue + amount,
+      totalRevenue: sql`${paidSubscriber.totalRevenue} + ${amount}`,
       nextPaymentDate,
     })
     .where(eq(paidSubscriber.id, foundSubscriber.id));
