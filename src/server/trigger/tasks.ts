@@ -55,7 +55,7 @@ export const createSubscriberTask = schemaTask({
 });
 
 export const subscriptionDisabledTask = schemaTask({
-  id: "webhook:handle-subscription-completed",
+  id: "webhook:handle-subscription-disabled",
   schema: z.object({
     subscriptionCode: z.string(),
     planCode: z.string(),
