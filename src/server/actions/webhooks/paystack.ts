@@ -15,6 +15,7 @@ import {
   tagInfo,
 } from "~/server/db/schema/app-schema";
 import {
+  KIT_API_KEY_HEADER,
   kitClient,
   type kitSubscriberCreateSchema,
 } from "~/server/fetch-clients/kit";
@@ -49,7 +50,7 @@ export async function createSubscriber(
       body: subscriberInfo,
       throws: true,
       headers: {
-        "X-Kit-Api-Key": decryptSecret(kitApiKey),
+        [KIT_API_KEY_HEADER]: decryptSecret(kitApiKey),
       },
     },
   );
@@ -151,7 +152,7 @@ export async function handleSubscriptionCancelled(
       subscriberId: foundSubscriber.kitSubscriberId.toString(),
     },
     headers: {
-      "X-Kit-Api-Key": decryptedKitApiKey,
+      [KIT_API_KEY_HEADER]: decryptedKitApiKey,
     },
     throws: true,
   });
@@ -163,7 +164,7 @@ export async function handleSubscriptionCancelled(
       subscriberId: foundSubscriber.kitSubscriberId.toString(),
     },
     headers: {
-      "X-Kit-Api-Key": decryptedKitApiKey,
+      [KIT_API_KEY_HEADER]: decryptedKitApiKey,
     },
     throws: true,
   });
@@ -214,7 +215,7 @@ export async function handleSubscriptionDisabled(
       subscriberId: foundSubscriber.kitSubscriberId.toString(),
     },
     headers: {
-      "X-Kit-Api-Key": decryptSecret(kitApiKey),
+      [KIT_API_KEY_HEADER]: decryptSecret(kitApiKey),
     },
     throws: true,
   });
@@ -261,6 +262,84 @@ export async function updateOnSuccessfulSubsequentPayment(
       status: "active",
       totalRevenue: foundSubscriber.totalRevenue + amount,
       nextPaymentDate,
+    })
+    .where(eq(paidSubscriber.id, foundSubscriber.id));
+}
+
+export async function updateOnFailedSubsequentPayment(
+  db: DbType,
+  subscriptionCode: string,
+  planCode: string,
+) {
+  const foundSubscriber = await db.query.paidSubscriber.findFirst({
+    where: eq(paidSubscriber.paystackSubscriptionCode, subscriptionCode),
+  });
+
+  if (!foundSubscriber) {
+    throw new Error(
+      `Subscriber with subscription code ${subscriptionCode} not found`,
+    );
+  }
+
+  const { planId } = await getCreatorInfoFromPlanCode(db, planCode);
+
+  if (foundSubscriber.planId !== planId) {
+    throw new Error(
+      `Plan ID mismatch for subscriber. Subscriber plan ID: ${foundSubscriber.planId}, Plan ID from Paystack webhook: ${planId}`,
+    );
+  }
+
+  // Tag the subscriber as non-renewing on Kit
+  const { kitApiKey, creatorId } = await getCreatorInfoFromPlanCode(
+    db,
+    planCode,
+  );
+
+  if (!kitApiKey) {
+    throw new Error(
+      "Unable to update subscriber. Creator Kit API Key not set!",
+    );
+  }
+
+  const decryptedKitApiKey = decryptSecret(kitApiKey);
+  const foundTagInfo = await db.query.tagInfo.findFirst({
+    where: eq(tagInfo.creatorId, creatorId),
+  });
+
+  if (!foundTagInfo) {
+    throw new Error("Unable to retrieve tag info");
+  }
+
+  // Remove the current active tag from the subscriber
+  await kitClient("@delete/tags/:tagId/subscribers/:subscriberId", {
+    params: {
+      tagId: foundTagInfo.kitActiveTagId.toString(),
+      subscriberId: foundSubscriber.kitSubscriberId.toString(),
+    },
+    headers: {
+      [KIT_API_KEY_HEADER]: decryptedKitApiKey,
+    },
+    throws: true,
+  });
+
+  // Add the attention tag to the subscriber
+  await kitClient("@post/tags/:tagId/subscribers/:subscriberId", {
+    params: {
+      tagId: foundTagInfo.kitAttentionTagId.toString(),
+      subscriberId: foundSubscriber.kitSubscriberId.toString(),
+    },
+    headers: {
+      [KIT_API_KEY_HEADER]: decryptedKitApiKey,
+    },
+    throws: true,
+  });
+
+  // Update the subscriber status on the app db
+  await db
+    .update(paidSubscriber)
+    .set({
+      status: "attention",
+      nextPaymentDate: null,
     })
     .where(eq(paidSubscriber.id, foundSubscriber.id));
 }
@@ -368,7 +447,7 @@ async function tagSubscriberOnKit(
         subscriberId: subscriberId,
       },
       headers: {
-        "X-Kit-Api-Key": decryptSecret(kitApiKey),
+        [KIT_API_KEY_HEADER]: decryptSecret(kitApiKey),
       },
       throws: true,
     },

@@ -10,6 +10,7 @@ import type {
   createSubscriberTask,
   subscriptionCancelledTask,
   subscriptionDisabledTask,
+  updateOnFailedSubsequentPaymentTask,
   updateOnSuccessfulSubsequentPaymentTask,
 } from "~/server/trigger/tasks";
 import { createHmac, timingSafeEqual } from "node:crypto";
@@ -17,7 +18,11 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 // `invoice.update` also runs when a charge attempt fails, but
 // it is considered a payment event as here while handling it,
 // we will only consider successful attempts, and ignore failed attempts
-const PaymentEventEnum = z.enum(["subscription.create", "invoice.update"]);
+const PaymentEventEnum = z.enum([
+  "subscription.create",
+  "invoice.update",
+  "invoice.payment_failed",
+]);
 
 const CancelEventEnum = z.enum([
   "subscription.disable",
@@ -117,6 +122,31 @@ export async function POST(req: Request) {
         );
 
         console.log(`Running create subscriber task with handle: ${handle}`);
+        break;
+      }
+      case "invoice.payment_failed": {
+        if (!data.plan) {
+          console.log("No plan info in invoice.update event, ignoring");
+          return OK_RESPONSE;
+        }
+        if (!data.subscription) {
+          console.log("No subscription info in invoice.update event, ignoring");
+          return OK_RESPONSE;
+        }
+
+        const handle = await tasks.trigger<
+          typeof updateOnFailedSubsequentPaymentTask
+        >(
+          "webhook:update-on-failed-subsequent-payment",
+
+          {
+            subscriptionCode: data.subscription.subscription_code,
+            planCode: data.plan.plan_code,
+          },
+        );
+        console.log(
+          `Running update on subsequent payment task with handle: ${handle}`,
+        );
         break;
       }
       case "invoice.update": {
