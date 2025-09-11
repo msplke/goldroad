@@ -228,6 +228,43 @@ export async function handleSubscriptionDisabled(
     .where(eq(paidSubscriber.id, foundSubscriber.id));
 }
 
+export async function updateOnSuccessfulSubsequentPayment(
+  db: DbType,
+  subscriptionCode: string,
+  planCode: string,
+  nextPaymentDate: Date,
+  amount: number,
+) {
+  const foundSubscriber = await db.query.paidSubscriber.findFirst({
+    where: eq(paidSubscriber.paystackSubscriptionCode, subscriptionCode),
+  });
+
+  if (!foundSubscriber) {
+    throw new Error(
+      `Subscriber with subscription code ${subscriptionCode} not found`,
+    );
+  }
+
+  const { planId } = await getCreatorInfoFromPlanCode(db, planCode);
+
+  if (foundSubscriber.planId !== planId) {
+    throw new Error(
+      `Plan ID mismatch for subscriber. Subscriber plan ID: ${foundSubscriber.planId}, Plan ID from Paystack webhook: ${planId}`,
+    );
+  }
+
+  // The status tag on Kit at this point should already be set to `active` from the initial subscription creation.
+
+  await db
+    .update(paidSubscriber)
+    .set({
+      status: "active",
+      totalRevenue: foundSubscriber.totalRevenue + amount,
+      nextPaymentDate,
+    })
+    .where(eq(paidSubscriber.id, foundSubscriber.id));
+}
+
 export async function getSubscriberInfoBySubscriptionCode(
   db: DbType,
   paystackSubscriptionCode: string,
