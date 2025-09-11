@@ -6,6 +6,7 @@ import {
   getSubscriberInfoBySubscriptionCode,
   handleSubscriptionCancelled,
   handleSubscriptionDisabled,
+  updateOnSuccessfulSubsequentPayment,
 } from "~/server/actions/webhooks/paystack";
 import { db } from "~/server/db";
 import { kitSubscriberCreateSchema } from "~/server/fetch-clients/kit";
@@ -93,6 +94,38 @@ export const subscriptionCancelledTask = schemaTask({
       logger.error("Error occurred, unable to handle subscription.cancelled", {
         error,
       });
+      throw error;
+    }
+  },
+});
+
+export const updateOnSuccessfulSubsequentPaymentTask = schemaTask({
+  id: "webhook:update-on-subsequent-payment",
+  schema: z.object({
+    subscriptionCode: z.string(),
+    planCode: z.string(),
+    nextPaymentDate: z.date(),
+    amount: z.number(),
+  }),
+  run: async (payload, { ctx }) => {
+    logger.log("Updating subscriber on subsequent payment...", { ctx });
+    try {
+      await updateOnSuccessfulSubsequentPayment(
+        db,
+        payload.subscriptionCode,
+        payload.planCode,
+        payload.nextPaymentDate,
+        payload.amount,
+      );
+
+      return { message: "Subscriber updated successfully" };
+    } catch (error) {
+      logger.error(
+        "Error occurred, unable to update subscriber on subsequent payment",
+        {
+          error,
+        },
+      );
       throw error;
     }
   },

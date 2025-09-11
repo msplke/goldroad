@@ -2,11 +2,15 @@ import { tasks } from "@trigger.dev/sdk";
 import { z } from "zod";
 
 import { env } from "~/env";
-import { planSchema } from "~/server/fetch-clients/paystack";
+import {
+  planSchema,
+  subscriptionStatusEnum,
+} from "~/server/fetch-clients/paystack";
 import type {
   createSubscriberTask,
   subscriptionCancelledTask,
   subscriptionDisabledTask,
+  updateOnSuccessfulSubsequentPaymentTask,
 } from "~/server/trigger/tasks";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
@@ -26,17 +30,25 @@ type CancelEvent = z.infer<typeof CancelEventEnum>;
 const PaystackWebhookBodySchema = z.object({
   event: z.string(), // Keep as string for initial parsing
   data: z.object({
-    id: z.number(),
+    id: z.number().optional(),
     subscription_code: z.string().optional(),
     plan: planSchema.optional(),
     next_payment_date: z.coerce.date().nullable().optional(),
-    amount: z.number().optional(),
+    amount: z.number().int(),
     status: z.string().optional(),
     customer: z.object({
       first_name: z.string(),
       last_name: z.string(),
       email: z.email(),
     }),
+    subscription: z
+      .object({
+        status: subscriptionStatusEnum,
+        subscription_code: z.string(),
+        amount: z.number().int(),
+        next_payment_date: z.coerce.date().nullable(),
+      })
+      .optional(),
   }),
 });
 
@@ -59,6 +71,9 @@ export async function POST(req: Request) {
   }
 
   // Parse the webhook payload
+  console.log("Start: ");
+  console.log(JSON.parse(rawBody));
+
   const parsedBody = PaystackWebhookBodySchema.safeParse(JSON.parse(rawBody));
   if (!parsedBody.success) {
     console.log("Error parsing body:", parsedBody.error);
@@ -85,8 +100,8 @@ export async function POST(req: Request) {
           return new Response("No next payment date", { status: 400 });
         if (!data.amount)
           return new Response("No amount info", { status: 400 });
-        // Create a new subscriber on Kit and on app db
 
+        // Create a new subscriber on Kit and on app db
         const handle = await tasks.trigger<typeof createSubscriberTask>(
           "webhook:create-subscriber",
           {
@@ -112,6 +127,34 @@ export async function POST(req: Request) {
           );
           return OK_RESPONSE;
         }
+        if (!data.plan) {
+          console.log("No plan info in invoice.update event, ignoring");
+          return OK_RESPONSE;
+        }
+        if (!data.subscription) {
+          console.log("No subscription info in invoice.update event, ignoring");
+          return OK_RESPONSE;
+        }
+        if (!data.subscription.next_payment_date) {
+          console.log("No next payment date in subscription info, ignoring");
+          return OK_RESPONSE;
+        }
+        const handle = await tasks.trigger<
+          typeof updateOnSuccessfulSubsequentPaymentTask
+        >(
+          "webhook:update-on-subsequent-payment",
+
+          {
+            subscriptionCode: data.subscription.subscription_code,
+            planCode: data.plan.plan_code,
+            nextPaymentDate: data.subscription.next_payment_date,
+            amount: data.amount / 100, // Convert from subunits to units
+          },
+        );
+        console.log(
+          `Running update on subsequent payment task with handle: ${handle}`,
+        );
+        break;
       }
     }
   }
