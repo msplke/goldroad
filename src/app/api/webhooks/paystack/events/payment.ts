@@ -1,4 +1,4 @@
-import { tasks } from "@trigger.dev/sdk";
+import { idempotencyKeys, tasks } from "@trigger.dev/sdk";
 
 import type {
   PaymentEvent,
@@ -48,6 +48,10 @@ async function handleSubscriptionCreationEvent(data: PaystackWebhookBodyData) {
     return;
   }
 
+  const idempotencyKey = await idempotencyKeys.create(
+    `paystack-subscription-create-${data.subscription_code}`,
+  );
+
   // Create a new subscriber on Kit and on app db
   const handle = await tasks.trigger<typeof createSubscriberTask>(
     "webhook:create-subscriber",
@@ -61,6 +65,7 @@ async function handleSubscriptionCreationEvent(data: PaystackWebhookBodyData) {
       planCode: data.plan.plan_code,
       subscriptionCode: data.subscription_code,
     },
+    { idempotencyKey },
   );
 
   console.log(`Running create subscriber task with handle: ${handle}`);
@@ -76,6 +81,10 @@ async function handleFailedPaymentEvent(data: PaystackWebhookBodyData) {
     return;
   }
 
+  const idempotencyKey = await idempotencyKeys.create(
+    `paystack-invoice-payment-failed-${data.subscription.subscription_code}`,
+  );
+
   const handle = await tasks.trigger<
     typeof updateOnFailedSubsequentPaymentTask
   >(
@@ -85,6 +94,7 @@ async function handleFailedPaymentEvent(data: PaystackWebhookBodyData) {
       subscriptionCode: data.subscription.subscription_code,
       planCode: data.plan.plan_code,
     },
+    { idempotencyKey },
   );
   console.log(
     `Running update on subsequent payment task with handle: ${handle}`,
@@ -113,6 +123,11 @@ async function handleSuccessfulPaymentEvent(data: PaystackWebhookBodyData) {
     console.log("No next payment date in subscription info, ignoring");
     return;
   }
+
+  const idempotencyKey = await idempotencyKeys.create(
+    `paystack-invoice-payment-success-${data.subscription.subscription_code}`,
+  );
+
   const handle = await tasks.trigger<
     typeof updateOnSuccessfulSubsequentPaymentTask
   >(
@@ -124,6 +139,7 @@ async function handleSuccessfulPaymentEvent(data: PaystackWebhookBodyData) {
       nextPaymentDate: data.subscription.next_payment_date,
       amount: data.amount / 100, // Convert from subunits to units
     },
+    { idempotencyKey },
   );
   console.log(
     `Running update on subsequent payment task with handle: ${handle}`,

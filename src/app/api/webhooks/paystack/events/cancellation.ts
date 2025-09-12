@@ -1,4 +1,4 @@
-import { tasks } from "@trigger.dev/sdk";
+import { idempotencyKeys, tasks } from "@trigger.dev/sdk";
 
 import type {
   CancellationEvent,
@@ -37,12 +37,17 @@ export async function handleSubscriptionDisabledEvent(
     return;
   }
 
+  const idempotencyKey = await idempotencyKeys.create(
+    `paystack-subscription-disable-${data.subscription_code}`,
+  );
+
   const handle = await tasks.trigger<typeof subscriptionDisabledTask>(
     "webhook:handle-subscription-disabled",
     {
       subscriptionCode: data.subscription_code,
       planCode: data.plan.plan_code,
     },
+    { idempotencyKey },
   );
   console.log(
     `Running handle subscription completed task with handle: ${handle}`,
@@ -64,6 +69,10 @@ export async function handleSubscriptionCancelledEvent(
     return;
   }
 
+  const idempotencyKey = await idempotencyKeys.create(
+    `paystack-subscription-not-renew-${data.subscription_code}`,
+  );
+
   // Handle subscription cancelled
   const handle = await tasks.trigger<typeof subscriptionCancelledTask>(
     "webhook:handle-subscription-cancelled",
@@ -71,6 +80,7 @@ export async function handleSubscriptionCancelledEvent(
       subscriptionCode: data.subscription_code,
       planCode: data.plan.plan_code,
     },
+    { idempotencyKey },
   );
   console.log(
     `Running handle subscription cancelled task with handle: ${handle}`,
