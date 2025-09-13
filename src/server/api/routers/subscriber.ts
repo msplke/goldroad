@@ -1,7 +1,33 @@
 import { eq } from "drizzle-orm";
+import type z from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { creator, paidSubscriber, plan, publication } from "~/server/db/schema";
+import type {
+  PlanInterval,
+  SubscriptionStatus,
+} from "~/server/fetch-clients/paystack";
+
+export type SubscriberListItem = {
+  subscriber: {
+    id: string;
+    email: string;
+    firstName: string | null;
+    status: SubscriptionStatus;
+    nextPaymentDate: Date | null;
+    totalRevenue: number;
+    createdAt: Date;
+  };
+  plan: {
+    id: string;
+    amount: number;
+    interval: z.infer<PlanInterval>;
+  };
+  publication: {
+    id: string;
+    name: string;
+  };
+};
 
 export const subscriberRouter = createTRPCRouter({
   get: protectedProcedure.query(async ({ ctx }) => {
