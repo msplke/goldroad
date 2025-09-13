@@ -13,7 +13,12 @@ export function SiteFooter({ className }: React.HTMLAttributes<HTMLElement>) {
       <MaxWidthWrapper>
         <div className="flex flex-col items-center justify-between gap-2 py-4 md:flex-row">
           <div className="flex flex-col items-center gap-2 md:flex-row md:gap-2">
-            <Icons.logo />
+            <div className="flex items-center gap-2">
+              <Icons.logo />
+              <span className="rounded-full bg-orange-500 px-2 py-0.5 font-medium text-white text-xs uppercase">
+                Beta
+              </span>
+            </div>
             <p className="text-sm leading-loose">
               © {new Date().getFullYear()} {siteConfig.name}. All rights
               reserved.
