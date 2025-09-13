@@ -10,12 +10,12 @@ export const sidebarLinks: SidebarNavItem[] = [
         icon: "dashboard",
         requiresOnboarding: false,
       },
-      {
-        title: "Subscribers",
-        href: "/dashboard/subscribers",
-        icon: "users",
-        requiresOnboarding: true,
-      },
+      // {
+      //   title: "Subscribers",
+      //   href: "/dashboard/subscribers",
+      //   icon: "users",
+      //   requiresOnboarding: true,
+      // },
       {
         title: "Publication",
         href: "/dashboard/publication",
