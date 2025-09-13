@@ -14,10 +14,10 @@ export const marketingConfig: MarketingConfig = {
       title: "Pricing",
       href: "#pricing",
     },
-    {
-      title: "Testimonials",
-      href: "#testimonials",
-    },
+    // {
+    //   title: "Testimonials",
+    //   href: "#testimonials",
+    // },
   ],
 };
 
