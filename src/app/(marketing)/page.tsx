@@ -3,7 +3,7 @@ import { Features } from "~/components/sections/features";
 import { HeroLanding } from "~/components/sections/hero-landing";
 import { HowItWorks } from "~/components/sections/how-it-works";
 import { Pricing } from "~/components/sections/pricing";
-import { Testimonials } from "~/components/sections/testimonials";
+// import { Testimonials } from "~/components/sections/testimonials";
 
 export default function LandingPage() {
   return (
@@ -12,7 +12,7 @@ export default function LandingPage() {
       <Features />
       <HowItWorks />
       <Pricing />
-      <Testimonials />
+      {/* <Testimonials /> */}
       <CallToAction />
     </>
   );

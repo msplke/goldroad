@@ -36,9 +36,6 @@ export function HeroLanding() {
             <a href="#how-it-works">See How It Works</a>
           </Button>
         </div>
-        <p className="mt-4 text-muted-foreground text-sm">
-          Payouts to your local bank. KYC verified creators only.
-        </p>
       </div>
     </section>
   );
