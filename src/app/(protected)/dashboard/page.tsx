@@ -4,7 +4,7 @@ import { Sparkles } from "lucide-react";
 import { useState } from "react";
 
 import { OverviewKPIs } from "~/components/dashboard/overview-kpis";
-// import { KPICharts } from "~/components/dashboard/kpi-charts"
+import { SubscribersTableWithData } from "~/components/dashboard/subscribers-table";
 import { OnboardingChecklist } from "~/components/onboarding/onboarding-checklist";
 import { OnboardingModal } from "~/components/onboarding/onboarding-modal";
 import { useOnboarding } from "~/hooks/use-onboarding";
@@ -53,7 +53,12 @@ export default function DashboardPage() {
         </div>
 
         <div className="slide-in-from-bottom-5 animate-in delay-300 duration-500">
-          {/* <KPICharts /> */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-xl">Recent Subscribers</h2>
+            </div>
+            <SubscribersTableWithData />
+          </div>
         </div>
       </div>
 
