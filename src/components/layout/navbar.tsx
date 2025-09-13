@@ -31,6 +31,9 @@ export function NavBar({ scroll = false }: { scroll?: boolean }) {
           <Link href="/" className="flex items-center space-x-2">
             <Icons.logo />
             <span className="font-bold text-lg">{siteConfig.name}</span>
+            <span className="rounded-full bg-orange-500 px-2 py-0.5 font-medium text-white text-xs uppercase">
+              Beta
+            </span>
           </Link>
 
           {links?.length ? (
