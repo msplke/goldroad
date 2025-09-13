@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { authClient } from "~/auth/client";
-import { Avatar, AvatarFallback } from "~/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -16,23 +16,9 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
-interface UserDropdownProps {
-  user?: {
-    name: string;
-    email: string;
-    initials?: string;
-  };
-}
-
-export function UserDropdown({ user }: UserDropdownProps) {
+export function UserDropdown() {
   const router = useRouter();
-
-  // Default user data for demo purposes
-  const userData = user || {
-    name: "[USER_NAME]",
-    email: "[USER_EMAIL]",
-    initials: "U",
-  };
+  const { data: session } = authClient.useSession();
 
   const handleLogout = async () => {
     await authClient.signOut({
@@ -44,6 +30,31 @@ export function UserDropdown({ user }: UserDropdownProps) {
     });
   };
 
+  // Show loading state if session is not available
+  if (!session?.user) {
+    return (
+      <Button
+        variant="ghost"
+        className="relative h-10 w-10 rounded-full hover:bg-accent"
+        disabled
+      >
+        <Avatar className="h-8 w-8">
+          <AvatarFallback className="bg-muted">...</AvatarFallback>
+        </Avatar>
+      </Button>
+    );
+  }
+
+  const user = session.user;
+  const initials = user.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : user.email?.[0]?.toUpperCase() || "U";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -52,8 +63,14 @@ export function UserDropdown({ user }: UserDropdownProps) {
           className="relative h-10 w-10 rounded-full hover:bg-accent"
         >
           <Avatar className="h-8 w-8">
+            {user.image && (
+              <AvatarImage
+                src={user.image}
+                alt={user.name || user.email || "User avatar"}
+              />
+            )}
             <AvatarFallback className="bg-primary font-medium text-primary-foreground text-sm">
-              {userData.initials || userData.name.charAt(0).toUpperCase()}
+              {initials}
             </AvatarFallback>
           </Avatar>
           <span className="sr-only">User menu</span>
@@ -62,9 +79,11 @@ export function UserDropdown({ user }: UserDropdownProps) {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="font-medium text-sm leading-none">{userData.name}</p>
+            <p className="font-medium text-sm leading-none">
+              {user.name || "Unknown User"}
+            </p>
             <p className="text-muted-foreground text-xs leading-none">
-              {userData.email}
+              {user.email}
             </p>
           </div>
         </DropdownMenuLabel>
