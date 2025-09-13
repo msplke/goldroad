@@ -1,42 +1,92 @@
-import { ArrowUpRight, Calendar, DollarSign, Users } from "lucide-react";
+"use client";
+
+import { Calendar, DollarSign, Users } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { cn } from "~/lib/utils";
+import { api } from "~/trpc/react";
 
-const kpis = [
-  {
-    title: "Monthly Recurring Revenue",
-    value: "$2,450",
-    change: "+12.5%",
-    trend: "up",
-    icon: DollarSign,
-    color: "from-green-500 to-emerald-600",
-    bgColor: "from-green-50 to-emerald-50",
-    borderColor: "border-green-200",
-  },
-  {
-    title: "Active Subscribers",
-    value: "78",
-    change: "+6 this month",
-    trend: "up",
-    icon: Users,
-    color: "from-blue-500 to-cyan-600",
-    bgColor: "from-blue-50 to-cyan-50",
-    borderColor: "border-blue-200",
-  },
-  {
-    title: "Next Payout",
-    value: "$1,890",
-    change: "Dec 15, 2024",
-    trend: "neutral",
-    icon: Calendar,
-    color: "from-purple-500 to-violet-600",
-    bgColor: "from-purple-50 to-violet-50",
-    borderColor: "border-purple-200",
-  },
-];
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat("en-KE", {
+    style: "currency",
+    currency: "KES",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
 
 export function OverviewKPIs() {
+  const { data: stats, isLoading } = api.subscriber.getStats.useQuery();
+
+  const kpis = [
+    {
+      title: "Monthly Recurring Revenue",
+      value: stats ? formatCurrency(stats.monthlyRecurringRevenue) : "KES 0",
+      change: "+12.5%",
+      trend: "up" as const,
+      icon: DollarSign,
+      color: "from-green-500 to-emerald-600",
+      bgColor: "from-green-50 to-emerald-50",
+      borderColor: "border-green-200",
+    },
+    {
+      title: "Active Subscribers",
+      value: stats ? stats.activeSubscribers.toString() : "0",
+      change: "+6 this month",
+      trend: "up" as const,
+      icon: Users,
+      color: "from-blue-500 to-cyan-600",
+      bgColor: "from-blue-50 to-cyan-50",
+      borderColor: "border-blue-200",
+    },
+    {
+      title: "Total Revenue",
+      value: stats ? formatCurrency(stats.totalRevenue) : "KES 0",
+      change: "All time",
+      trend: "neutral" as const,
+      icon: Calendar,
+      color: "from-purple-500 to-violet-600",
+      bgColor: "from-purple-50 to-violet-50",
+      borderColor: "border-purple-200",
+    },
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card className="animate-pulse">
+          <CardHeader className="pb-3">
+            <div className="h-4 w-1/2 rounded bg-muted" />
+          </CardHeader>
+          <CardContent>
+            <div className="mb-2 h-8 w-2/3 rounded bg-muted" />
+            <div className="h-3 w-1/3 rounded bg-muted" />
+          </CardContent>
+        </Card>
+
+        <Card className="animate-pulse">
+          <CardHeader className="pb-3">
+            <div className="h-4 w-1/2 rounded bg-muted" />
+          </CardHeader>
+          <CardContent>
+            <div className="mb-2 h-8 w-2/3 rounded bg-muted" />
+            <div className="h-3 w-1/3 rounded bg-muted" />
+          </CardContent>
+        </Card>
+
+        <Card className="animate-pulse">
+          <CardHeader className="pb-3">
+            <div className="h-4 w-1/2 rounded bg-muted" />
+          </CardHeader>
+          <CardContent>
+            <div className="mb-2 h-8 w-2/3 rounded bg-muted" />
+            <div className="h-3 w-1/3 rounded bg-muted" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-6 md:grid-cols-3">
       {kpis.map((kpi, index) => {
@@ -71,7 +121,7 @@ export function OverviewKPIs() {
               <div className="mb-2 font-bold text-3xl text-gray-900 transition-transform duration-200 group-hover:scale-105">
                 {kpi.value}
               </div>
-              <div className="flex items-center gap-2 text-sm">
+              {/* <div className="flex items-center gap-2 text-sm">
                 {kpi.trend === "up" && (
                   <div className="flex items-center gap-1 rounded-full bg-green-100 px-2 py-1 text-green-700">
                     <ArrowUpRight className="h-3 w-3" />
@@ -83,7 +133,7 @@ export function OverviewKPIs() {
                     {kpi.change}
                   </span>
                 )}
-              </div>
+              </div> */}
             </CardContent>
           </Card>
         );

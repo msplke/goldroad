@@ -2,7 +2,7 @@ import { creatorRouter } from "~/server/api/routers/creator";
 import { paystackRouter } from "~/server/api/routers/paystack";
 import { planRouter } from "~/server/api/routers/plan";
 import { publicationRouter } from "~/server/api/routers/publication";
-// import { subscriberRouter } from "~/server/api/routers/subscriber";
+import { subscriberRouter } from "~/server/api/routers/subscriber";
 import { userRouter } from "~/server/api/routers/user";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
@@ -16,8 +16,8 @@ export const appRouter = createTRPCRouter({
   paystack: paystackRouter,
   plan: planRouter,
   publication: publicationRouter,
+  subscriber: subscriberRouter,
   user: userRouter,
-  // subscriber: subscriberRouter,
 });
 
 // export type definition of API
