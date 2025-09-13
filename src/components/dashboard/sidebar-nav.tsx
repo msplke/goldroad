@@ -37,6 +37,9 @@ export function SidebarNav({
                     const Icon = Icons[item.icon ?? "arrowRight"];
                     const isActive = pathname === item.href;
                     const isDisabled = item.requiresOnboarding && !isComplete;
+                    const isExternal =
+                      item.href.startsWith("http") ||
+                      item.href.startsWith("mailto:");
 
                     return (
                       <SidebarMenuItem key={item.href}>
@@ -59,6 +62,24 @@ export function SidebarNav({
                               <Icon className="size-4" />
                               <span>{item.title}</span>
                             </div>
+                          ) : isExternal ? (
+                            <a
+                              href={item.href}
+                              className="flex w-full items-center gap-3 rounded-md font-medium text-sm hover:bg-muted"
+                              target={
+                                item.href.startsWith("mailto:")
+                                  ? "_self"
+                                  : "_blank"
+                              }
+                              rel={
+                                item.href.startsWith("mailto:")
+                                  ? undefined
+                                  : "noopener noreferrer"
+                              }
+                            >
+                              <Icon className="size-4" />
+                              <span>{item.title}</span>
+                            </a>
                           ) : (
                             <Link
                               href={item.href}
