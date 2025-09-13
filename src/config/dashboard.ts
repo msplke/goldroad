@@ -39,6 +39,12 @@ export const sidebarLinks: SidebarNavItem[] = [
         icon: "home",
         requiresOnboarding: false,
       },
+      {
+        title: "Contact Support",
+        href: "mailto:kibuchi.chad@gmail.com",
+        icon: "help",
+        requiresOnboarding: false,
+      },
     ],
   },
 ];
