@@ -118,8 +118,8 @@ importers:
         specifier: 4.0.2
         version: 4.0.2(supports-color@10.2.0)(typescript@5.9.2)
       '@types/node':
-        specifier: ^22.18.3
-        version: 22.18.3
+        specifier: ^22.18.4
+        version: 22.18.4
       '@types/react':
         specifier: ^19.1.13
         version: 19.1.13
@@ -1769,8 +1769,8 @@ packages:
   '@types/cors@2.8.19':
     resolution: {integrity: sha512-mFNylyeyqN93lfe/9CSxOGREz8cpzAhH+E93xJ4xWQf62V8sQ/24reV2nyzUWM6H6Xji+GGHpkbLe7pVoUEskg==}
 
-  '@types/node@22.18.3':
-    resolution: {integrity: sha512-gTVM8js2twdtqM+AE2PdGEe9zGQY4UvmFjan9rZcVb6FGdStfjWoWejdmy4CfWVO9rh5MiYQGZloKAGkJt8lMw==}
+  '@types/node@22.18.4':
+    resolution: {integrity: sha512-UJdblFqXymSBhmZf96BnbisoFIr8ooiiBRMolQgg77Ea+VM37jXw76C2LQr9n8wm9+i/OvlUlW6xSvqwzwqznw==}
 
   '@types/react-dom@19.1.9':
     resolution: {integrity: sha512-qXRuZaOsAdXKFyOhRBg6Lqqc0yay13vN7KrIg4L7N4aaHN68ma9OK3NE1BoDFgFOTfM7zg+3/8+2n8rLUH3OKQ==}
@@ -4752,9 +4752,9 @@ snapshots:
 
   '@types/cors@2.8.19':
     dependencies:
-      '@types/node': 22.18.3
+      '@types/node': 22.18.4
 
-  '@types/node@22.18.3':
+  '@types/node@22.18.4':
     dependencies:
       undici-types: 6.21.0
 
@@ -5104,7 +5104,7 @@ snapshots:
     dependencies:
       '@types/cookie': 0.4.1
       '@types/cors': 2.8.19
-      '@types/node': 22.18.3
+      '@types/node': 22.18.4
       accepts: 1.3.8
       base64id: 2.0.0
       cookie: 0.4.2
@@ -5853,7 +5853,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 22.18.3
+      '@types/node': 22.18.4
       long: 5.3.2
 
   proxy-addr@2.0.7:
