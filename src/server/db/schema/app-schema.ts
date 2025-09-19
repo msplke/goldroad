@@ -13,7 +13,7 @@ export const paidSubscriber = createTable("paid_subscriber", (d) => ({
   email: d.text().unique().notNull(),
   firstName: d.text(),
   paystackSubscriptionCode: d.text().unique().notNull(),
-  kitSubscriberId: d.bigint({ mode: "number" }).unique().notNull(),
+  kitSubscriberId: d.bigint({ mode: "number" }).unique(), // Optional for creators without Kit integration
   status: d
     .varchar({ length: 20 })
     .$type<SubscriptionStatus>()
@@ -71,7 +71,7 @@ export const publication = createTable("publication", (d) => ({
   name: d.text().notNull(),
   description: d.text(),
   slug: d.text().unique().notNull(), // For /p/[publication-slug] URLs
-  kitPublicationTagId: d.bigint({ mode: "number" }).notNull(),
+  kitPublicationTagId: d.bigint({ mode: "number" }), // Optional for creators without Kit integration
   creatorId: d
     .uuid()
     .notNull()

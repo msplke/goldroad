@@ -18,28 +18,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import type { Step2FormData } from "~/lib/validators/onboarding";
+import type { Step1FormData } from "~/lib/validators/onboarding";
 import { api } from "~/trpc/react";
 
 type AddBankInfoFormProps = {
-  step2Form: UseFormReturn<Step2FormData>;
-  handleStep2SubmitAction: (data: Step2FormData) => void;
+  step1Form: UseFormReturn<Step1FormData>;
+  handleStep1SubmitAction: (data: Step1FormData) => void;
 };
 
 export function AddBankInfoForm({
-  step2Form,
-  handleStep2SubmitAction,
+  step1Form,
+  handleStep1SubmitAction,
 }: AddBankInfoFormProps) {
   const { data: response, isLoading, isError } = api.paystack.bank.useQuery({});
 
   return (
-    <Form {...step2Form}>
+    <Form {...step1Form}>
       <form
-        onSubmit={step2Form.handleSubmit(handleStep2SubmitAction)}
+        onSubmit={step1Form.handleSubmit(handleStep1SubmitAction)}
         className="space-y-4"
       >
         <FormField
-          control={step2Form.control}
+          control={step1Form.control}
           name="bankCode"
           render={({ field }) => (
             <FormItem>
@@ -89,7 +89,7 @@ export function AddBankInfoForm({
           )}
         />
         <FormField
-          control={step2Form.control}
+          control={step1Form.control}
           name="accountNumber"
           render={({ field }) => (
             <FormItem>
@@ -103,7 +103,7 @@ export function AddBankInfoForm({
         />
 
         <FormField
-          control={step2Form.control}
+          control={step1Form.control}
           name="accountName"
           render={({ field }) => (
             <FormItem>

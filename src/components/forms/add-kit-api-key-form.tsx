@@ -14,27 +14,27 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import type { Step1FormData } from "~/lib/validators/onboarding";
+import type { Step4FormData } from "~/lib/validators/onboarding";
 
 type AddKitApiKeyFormProps = {
-  step1Form: UseFormReturn<Step1FormData>;
-  handleStep1SubmitAction: (data: Step1FormData) => void;
+  step4Form: UseFormReturn<Step4FormData>;
+  handleStep4SubmitAction: (data: Step4FormData) => void;
 };
 
 export function AddKitApiKeyForm({
-  step1Form,
-  handleStep1SubmitAction,
+  step4Form,
+  handleStep4SubmitAction,
 }: AddKitApiKeyFormProps) {
   const [showApiKey, setShowApiKey] = useState(false);
 
   return (
-    <Form {...step1Form}>
+    <Form {...step4Form}>
       <form
-        onSubmit={step1Form.handleSubmit(handleStep1SubmitAction)}
+        onSubmit={step4Form.handleSubmit(handleStep4SubmitAction)}
         className="space-y-4"
       >
         <FormField
-          control={step1Form.control}
+          control={step4Form.control}
           name="apiKey"
           render={({ field }) => (
             <FormItem>
@@ -42,7 +42,7 @@ export function AddKitApiKeyForm({
               <FormControl>
                 <div className="relative">
                   <Input
-                    placeholder="Your API key"
+                    placeholder="Your API key (leave empty to skip)"
                     type={showApiKey ? "text" : "password"}
                     className="pr-10"
                     {...field}

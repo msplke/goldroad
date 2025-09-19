@@ -128,21 +128,16 @@ export function OnboardingModal({
   // Form instances for each step
   const step1Form = useForm<Step1FormData>({
     resolver: zodResolver(step1Schema),
-    defaultValues: { apiKey: "" },
+    defaultValues: { bankCode: "", accountNumber: "", accountName: "" },
   });
 
   const step2Form = useForm<Step2FormData>({
     resolver: zodResolver(step2Schema),
-    defaultValues: { bankCode: "", accountNumber: "", accountName: "" },
+    defaultValues: { publicationName: "", publicationDescription: "" },
   });
 
   const step3Form = useForm<Step3FormData>({
     resolver: zodResolver(step3Schema),
-    defaultValues: { publicationName: "", publicationDescription: "" },
-  });
-
-  const step4Form = useForm<Step4FormData>({
-    resolver: zodResolver(step4Schema),
     defaultValues: {
       publicationId: "",
       monthlyAmount: 200,
@@ -150,12 +145,17 @@ export function OnboardingModal({
     },
   });
 
-  // Update step 4 form when publication is created
+  const step4Form = useForm<Step4FormData>({
+    resolver: zodResolver(step4Schema),
+    defaultValues: { apiKey: "" },
+  });
+
+  // Update step 3 form when publication is created
   useEffect(() => {
     if (publicationId) {
-      step4Form.setValue("publicationId", publicationId);
+      step3Form.setValue("publicationId", publicationId);
     }
-  }, [publicationId, step4Form]);
+  }, [publicationId, step3Form]);
 
   const currentStepConfig = stepConfigs.find((step) => step.id === currentStep);
   const isLastStep = currentStep === totalSteps;
@@ -173,16 +173,6 @@ export function OnboardingModal({
   const handleStep1Submit = (data: Step1FormData) => {
     if (completedSteps.includes(1)) {
       toast.info(
-        "Kit integration is already set up and can only be modified from the settings page.",
-      );
-      return;
-    }
-    addKitApiKey.mutate({ kitApiKey: data.apiKey });
-  };
-
-  const handleStep2Submit = (data: Step2FormData) => {
-    if (completedSteps.includes(2)) {
-      toast.info(
         "Bank account information is already saved and can only be modified from the settings page.",
       );
       return;
@@ -194,8 +184,8 @@ export function OnboardingModal({
     });
   };
 
-  const handleStep3Submit = (data: Step3FormData) => {
-    if (completedSteps.includes(3)) {
+  const handleStep2Submit = (data: Step2FormData) => {
+    if (completedSteps.includes(2)) {
       toast.info(
         "Publication is already created and can only be modified from the settings page.",
       );
@@ -207,13 +197,13 @@ export function OnboardingModal({
     });
   };
 
-  const handleStep4Submit = (data: Step4FormData) => {
-    if (completedSteps.includes(4)) {
-      toast.info("Payment plans are already set up! Your setup is complete.");
+  const handleStep3Submit = (data: Step3FormData) => {
+    if (completedSteps.includes(3)) {
+      toast.info("Payment plans are already set up!");
       return;
     }
     if (!publicationId) {
-      toast.error("Publication ID is missing. Please complete step 3 first.");
+      toast.error("Publication ID is missing. Please complete step 2 first.");
       return;
     }
     createPlans.mutate({
@@ -221,6 +211,27 @@ export function OnboardingModal({
       monthlyAmount: data.monthlyAmount,
       annualAmount: data.annualAmount,
     });
+  };
+
+  const handleStep4Submit = (data: Step4FormData) => {
+    if (completedSteps.includes(4)) {
+      toast.info(
+        "Kit integration is already set up and can only be modified from the settings page.",
+      );
+      return;
+    }
+
+    // If API key is empty, skip Kit integration
+    if (!data.apiKey || data.apiKey.trim() === "") {
+      toast.success(
+        "Onboarding completed! Kit integration can be added later from settings.",
+      );
+      utils.creator.get.invalidate(); // This will trigger isComplete to be true
+      return;
+    }
+
+    // Otherwise, set up Kit integration
+    addKitApiKey.mutate({ kitApiKey: data.apiKey });
   };
 
   if (!currentStepConfig) return null;
@@ -239,7 +250,16 @@ export function OnboardingModal({
     createPlans.error;
 
   const handleSkip = () => {
-    onOpenChange(false);
+    if (currentStep === 4) {
+      // Skip Kit integration - trigger completion
+      toast.success(
+        "Onboarding completed! Kit integration can be added later from settings.",
+      );
+      utils.creator.get.invalidate();
+    } else {
+      // For other steps, just close the modal
+      onOpenChange(false);
+    }
   };
 
   return (
@@ -327,28 +347,28 @@ export function OnboardingModal({
                   ) : null}
 
                   {currentStep === 1 && (
-                    <AddKitApiKeyForm
+                    <AddBankInfoForm
                       step1Form={step1Form}
                       handleStep1SubmitAction={handleStep1Submit}
                     />
                   )}
 
                   {currentStep === 2 && (
-                    <AddBankInfoForm
+                    <AddPublicationForm
                       step2Form={step2Form}
                       handleStep2SubmitAction={handleStep2Submit}
                     />
                   )}
 
                   {currentStep === 3 && (
-                    <AddPublicationForm
+                    <AddPaymentPlanForm
                       step3Form={step3Form}
                       handleStep3SubmitAction={handleStep3Submit}
                     />
                   )}
 
                   {currentStep === 4 && (
-                    <AddPaymentPlanForm
+                    <AddKitApiKeyForm
                       step4Form={step4Form}
                       handleStep4SubmitAction={handleStep4Submit}
                     />
@@ -397,9 +417,15 @@ export function OnboardingModal({
             <div />
 
             <div className="flex items-center gap-2">
-              <Button variant="ghost" onClick={handleSkip} disabled={isLoading}>
-                Skip for now
-              </Button>
+              {currentStep === 4 && (
+                <Button
+                  variant="ghost"
+                  onClick={handleSkip}
+                  disabled={isLoading}
+                >
+                  Skip for now
+                </Button>
+              )}
               <Button
                 onClick={() => {
                   switch (currentStep) {

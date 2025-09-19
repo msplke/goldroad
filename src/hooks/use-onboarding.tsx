@@ -37,29 +37,29 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(
 const defaultSteps: OnboardingStep[] = [
   {
     id: 1,
-    title: "Setup Kit",
-    description:
-      "Add your Kit API key to automatically sync paying subscribers with your Kit account",
-    completed: false,
-  },
-  {
-    id: 2,
     title: "Provide Bank Details",
     description:
       "Add your bank account information to receive payouts from subscriptions",
     completed: false,
   },
   {
-    id: 3,
+    id: 2,
     title: "Create Publication",
     description:
       "Set up your publication with a name and description for your subscribers",
     completed: false,
   },
   {
-    id: 4,
+    id: 3,
     title: "Setup Payment Plans",
     description: "Configure your monthly and annual subscription pricing",
+    completed: false,
+  },
+  {
+    id: 4,
+    title: "Connect Kit (Optional)",
+    description:
+      "Optionally connect your Kit account to automatically sync paying subscribers",
     completed: false,
   },
 ];
@@ -81,16 +81,23 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
     let completed = false;
     switch (step.id) {
       case 1:
-        completed = creator.hasKitApiKey;
-        break;
-      case 2:
         completed = creator.hasBankInfo;
         break;
-      case 3:
+      case 2:
         completed = Boolean(creator.hasCompletedPublicationSetup);
         break;
-      case 4:
+      case 3:
         completed = Boolean(creator.hasCompletedPaymentPlansSetup);
+        break;
+      case 4:
+        // Kit integration is optional - mark as completed if either:
+        // 1. User has set up Kit integration, OR
+        // 2. User has completed all essential steps (indicating they can skip Kit)
+        completed =
+          creator.hasKitApiKey ||
+          (creator.hasBankInfo &&
+            creator.hasCompletedPublicationSetup &&
+            creator.hasCompletedPaymentPlansSetup);
         break;
     }
     return { ...step, completed };
@@ -103,12 +110,25 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
       return;
     }
 
-    // Find first incomplete step
-    const firstIncompleteStep = steps.find((step) => !step.completed);
-    if (firstIncompleteStep) {
-      setCurrentStep(firstIncompleteStep.id);
+    // Check if all essential steps are completed (steps 1-3)
+    const essentialStepsCompleted =
+      creator.hasBankInfo &&
+      creator.hasCompletedPublicationSetup &&
+      creator.hasCompletedPaymentPlansSetup;
+
+    // Find first incomplete step among essential steps
+    const firstIncompleteEssentialStep = steps
+      .slice(0, 3)
+      .find((step) => !step.completed);
+
+    if (firstIncompleteEssentialStep) {
+      // Still have essential steps to complete
+      setCurrentStep(firstIncompleteEssentialStep.id);
+    } else if (essentialStepsCompleted && !creator.hasKitApiKey) {
+      // All essential steps done, Kit not set up - show Kit step
+      setCurrentStep(4);
     }
-    // If all steps are complete, stay on the last step
+    // If all steps are complete, stay on the current step (don't auto-advance away)
   }, [creator, steps]);
 
   // Calculate derived values
@@ -117,9 +137,25 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
     .map((step) => step.id);
 
   const totalSteps = steps.length;
-  const isComplete = completedSteps.length === totalSteps;
+
+  // Consider onboarding complete when essential steps (1-3) are done
+  const essentialStepsCompleted = creator
+    ? creator.hasBankInfo &&
+      creator.hasCompletedPublicationSetup &&
+      creator.hasCompletedPaymentPlansSetup
+    : false;
+
+  const isComplete = essentialStepsCompleted;
+
+  // Calculate completion percentage based on essential steps + optional kit
+  const essentialStepsCount = 3;
+  const completedEssentialSteps = completedSteps.filter((id) => id <= 3).length;
+  const kitCompleted = completedSteps.includes(4) ? 1 : 0;
+
   const completionPercentage = Math.round(
-    (completedSteps.length / totalSteps) * 100,
+    ((completedEssentialSteps + kitCompleted * 0.25) /
+      (essentialStepsCount + 0.25)) *
+      100,
   );
 
   // Add current indicator to steps
