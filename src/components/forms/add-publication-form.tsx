@@ -12,25 +12,25 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
-import type { Step3FormData } from "~/lib/validators/onboarding";
+import type { Step2FormData } from "~/lib/validators/onboarding";
 
 type AddPublicationFormProps = {
-  step3Form: UseFormReturn<Step3FormData>;
-  handleStep3SubmitAction: (data: Step3FormData) => void;
+  step2Form: UseFormReturn<Step2FormData>;
+  handleStep2SubmitAction: (data: Step2FormData) => void;
 };
 
 export function AddPublicationForm({
-  step3Form,
-  handleStep3SubmitAction,
+  step2Form,
+  handleStep2SubmitAction,
 }: AddPublicationFormProps) {
   return (
-    <Form {...step3Form}>
+    <Form {...step2Form}>
       <form
-        onSubmit={step3Form.handleSubmit(handleStep3SubmitAction)}
+        onSubmit={step2Form.handleSubmit(handleStep2SubmitAction)}
         className="space-y-4"
       >
         <FormField
-          control={step3Form.control}
+          control={step2Form.control}
           name="publicationName"
           render={({ field }) => (
             <FormItem>
@@ -44,7 +44,7 @@ export function AddPublicationForm({
         />
 
         <FormField
-          control={step3Form.control}
+          control={step2Form.control}
           name="publicationDescription"
           render={({ field }) => (
             <FormItem>

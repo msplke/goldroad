@@ -26,26 +26,6 @@ interface StepConfig {
 export const stepConfigs: StepConfig[] = [
   {
     id: 1,
-    icon: Mail,
-    content: {
-      title: "Set up Kit Integration",
-      description:
-        "Connect your Kit account to automatically sync paying subscribers.",
-      fields: [
-        {
-          name: "apiKey",
-          label: "Kit API Key",
-          placeholder: "Your API key",
-          type: "password",
-        },
-      ],
-      helpText:
-        "Your API key will be encrypted and stored securely. Get it from Account (top-right) → Settings → Developer (V4 Keys).",
-      helpLink: "https://help.kit.com/en/articles/9902901-kit-api-overview",
-    },
-  },
-  {
-    id: 2,
     icon: CreditCard,
     content: {
       title: "Provide Bank Details",
@@ -99,7 +79,7 @@ export const stepConfigs: StepConfig[] = [
     },
   },
   {
-    id: 3,
+    id: 2,
     icon: FileText,
     content: {
       title: "Create Your Publication",
@@ -120,11 +100,11 @@ export const stepConfigs: StepConfig[] = [
       ],
       helpText:
         "This information will be displayed on your public pricing page and payment forms.",
-      requiresPrevious: [1, 2], // Requires Kit and Bank Details to be completed
+      requiresPrevious: [1], // Requires Bank Details to be completed
     },
   },
   {
-    id: 4,
+    id: 3,
     icon: DollarSign,
     content: {
       title: "Setup Payment Plans",
@@ -152,7 +132,27 @@ export const stepConfigs: StepConfig[] = [
       ],
       helpText:
         "Annual plans should offer savings compared to monthly. We'll create Paystack payment plans and generate your pricing page.",
-      requiresPrevious: [1, 2, 3], // Requires all previous steps
+      requiresPrevious: [1, 2], // Requires Bank Details and Publication
+    },
+  },
+  {
+    id: 4,
+    icon: Mail,
+    content: {
+      title: "Connect Kit (Optional)",
+      description:
+        "Optionally connect your Kit account to automatically sync paying subscribers and enable advanced email marketing features.",
+      fields: [
+        {
+          name: "apiKey",
+          label: "Kit API Key",
+          placeholder: "Your API key (leave empty to skip)",
+          type: "password",
+        },
+      ],
+      helpText:
+        "Kit integration allows you to automatically tag paying subscribers in your Kit account and send them exclusive content. You can skip this step and add it later. Get your API key from Account (top-right) → Settings → Developer (V4 Keys).",
+      helpLink: "https://help.kit.com/en/articles/9902901-kit-api-overview",
     },
   },
 ];

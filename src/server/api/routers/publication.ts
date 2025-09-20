@@ -51,7 +51,7 @@ const UpdatePublicationInfoSchema = z.object({
 // TODO: Use one validation schema on front and back end
 
 export const publicationRouter = createTRPCRouter({
-  /** Creates a publication with a Kit tag. Plans are created separately via the plan router. */
+  /** Creates a publication with an optional Kit tag. Plans are created separately via the plan router. */
   create: protectedProcedure
     .input(CreatePublicationInfoSchema)
     .mutation(async ({ ctx, input }) => {
@@ -72,26 +72,37 @@ export const publicationRouter = createTRPCRouter({
           });
         }
 
-        if (!foundCreator.kitApiKey) {
-          throw new TRPCError({
-            message: "Creator's Kit API Key is not set",
-            code: "BAD_REQUEST",
-          });
-        }
+        let kitPublicationTagId: number | null = null;
 
-        // Create a Kit tag for the publication
-        console.log("Creating a tag for the publication on Kit...");
-        const tag = await createKitTag(
-          input.name,
-          decryptSecret(foundCreator.kitApiKey),
-        );
+        // Only create Kit tag if API key is available
+        if (foundCreator.kitApiKey) {
+          try {
+            // Create a Kit tag for the publication
+            console.log("Creating a tag for the publication on Kit...");
+            const tag = await createKitTag(
+              input.name,
+              decryptSecret(foundCreator.kitApiKey),
+            );
+            kitPublicationTagId = tag.id;
+          } catch (error) {
+            console.error(
+              "Failed to create Kit tag, but continuing without it:",
+              error,
+            );
+            // Don't throw - we can create the publication without Kit integration
+          }
+        } else {
+          console.log(
+            "Kit API key not available, creating publication without Kit tag",
+          );
+        }
 
         // Create the publication on the DB
         console.log("Creating the publication on the DB...");
         const publicationId = await createPublication(
           tx,
           foundCreator.id,
-          tag.id,
+          kitPublicationTagId,
           input,
         );
 
@@ -296,7 +307,7 @@ async function checkForExistingPublication(
 async function createPublication(
   db: DbType,
   creatorId: string,
-  kitPublicationTagId: number,
+  kitPublicationTagId: number | null,
   publicationInfo: z.infer<typeof CreatePublicationInfoSchema>,
 ) {
   // Generate a URL-friendly slug from the publication name
