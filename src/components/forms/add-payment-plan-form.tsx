@@ -11,26 +11,26 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import type { Step4FormData } from "~/lib/validators/onboarding";
+import type { Step3FormData } from "~/lib/validators/onboarding";
 
 type AddPaymentPlanFormProps = {
-  step4Form: UseFormReturn<Step4FormData>;
-  handleStep4SubmitAction: (data: Step4FormData) => void;
+  step3Form: UseFormReturn<Step3FormData>;
+  handleStep3SubmitAction: (data: Step3FormData) => void;
 };
 
 export function AddPaymentPlanForm({
-  step4Form,
-  handleStep4SubmitAction,
+  step3Form,
+  handleStep3SubmitAction,
 }: AddPaymentPlanFormProps) {
   return (
-    <Form {...step4Form}>
+    <Form {...step3Form}>
       <form
-        onSubmit={step4Form.handleSubmit(handleStep4SubmitAction)}
+        onSubmit={step3Form.handleSubmit(handleStep3SubmitAction)}
         className="space-y-4"
       >
         {/* Hidden field for publication ID */}
         <FormField
-          control={step4Form.control}
+          control={step3Form.control}
           name="publicationId"
           render={({ field }) => (
             <FormItem className="hidden">
@@ -41,7 +41,7 @@ export function AddPaymentPlanForm({
           )}
         />
         <FormField
-          control={step4Form.control}
+          control={step3Form.control}
           name="monthlyAmount"
           render={({ field }) => (
             <FormItem>
@@ -59,7 +59,7 @@ export function AddPaymentPlanForm({
           )}
         />
         <FormField
-          control={step4Form.control}
+          control={step3Form.control}
           name="annualAmount"
           render={({ field }) => (
             <FormItem>

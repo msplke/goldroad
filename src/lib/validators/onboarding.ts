@@ -2,10 +2,6 @@ import z from "zod";
 
 // Form schemas for each onboarding step
 export const step1Schema = z.object({
-  apiKey: z.string().min(1, "Kit API key is required"),
-});
-
-export const step2Schema = z.object({
   bankCode: z.string().min(1, "Please select a bank"),
   accountNumber: z
     .string()
@@ -13,12 +9,12 @@ export const step2Schema = z.object({
   accountName: z.string().min(2, "Account name is required"),
 });
 
-export const step3Schema = z.object({
+export const step2Schema = z.object({
   publicationName: z.string().min(1, "Publication name is required"),
   publicationDescription: z.string().optional(),
 });
 
-export const step4Schema = z.object({
+export const step3Schema = z.object({
   publicationId: z.uuid("Invalid publication ID"),
   monthlyAmount: z
     .number()
@@ -26,6 +22,10 @@ export const step4Schema = z.object({
   annualAmount: z
     .number()
     .min(1000, "Annual amount must be at least Ksh. 1000"),
+});
+
+export const step4Schema = z.object({
+  apiKey: z.string().optional(), // Made optional - can be empty to skip
 });
 
 export type Step1FormData = z.infer<typeof step1Schema>;
