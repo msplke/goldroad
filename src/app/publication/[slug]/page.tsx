@@ -102,7 +102,7 @@ export default async function PublicationSubscriptionPage({
                     ))}
                   </CardContent>
 
-                  <CardFooter>
+                  <CardFooter className="h-full items-end">
                     <Button asChild className="w-full">
                       <Link
                         href={`https://paystack.com/pay/${plan.paystackPaymentPageUrlSlug}`}
