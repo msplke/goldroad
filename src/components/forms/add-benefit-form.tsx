@@ -99,7 +99,7 @@ export function AddBenefitForm({
         <DialogHeader>
           <DialogTitle>Add Benefit</DialogTitle>
           <DialogDescription>
-            Add a new benefit to the {planName} plan.
+            Add a new benefit to {planName}
             {isAtLimit
               ? ` You've reached the maximum of ${MAX_BENEFITS_PER_PLAN} benefits per plan.`
               : ` (${currentBenefitCount}/${MAX_BENEFITS_PER_PLAN} benefits used)`}
