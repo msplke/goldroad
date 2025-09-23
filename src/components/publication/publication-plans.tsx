@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
+import { MAX_BENEFITS_PER_PLAN } from "~/lib/constants";
 import { api } from "~/trpc/react";
 
 interface PublicationPlansProps {
@@ -205,7 +206,8 @@ export function PublicationPlans({ publicationId }: PublicationPlansProps) {
             <strong>Note:</strong> Pricing changes are automatically synced with
             Paystack and will apply to new subscribers. Existing subscribers
             will continue with their current pricing until they renew their
-            subscription. Each plan can have up to 4 benefits.
+            subscription. Each plan can have up to {MAX_BENEFITS_PER_PLAN}{" "}
+            benefits.
           </p>
         </div>
       </CardContent>
