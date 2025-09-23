@@ -152,7 +152,7 @@ export function PublicationPlans({ publicationId }: PublicationPlansProps) {
 
             {/* Benefits Section */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2">
                   <h5 className="font-medium text-sm">Plan Benefits</h5>
                   {plan.planBenefits.length > 0 && (
@@ -162,7 +162,7 @@ export function PublicationPlans({ publicationId }: PublicationPlansProps) {
                   )}
                 </div>
 
-                <div className="flex gap-2">
+                <div className="hidden sm:flex sm:gap-2">
                   <AddBenefitForm
                     planId={plan.id}
                     planName={plan.name}
@@ -179,7 +179,7 @@ export function PublicationPlans({ publicationId }: PublicationPlansProps) {
               </div>
 
               {plan.planBenefits && plan.planBenefits.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-4">
                   {plan.planBenefits.map((benefit) => (
                     <div
                       key={benefit.id}
@@ -198,6 +198,20 @@ export function PublicationPlans({ publicationId }: PublicationPlansProps) {
                       </div>
                     </div>
                   ))}
+                  <div className="flex items-center justify-end gap-2 sm:hidden">
+                    <AddBenefitForm
+                      planId={plan.id}
+                      planName={plan.name}
+                      currentBenefitCount={plan.planBenefits?.length ?? 0}
+                    />
+                    {plan.planBenefits && plan.planBenefits.length > 0 && (
+                      <ClearBenefitsDialog
+                        planId={plan.id}
+                        planName={plan.name}
+                        benefitCount={plan.planBenefits.length}
+                      />
+                    )}
+                  </div>
                 </div>
               ) : (
                 <p className="py-4 text-center text-muted-foreground text-sm">
