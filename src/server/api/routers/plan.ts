@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { count, eq } from "drizzle-orm";
 import z from "zod";
 
+import { MAX_BENEFITS_PER_PLAN } from "~/lib/constants";
 import { getCreator } from "~/server/actions/trpc/creator";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import type { DbType } from "~/server/db";
@@ -11,8 +12,6 @@ import {
   type createPlanSchema,
   paystackClient,
 } from "~/server/fetch-clients/paystack";
-
-const MAX_BENEFITS_PER_PLAN = 4;
 
 const CreatePlanInfoSchema = z.object({
   publicationId: z.uuid("Invalid publication ID"),

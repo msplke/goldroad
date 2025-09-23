@@ -25,9 +25,8 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Textarea } from "~/components/ui/textarea";
+import { MAX_BENEFITS_PER_PLAN } from "~/lib/constants";
 import { api } from "~/trpc/react";
-
-const MAX_BENEFITS_PER_PLAN = 4;
 
 const addBenefitSchema = z.object({
   description: z
