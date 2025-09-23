@@ -153,7 +153,15 @@ export function PublicationPlans({ publicationId }: PublicationPlansProps) {
             {/* Benefits Section */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h5 className="font-medium text-sm">Plan Benefits</h5>
+                <div className="flex items-center gap-2">
+                  <h5 className="font-medium text-sm">Plan Benefits</h5>
+                  {plan.planBenefits.length > 0 && (
+                    <Badge variant="outline" className="w-fit">
+                      {plan.planBenefits.length}/{MAX_BENEFITS_PER_PLAN}
+                    </Badge>
+                  )}
+                </div>
+
                 <div className="flex gap-2">
                   <AddBenefitForm
                     planId={plan.id}
