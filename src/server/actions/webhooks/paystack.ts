@@ -90,10 +90,8 @@ export async function createSubscriber(
         console.log("Tag results:", tagResults);
       }
     } catch (error) {
-      console.error(
-        "Kit integration failed, but continuing without it:",
-        error,
-      );
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error("Kit integration failed, continuing without it:", msg);
       // Don't throw - we can still create the subscriber without Kit integration
     }
   } else {

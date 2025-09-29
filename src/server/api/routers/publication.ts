@@ -85,9 +85,10 @@ export const publicationRouter = createTRPCRouter({
             );
             kitPublicationTagId = tag.id;
           } catch (error) {
+            const msg = error instanceof Error ? error.message : String(error);
             console.error(
-              "Failed to create Kit tag, but continuing without it:",
-              error,
+              "Failed to create Kit tag, continuing without it:",
+              msg,
             );
             // Don't throw - we can create the publication without Kit integration
           }
