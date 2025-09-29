@@ -80,7 +80,10 @@ export function OnboardingModal({
   // tRPC mutations - simplified to only handle server updates
   const addKitApiKey = api.creator.addOrUpdateKitApiKey.useMutation({
     onSuccess: () => {
-      toast.success("Kit integration completed successfully!");
+      toast.success(
+        "🎉 Kit integration completed! Your paying subscribers will now be automatically synced to Kit.",
+        { duration: 5000 },
+      );
       // The useOnboarding hook will automatically advance when creator data refetches
       utils.creator.get.invalidate();
     },
@@ -116,7 +119,10 @@ export function OnboardingModal({
 
   const createPlans = api.plan.createMonthlyAndYearlyPlans.useMutation({
     onSuccess: () => {
-      toast.success("Payment plans created successfully! Setup complete!");
+      toast.success(
+        "Payment plans created successfully! Setup complete! 🎉 Optional Kit integration can be added anytime from Settings.",
+        { duration: 5000 },
+      );
       utils.creator.get.invalidate();
       // Modal will close automatically via isComplete useEffect
     },
@@ -224,7 +230,8 @@ export function OnboardingModal({
     // If API key is empty, skip Kit integration
     if (!data.apiKey || data.apiKey.trim() === "") {
       toast.success(
-        "Onboarding completed! Kit integration can be added later from settings.",
+        "🎉 Setup complete! Optional Kit integration can be added anytime from Settings.",
+        { duration: 5000 },
       );
       utils.creator.get.invalidate(); // This will trigger isComplete to be true
       return;
@@ -253,7 +260,8 @@ export function OnboardingModal({
     if (currentStep === 4) {
       // Skip Kit integration - trigger completion
       toast.success(
-        "Onboarding completed! Kit integration can be added later from settings.",
+        "✅ Perfect! Your creator dashboard is fully set up and ready to accept payments. Kit integration skipped - you can enable it later from Settings.",
+        { duration: 5000 },
       );
       utils.creator.get.invalidate();
     } else {
@@ -271,8 +279,10 @@ export function OnboardingModal({
             Setup Your Creator Dashboard
           </DialogTitle>
           <DialogDescription>
-            Step {currentStep} of {totalSteps}: Complete your account setup to
-            start accepting payments
+            Step {currentStep} of {totalSteps}:{" "}
+            {currentStep === 4
+              ? "Optional integration to enhance your email marketing"
+              : "Complete your account setup to start accepting payments"}
           </DialogDescription>
         </DialogHeader>
 
@@ -281,20 +291,27 @@ export function OnboardingModal({
           <div className="flex items-center justify-between">
             {steps.map((step, index) => (
               <div key={step.id} className="flex items-center">
-                <div
-                  className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors",
-                    step.completed
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : step.id === currentStep
-                        ? "border-primary text-primary"
-                        : "border-muted text-muted-foreground",
-                  )}
-                >
-                  {step.completed ? (
-                    <CheckCircle2 className="h-4 w-4" />
-                  ) : (
-                    <span className="font-medium text-sm">{step.id}</span>
+                <div className="relative">
+                  <div
+                    className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors",
+                      step.completed
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : step.id === currentStep
+                          ? "border-primary text-primary"
+                          : "border-muted text-muted-foreground",
+                    )}
+                  >
+                    {step.completed ? (
+                      <CheckCircle2 className="h-4 w-4" />
+                    ) : (
+                      <span className="font-medium text-sm">{step.id}</span>
+                    )}
+                  </div>
+                  {step.id === 4 && (
+                    <span className="-bottom-5 -translate-x-1/2 absolute left-1/2 font-medium text-muted-foreground text-xs">
+                      Optional
+                    </span>
                   )}
                 </div>
                 {index < steps.length - 1 && (
@@ -422,8 +439,9 @@ export function OnboardingModal({
                   variant="ghost"
                   onClick={handleSkip}
                   disabled={isLoading}
+                  className="text-muted-foreground hover:text-foreground"
                 >
-                  Skip for now
+                  Skip Kit Integration
                 </Button>
               )}
               <Button

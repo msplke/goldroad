@@ -38,7 +38,12 @@ export function AddKitApiKeyForm({
           name="apiKey"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Kit API Key</FormLabel>
+              <FormLabel>
+                Kit API Key{" "}
+                <span className="font-normal text-muted-foreground text-sm">
+                  (Optional)
+                </span>
+              </FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input

@@ -151,7 +151,7 @@ export const stepConfigs: StepConfig[] = [
         },
       ],
       helpText:
-        "Kit integration allows you to automatically tag paying subscribers in your Kit account and send them exclusive content. You can skip this step and add it later. Get your API key from Account (top-right) → Settings → Developer (V4 Keys).",
+        "🎯 Why Kit integration? Automatically tag paying subscribers in your Kit account to send them exclusive content and manage your email marketing. ⏭️ You can safely skip this step - your payment system will work perfectly without it. Add Kit integration later from your dashboard settings whenever you're ready. Get your API key from Account (top-right) → Settings → Developer (V4 Keys).",
       helpLink: "https://help.kit.com/en/articles/9902901-kit-api-overview",
     },
   },
