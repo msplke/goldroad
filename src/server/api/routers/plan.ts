@@ -272,13 +272,10 @@ export const planRouter = createTRPCRouter({
         }
 
         // Check current benefit count
-        // This includes a lock the row to prevent race conditions on concurrent benefit additions
-        // from adding more than the allowed number of benefits (with the select ... for update)
         const benefitCountResult = await tx
           .select({ count: count() })
           .from(planBenefit)
-          .where(eq(planBenefit.planId, input.planId))
-          .for("update");
+          .where(eq(planBenefit.planId, input.planId));
 
         const benefitCount = benefitCountResult[0]?.count ?? 0;
 
