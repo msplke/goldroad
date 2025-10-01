@@ -1,7 +1,8 @@
 import { TRPCError } from "@trpc/server";
-import { and, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import z from "zod";
 
+import { MAX_BENEFITS_PER_PLAN } from "~/lib/constants";
 import { generateSlugFromName } from "~/lib/utils";
 import { getCreator } from "~/server/actions/trpc/creator";
 import {
@@ -12,7 +13,12 @@ import {
 import { decryptSecret } from "~/server/crypto/kit-secrets";
 import type { DbType } from "~/server/db";
 import { user } from "~/server/db/schema";
-import { creator, plan, publication } from "~/server/db/schema/app-schema";
+import {
+  creator,
+  plan,
+  publication,
+  publicationBenefit,
+} from "~/server/db/schema/app-schema";
 import { kitClient } from "~/server/fetch-clients/kit";
 
 const CreatePublicationInfoSchema = z.object({
@@ -46,6 +52,30 @@ const UpdatePublicationInfoSchema = z.object({
     .refine((slug) => !slug.includes("--"), {
       message: "Slug cannot contain consecutive hyphens",
     }),
+});
+
+const AddBenefitSchema = z.object({
+  publicationId: z.uuid("Invalid publication ID"),
+  description: z
+    .string()
+    .min(1, "Benefit description is required")
+    .max(500, "Benefit description must be less than 500 characters"),
+});
+
+const UpdateBenefitSchema = z.object({
+  benefitId: z.uuid("Invalid benefit ID"),
+  description: z
+    .string()
+    .min(1, "Benefit description is required")
+    .max(500, "Benefit description must be less than 500 characters"),
+});
+
+const DeleteBenefitSchema = z.object({
+  benefitId: z.uuid("Invalid benefit ID"),
+});
+
+const ClearBenefitsSchema = z.object({
+  publicationId: z.uuid("Invalid publication ID"),
 });
 
 // TODO: Use one validation schema on front and back end
@@ -260,11 +290,6 @@ export const publicationRouter = createTRPCRouter({
           amount: true,
           paystackPaymentPageUrlSlug: true,
         },
-        with: {
-          planBenefits: {
-            columns: { id: true, description: true },
-          },
-        },
       });
 
       if (plans.length === 0) {
@@ -284,6 +309,205 @@ export const publicationRouter = createTRPCRouter({
         },
         plans,
       };
+    }),
+
+  getBenefits: protectedProcedure
+    .input(z.object({ publicationId: z.uuid("Invalid publication ID") }))
+    .query(async ({ ctx, input }) => {
+      const foundCreator = await getCreator(ctx.db, ctx.session.user.id);
+
+      // Verify the publication belongs to this creator
+      const publicationResult = await ctx.db.query.publication.findFirst({
+        where: eq(publication.id, input.publicationId),
+      });
+
+      if (
+        !publicationResult ||
+        publicationResult.creatorId !== foundCreator.id
+      ) {
+        throw new TRPCError({
+          message: "Publication not found or access denied",
+          code: "NOT_FOUND",
+        });
+      }
+
+      const benefits = await ctx.db.query.publicationBenefit.findMany({
+        where: eq(publicationBenefit.publicationId, input.publicationId),
+        orderBy: publicationBenefit.createdAt,
+      });
+
+      return benefits;
+    }),
+  /** Add a benefit to a plan (max 4 benefits per plan) */
+  addBenefit: protectedProcedure
+    .input(AddBenefitSchema)
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.transaction(async (tx) => {
+        const foundCreator = await getCreator(tx, ctx.session.user.id);
+
+        // Get publication and verify ownership
+        const foundPublication = await tx.query.publication.findFirst({
+          where: eq(publication.id, input.publicationId),
+        });
+
+        if (!foundPublication) {
+          throw new TRPCError({
+            message: "Publication not found",
+            code: "NOT_FOUND",
+          });
+        }
+
+        // Verify the publication belongs to this creator
+        if (foundPublication.creatorId !== foundCreator.id) {
+          throw new TRPCError({
+            message: "You don't have permission to edit this publication",
+            code: "FORBIDDEN",
+          });
+        }
+
+        // Check current benefit count
+        const benefitCountResult = await tx
+          .select({ count: count() })
+          .from(publicationBenefit)
+          .where(eq(publicationBenefit.publicationId, input.publicationId));
+
+        const benefitCount = benefitCountResult[0]?.count ?? 0;
+
+        if (benefitCount >= MAX_BENEFITS_PER_PLAN) {
+          throw new TRPCError({
+            message: `A publication can have a maximum of ${MAX_BENEFITS_PER_PLAN} benefits`,
+            code: "BAD_REQUEST",
+          });
+        }
+
+        // Add the benefit
+        const result = await tx
+          .insert(publicationBenefit)
+          .values({
+            publicationId: input.publicationId,
+            description: input.description,
+          })
+          .returning();
+
+        return result[0];
+      });
+    }),
+
+  /** Update a benefit description */
+  updateBenefit: protectedProcedure
+    .input(UpdateBenefitSchema)
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.transaction(async (tx) => {
+        const foundCreator = await getCreator(tx, ctx.session.user.id);
+
+        // Get the benefit and verify ownership through publication
+        const foundBenefit = await tx.query.publicationBenefit.findFirst({
+          where: eq(publicationBenefit.id, input.benefitId),
+          with: {
+            publication: true,
+          },
+        });
+
+        if (!foundBenefit) {
+          throw new TRPCError({
+            message: "Benefit not found",
+            code: "NOT_FOUND",
+          });
+        }
+
+        // Verify ownership
+        if (foundBenefit.publication.creatorId !== foundCreator.id) {
+          throw new TRPCError({
+            message: "You don't have permission to edit this benefit",
+            code: "FORBIDDEN",
+          });
+        }
+
+        // Update the benefit
+        await tx
+          .update(publicationBenefit)
+          .set({
+            description: input.description,
+          })
+          .where(eq(publicationBenefit.id, input.benefitId));
+
+        return { success: true };
+      });
+    }),
+
+  /** Delete a benefit */
+  deleteBenefit: protectedProcedure
+    .input(DeleteBenefitSchema)
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.transaction(async (tx) => {
+        const foundCreator = await getCreator(tx, ctx.session.user.id);
+
+        // Get the benefit and verify ownership through publication
+        const foundBenefit = await tx.query.publicationBenefit.findFirst({
+          where: eq(publicationBenefit.id, input.benefitId),
+          with: {
+            publication: true,
+          },
+        });
+
+        if (!foundBenefit) {
+          throw new TRPCError({
+            message: "Benefit not found",
+            code: "NOT_FOUND",
+          });
+        }
+
+        // Verify ownership
+        if (foundBenefit.publication.creatorId !== foundCreator.id) {
+          throw new TRPCError({
+            message: "You don't have permission to delete this benefit",
+            code: "FORBIDDEN",
+          });
+        }
+
+        // Delete the benefit
+        await tx
+          .delete(publicationBenefit)
+          .where(eq(publicationBenefit.id, input.benefitId));
+
+        return { success: true };
+      });
+    }),
+
+  /** Clear all benefits for a plan */
+  clearBenefits: protectedProcedure
+    .input(ClearBenefitsSchema)
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.transaction(async (tx) => {
+        const foundCreator = await getCreator(tx, ctx.session.user.id);
+
+        // Get publication and verify ownership
+        const foundPublication = await tx.query.publication.findFirst({
+          where: eq(publication.id, input.publicationId),
+        });
+
+        if (!foundPublication) {
+          throw new TRPCError({
+            message: "Publication not found",
+            code: "NOT_FOUND",
+          });
+        }
+
+        // Verify the publication belongs to this creator
+        if (foundPublication.creatorId !== foundCreator.id) {
+          throw new TRPCError({
+            message: "You don't have permission to edit this publication",
+            code: "FORBIDDEN",
+          });
+        }
+
+        // Delete all benefits for this plan
+        await tx
+          .delete(publicationBenefit)
+          .where(eq(publicationBenefit.publicationId, input.publicationId));
+
+        return { success: true };
+      });
     }),
 });
 
