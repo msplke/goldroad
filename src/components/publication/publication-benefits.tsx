@@ -14,11 +14,6 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { MAX_BENEFITS_PER_PLAN } from "~/lib/constants";
 import { api } from "~/trpc/react";
 
-interface PublicationPlansProps {
-  publicationId: string;
-  publicationName: string;
-}
-
 function Header() {
   return (
     <CardHeader>
@@ -31,10 +26,15 @@ function Header() {
   );
 }
 
+interface PublicationBenefitsProps {
+  publicationId: string;
+  publicationName: string;
+}
+
 export function PublicationBenefits({
   publicationId,
   publicationName,
-}: PublicationPlansProps) {
+}: PublicationBenefitsProps) {
   const {
     data: benefits,
     isLoading,
