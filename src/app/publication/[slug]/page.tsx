@@ -51,6 +51,20 @@ export default async function PublicationSubscriptionPage({
 
   try {
     const data = await api.publication.getBySlug({ slug });
+    const annualPlanPrice = data.plans.find(
+      (plan) => plan.interval === "annually",
+    )?.amount;
+    const monthlyPlanPrice = data.plans.find(
+      (plan) => plan.interval === "monthly",
+    )?.amount;
+
+    const savingsWithAnnual = monthlyPlanPrice
+      ? monthlyPlanPrice * 12 - (annualPlanPrice ?? 0)
+      : 0;
+
+    const percentageSaved = monthlyPlanPrice
+      ? Math.round((savingsWithAnnual / (monthlyPlanPrice * 12)) * 100)
+      : 0;
 
     return (
       <div className="min-h-screen bg-background text-foreground">
@@ -80,7 +94,7 @@ export default async function PublicationSubscriptionPage({
           {/* Plans Grid */}
           <div className="flex justify-center">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              {data.plans.map((plan, _index) => (
+              {data.plans.map((plan) => (
                 <Card key={plan.id} className="min-w-[280px] max-w-sm">
                   <CardHeader className="text-center">
                     <CardTitle className="capitalize">
@@ -100,6 +114,15 @@ export default async function PublicationSubscriptionPage({
                         <span className="text-sm">{benefit.description}</span>
                       </div>
                     ))}
+                    {plan.interval === "annually" && savingsWithAnnual > 0 && (
+                      <div className="mt-2 flex items-start gap-2">
+                        <Icons.payments className="mt-0.5 h-4 w-4 flex-shrink-0 text-yellow-500" />
+                        <span className="text-sm">
+                          Save Ksh. {savingsWithAnnual} ({percentageSaved}%){" "}
+                          compared to the monthly plan
+                        </span>
+                      </div>
+                    )}
                   </CardContent>
 
                   <CardFooter className="h-full items-end">
