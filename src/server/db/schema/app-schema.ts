@@ -115,6 +115,15 @@ export const publicationBenefit = createTable("publication_benefit", (d) => ({
   updatedAt,
 }));
 
+export const publicationRelations = relations(publication, ({ many, one }) => ({
+  plans: many(plan),
+  benefits: many(publicationBenefit),
+  creator: one(creator, {
+    fields: [publication.creatorId],
+    references: [creator.id],
+  }),
+}));
+
 export const planRelations = relations(plan, ({ one }) => ({
   publication: one(publication, {
     fields: [plan.publicationId],

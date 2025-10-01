@@ -94,7 +94,7 @@ export default async function PublicationSubscriptionPage({
                   </CardHeader>
 
                   <CardContent className="space-y-3">
-                    {plan.planBenefits.map((benefit) => (
+                    {data.publication.benefits.map((benefit) => (
                       <div key={benefit.id} className="flex items-start gap-2">
                         <CheckIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
                         <span className="text-sm">{benefit.description}</span>
