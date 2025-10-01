@@ -57,12 +57,12 @@ export function EditBenefitForm({
     },
   });
 
-  const editBenefitMutation = api.plan.updateBenefit.useMutation({
+  const editBenefitMutation = api.publication.updateBenefit.useMutation({
     onSuccess: () => {
       toast.success("Benefit updated successfully");
       setOpen(false);
       onSuccess?.();
-      void utils.plan.getByPublication.invalidate();
+      void utils.publication.getBenefits.invalidate();
     },
     onError: (error) => {
       toast.error(error.message);
@@ -109,7 +109,7 @@ export function EditBenefitForm({
                   <FormControl>
                     <Textarea
                       {...field}
-                      placeholder="Describe what subscribers get with this plan..."
+                      placeholder="Describe what subscribers get with this publication..."
                       rows={3}
                       maxLength={500}
                     />

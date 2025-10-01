@@ -38,15 +38,15 @@ const addBenefitSchema = z.object({
 type AddBenefitFormData = z.infer<typeof addBenefitSchema>;
 
 interface AddBenefitFormProps {
-  planId: string;
-  planName: string;
+  publicationId: string;
+  publicationName: string;
   currentBenefitCount: number;
   onSuccess?: () => void;
 }
 
 export function AddBenefitForm({
-  planId,
-  planName,
+  publicationId,
+  publicationName,
   currentBenefitCount,
   onSuccess,
 }: AddBenefitFormProps) {
@@ -60,13 +60,13 @@ export function AddBenefitForm({
     },
   });
 
-  const addBenefitMutation = api.plan.addBenefit.useMutation({
+  const addBenefitMutation = api.publication.addBenefit.useMutation({
     onSuccess: () => {
       toast.success("Benefit added successfully");
       setOpen(false);
       form.reset();
       onSuccess?.();
-      void utils.plan.getByPublication.invalidate();
+      void utils.publication.getBenefits.invalidate();
     },
     onError: (error) => {
       toast.error(error.message);
@@ -75,7 +75,7 @@ export function AddBenefitForm({
 
   const onSubmit = (data: AddBenefitFormData) => {
     addBenefitMutation.mutate({
-      planId,
+      publicationId,
       description: data.description,
     });
   };
@@ -99,9 +99,9 @@ export function AddBenefitForm({
         <DialogHeader>
           <DialogTitle>Add Benefit</DialogTitle>
           <DialogDescription>
-            Add a new benefit to {planName}
+            Add a new benefit to {publicationName}
             {isAtLimit
-              ? ` You've reached the maximum of ${MAX_BENEFITS_PER_PLAN} benefits per plan.`
+              ? ` You've reached the maximum of ${MAX_BENEFITS_PER_PLAN} benefits.`
               : ` (${currentBenefitCount}/${MAX_BENEFITS_PER_PLAN} benefits used)`}
           </DialogDescription>
         </DialogHeader>
@@ -117,7 +117,7 @@ export function AddBenefitForm({
                   <FormControl>
                     <Textarea
                       {...field}
-                      placeholder="Describe what subscribers get with this plan..."
+                      placeholder="Describe what subscribers get by subscribing to this publication..."
                       rows={3}
                       maxLength={500}
                     />

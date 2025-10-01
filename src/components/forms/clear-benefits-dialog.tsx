@@ -17,27 +17,27 @@ import {
 import { api } from "~/trpc/react";
 
 interface ClearBenefitsDialogProps {
-  planId: string;
-  planName: string;
+  publicationId: string;
+  publicationName: string;
   benefitCount: number;
   onSuccess?: () => void;
 }
 
 export function ClearBenefitsDialog({
-  planId,
-  planName,
+  publicationId,
+  publicationName,
   benefitCount,
   onSuccess,
 }: ClearBenefitsDialogProps) {
   const [open, setOpen] = useState(false);
   const utils = api.useUtils();
 
-  const clearBenefitsMutation = api.plan.clearBenefits.useMutation({
+  const clearBenefitsMutation = api.publication.clearBenefits.useMutation({
     onSuccess: () => {
       toast.success("All benefits cleared successfully");
       setOpen(false);
       onSuccess?.();
-      void utils.plan.getByPublication.invalidate();
+      void utils.publication.getBenefits.invalidate();
     },
     onError: (error) => {
       toast.error(error.message);
@@ -46,7 +46,7 @@ export function ClearBenefitsDialog({
 
   const handleClear = () => {
     clearBenefitsMutation.mutate({
-      planId,
+      publicationId,
     });
   };
 
@@ -67,8 +67,8 @@ export function ClearBenefitsDialog({
           <DialogTitle>Clear All Benefits</DialogTitle>
           <DialogDescription>
             Are you sure you want to remove all {benefitCount} benefit
-            {benefitCount !== 1 ? "s" : ""} from the <strong>{planName}</strong>{" "}
-            plan? This action cannot be undone.
+            {benefitCount !== 1 ? "s" : ""} from{" "}
+            <strong>{publicationName}</strong>? This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2">

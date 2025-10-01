@@ -30,12 +30,12 @@ export function DeleteBenefitDialog({
   const [open, setOpen] = useState(false);
   const utils = api.useUtils();
 
-  const deleteBenefitMutation = api.plan.deleteBenefit.useMutation({
+  const deleteBenefitMutation = api.publication.deleteBenefit.useMutation({
     onSuccess: () => {
       toast.success("Benefit deleted successfully");
       setOpen(false);
       onSuccess?.();
-      void utils.plan.getByPublication.invalidate();
+      void utils.publication.getBenefits.invalidate();
     },
     onError: (error) => {
       toast.error(error.message);
