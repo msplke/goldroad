@@ -104,28 +104,30 @@ export const plan = createTable(
   ],
 );
 
-export const planBenefit = createTable("plan_benefit", (d) => ({
+export const publicationBenefit = createTable("publication_benefit", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
-  planId: d
+  publicationId: d
     .uuid()
     .notNull()
-    .references(() => plan.id, { onDelete: "cascade" }),
+    .references(() => publication.id, { onDelete: "cascade" }),
   description: d.text().notNull(),
   createdAt,
   updatedAt,
 }));
 
-export const planRelations = relations(plan, ({ many, one }) => ({
-  planBenefits: many(planBenefit),
+export const planRelations = relations(plan, ({ one }) => ({
   publication: one(publication, {
     fields: [plan.publicationId],
     references: [publication.id],
   }),
 }));
 
-export const planBenefitRelations = relations(planBenefit, ({ one }) => ({
-  plan: one(plan, {
-    fields: [planBenefit.planId],
-    references: [plan.id],
+export const publicationBenefitRelations = relations(
+  publicationBenefit,
+  ({ one }) => ({
+    publication: one(publication, {
+      fields: [publicationBenefit.publicationId],
+      references: [publication.id],
+    }),
   }),
-}));
+);
