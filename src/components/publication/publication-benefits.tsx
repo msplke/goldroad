@@ -129,7 +129,7 @@ export function PublicationBenefits({
             <AddBenefitForm
               publicationId={publicationId}
               publicationName={publicationName}
-              currentBenefitCount={0}
+              currentBenefitCount={benefits?.length ?? 0}
             />
             {benefits && benefits.length > 0 && (
               <ClearBenefitsDialog
