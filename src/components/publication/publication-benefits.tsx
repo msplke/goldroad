@@ -10,12 +10,25 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { Skeleton } from "~/components/ui/skeleton";
 import { MAX_BENEFITS_PER_PLAN } from "~/lib/constants";
 import { api } from "~/trpc/react";
 
 interface PublicationPlansProps {
   publicationId: string;
   publicationName: string;
+}
+
+function Header() {
+  return (
+    <CardHeader>
+      <CardTitle>Publication Benefits</CardTitle>
+      <CardDescription>
+        Describe the benefits subscribers will receive with this publication.
+        You can add up to {MAX_BENEFITS_PER_PLAN} benefits.
+      </CardDescription>
+    </CardHeader>
+  );
 }
 
 export function PublicationBenefits({
@@ -25,28 +38,40 @@ export function PublicationBenefits({
   const {
     data: benefits,
     isLoading,
-    isError,
+    error,
   } = api.publication.getBenefits.useQuery({
     publicationId,
   });
 
   if (isLoading) {
-    return <div>Loading benefits...</div>;
+    return (
+      <Card>
+        <Header />
+        <CardContent className="space-y-4">
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-20 w-full" />
+        </CardContent>
+      </Card>
+    );
   }
 
-  if (isError) {
-    return <div>Error loading benefits.</div>;
+  if (error) {
+    return (
+      <Card>
+        <Header />
+        <CardContent>
+          <div className="py-8 text-center">
+            <p className="text-muted-foreground">Failed to load benefits</p>
+            <p className="text-muted-foreground text-sm">{error.message}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Publication Benefits</CardTitle>
-        <CardDescription>
-          Describe the benefits subscribers will receive with this publication.
-          You can add up to {MAX_BENEFITS_PER_PLAN} benefits.
-        </CardDescription>
-      </CardHeader>
+      <Header />
       <CardContent>
         <div className="space-y-3">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
