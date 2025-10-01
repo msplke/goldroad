@@ -51,20 +51,6 @@ export default async function PublicationSubscriptionPage({
 
   try {
     const data = await api.publication.getBySlug({ slug });
-    const annualPlanPrice = data.plans.find(
-      (plan) => plan.interval === "annually",
-    )?.amount;
-    const monthlyPlanPrice = data.plans.find(
-      (plan) => plan.interval === "monthly",
-    )?.amount;
-
-    const savingsWithAnnual = monthlyPlanPrice
-      ? monthlyPlanPrice * 12 - (annualPlanPrice ?? 0)
-      : 0;
-
-    const percentageSaved = monthlyPlanPrice
-      ? Math.round((savingsWithAnnual / (monthlyPlanPrice * 12)) * 100)
-      : 0;
 
     return (
       <div className="min-h-screen bg-background text-foreground">
@@ -72,85 +58,171 @@ export default async function PublicationSubscriptionPage({
           <MaxWidthWrapper className="absolute top-0 flex justify-end p-4">
             <ModeToggle />
           </MaxWidthWrapper>
-
-          {/* Header */}
-          <div className="mb-12 text-center">
-            <Icons.logo className="mx-auto mb-4 h-10 w-10" />
-            <h1 className="mb-2 font-bold text-4xl">{data.publication.name}</h1>
-            <p className="text-lg text-muted-foreground">
-              by {data.creatorName}
-            </p>
-            {data.publication.description && (
-              <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-                {data.publication.description}
-              </p>
-            )}
-          </div>
-
-          <div className="mb-8 text-center">
-            <h2 className="font-bold text-3xl">Choose a subscription plan</h2>
-          </div>
-
-          {/* Plans Grid */}
-          <div className="flex justify-center">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              {data.plans.map((plan) => (
-                <Card key={plan.id} className="min-w-[280px] max-w-sm">
-                  <CardHeader className="text-center">
-                    <CardTitle className="capitalize">
-                      {plan.interval === "annually" ? "annual" : plan.interval}
-                    </CardTitle>
-                    <CardDescription>
-                      <span className="font-bold text-2xl text-foreground">
-                        Ksh. {plan.amount}
-                      </span>
-                    </CardDescription>
-                  </CardHeader>
-
-                  <CardContent className="space-y-3">
-                    {data.publication.benefits.map((benefit) => (
-                      <div key={benefit.id} className="flex items-start gap-2">
-                        <CheckIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
-                        <span className="text-sm">{benefit.description}</span>
-                      </div>
-                    ))}
-                    {plan.interval === "annually" && savingsWithAnnual > 0 && (
-                      <div className="mt-2 flex items-start gap-2">
-                        <Icons.payments className="mt-0.5 h-4 w-4 flex-shrink-0 text-yellow-500" />
-                        <span className="text-sm">
-                          Save Ksh. {savingsWithAnnual} ({percentageSaved}%){" "}
-                          compared to the monthly plan
-                        </span>
-                      </div>
-                    )}
-                  </CardContent>
-
-                  <CardFooter className="h-full items-end">
-                    <Button asChild className="w-full">
-                      <Link
-                        href={`https://paystack.com/pay/${plan.paystackPaymentPageUrlSlug}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Subscribe
-                      </Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-8 text-center text-sm">
-            Powered by{" "}
-            <Link href="/" className="underline">
-              Goldroad
-            </Link>
-          </div>
+          <PublicationHeader
+            name={data.publication.name}
+            creator={data.creatorName}
+            description={data.publication.description}
+          />
+          <Plans plans={data.plans} benefits={data.publication.benefits} />
+          <Footer />
         </div>
       </div>
     );
   } catch (_error) {
     notFound();
   }
+}
+
+function Footer() {
+  return (
+    <div className="mt-8 text-center text-sm">
+      Powered by{" "}
+      <Link href="/" className="underline">
+        Goldroad
+      </Link>
+    </div>
+  );
+}
+
+type PublicationHeaderProps = {
+  name: string;
+  description: string | null;
+  creator: string;
+};
+
+function PublicationHeader({
+  description,
+  name,
+  creator,
+}: PublicationHeaderProps) {
+  return (
+    <div className="mb-12 text-center">
+      <Icons.logo className="mx-auto mb-4 h-10 w-10" />
+      <h1 className="mb-2 font-bold text-4xl">{name}</h1>
+      <p className="text-lg text-muted-foreground">by {creator}</p>
+      {description && (
+        <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
+          {description}
+        </p>
+      )}
+    </div>
+  );
+}
+
+type Plan = {
+  name: string;
+  id: string;
+  interval: "hourly" | "daily" | "monthly" | "annually";
+  amount: number;
+  paystackPaymentPageUrlSlug: string;
+};
+
+type Benefit = {
+  id: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date | null;
+  publicationId: string;
+};
+
+type PlansProps = {
+  plans: Plan[];
+  benefits: Benefit[];
+};
+
+function Plans({ plans, benefits }: PlansProps) {
+  const annualPlanPrice = plans.find(
+    (plan) => plan.interval === "annually",
+  )?.amount;
+  const monthlyPlanPrice = plans.find(
+    (plan) => plan.interval === "monthly",
+  )?.amount;
+
+  const savingsWithAnnual = monthlyPlanPrice
+    ? monthlyPlanPrice * 12 - (annualPlanPrice ?? 0)
+    : 0;
+
+  const percentageSaved = monthlyPlanPrice
+    ? Math.round((savingsWithAnnual / (monthlyPlanPrice * 12)) * 100)
+    : 0;
+
+  return (
+    <>
+      <div className="mb-8 text-center">
+        <h2 className="font-bold text-3xl">Choose a subscription plan</h2>
+      </div>
+      <div className="flex justify-center">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          {plans.map((plan) => (
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              benefits={benefits}
+              savingsWithAnnual={savingsWithAnnual}
+              percentageSaved={percentageSaved}
+            />
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+type PlanCardProps = {
+  plan: Plan;
+  benefits: Benefit[];
+  savingsWithAnnual: number;
+  percentageSaved: number;
+};
+
+function PlanCard({
+  plan,
+  benefits,
+  savingsWithAnnual,
+  percentageSaved,
+}: PlanCardProps) {
+  return (
+    <Card key={plan.id} className="min-w-[280px] max-w-sm">
+      <CardHeader className="text-center">
+        <CardTitle className="capitalize">
+          {plan.interval === "annually" ? "annual" : plan.interval}
+        </CardTitle>
+        <CardDescription>
+          <span className="font-bold text-2xl text-foreground">
+            Ksh. {plan.amount}
+          </span>
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="space-y-3">
+        {benefits.map((benefit) => (
+          <div key={benefit.id} className="flex items-start gap-2">
+            <CheckIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
+            <span className="text-sm">{benefit.description}</span>
+          </div>
+        ))}
+        {plan.interval === "annually" && savingsWithAnnual > 0 && (
+          <div className="mt-2 flex items-start gap-2">
+            <Icons.payments className="mt-0.5 h-4 w-4 flex-shrink-0 text-yellow-500" />
+            <span className="text-sm">
+              Save Ksh. {savingsWithAnnual} ({percentageSaved}%) compared to the
+              monthly plan
+            </span>
+          </div>
+        )}
+      </CardContent>
+
+      <CardFooter className="h-full items-end">
+        <Button asChild className="w-full">
+          <Link
+            href={`https://paystack.com/pay/${plan.paystackPaymentPageUrlSlug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Subscribe
+          </Link>
+        </Button>
+      </CardFooter>
+    </Card>
+  );
 }
