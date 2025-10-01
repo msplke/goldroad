@@ -4,6 +4,7 @@ import { AlertCircle, Loader2 } from "lucide-react";
 
 import { EditPublicationForm } from "~/components/forms/edit-publication-form";
 import { OnboardingGuard } from "~/components/onboarding/onboarding-guard";
+import { PublicationBenefits } from "~/components/publication/publication-benefits";
 import { PublicationPlans } from "~/components/publication/publication-plans";
 import { PublicationShareLink } from "~/components/publication/publication-share-link";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
@@ -108,6 +109,12 @@ function PublicationContent() {
 
         {/* Payment Plans */}
         <PublicationPlans publicationId={publication.id} />
+
+        {/* Subscriber Benefits */}
+        <PublicationBenefits
+          publicationId={publication.id}
+          publicationName={publication.name}
+        />
       </div>
     </div>
   );

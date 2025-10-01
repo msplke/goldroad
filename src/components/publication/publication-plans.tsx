@@ -3,10 +3,6 @@
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 
-import { AddBenefitForm } from "~/components/forms/add-benefit-form";
-import { ClearBenefitsDialog } from "~/components/forms/clear-benefits-dialog";
-import { DeleteBenefitDialog } from "~/components/forms/delete-benefit-dialog";
-import { EditBenefitForm } from "~/components/forms/edit-benefit-form";
 import { EditPlanPricingForm } from "~/components/forms/edit-plan-pricing-form";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -18,7 +14,6 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
-import { MAX_BENEFITS_PER_PLAN } from "~/lib/constants";
 import { api } from "~/trpc/react";
 
 interface PublicationPlansProps {
@@ -149,77 +144,6 @@ export function PublicationPlans({ publicationId }: PublicationPlansProps) {
                 </Button>
               </div>
             </div>
-
-            {/* Benefits Section */}
-            <div className="space-y-3">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-2">
-                  <h5 className="font-medium text-sm">Plan Benefits</h5>
-                  {plan.planBenefits.length > 0 && (
-                    <Badge variant="outline" className="w-fit">
-                      {plan.planBenefits.length}/{MAX_BENEFITS_PER_PLAN}
-                    </Badge>
-                  )}
-                </div>
-
-                <div className="hidden sm:flex sm:gap-2">
-                  <AddBenefitForm
-                    planId={plan.id}
-                    planName={plan.name}
-                    currentBenefitCount={plan.planBenefits?.length ?? 0}
-                  />
-                  {plan.planBenefits && plan.planBenefits.length > 0 && (
-                    <ClearBenefitsDialog
-                      planId={plan.id}
-                      planName={plan.name}
-                      benefitCount={plan.planBenefits.length}
-                    />
-                  )}
-                </div>
-              </div>
-
-              {plan.planBenefits && plan.planBenefits.length > 0 ? (
-                <div className="space-y-4">
-                  {plan.planBenefits.map((benefit) => (
-                    <div
-                      key={benefit.id}
-                      className="flex items-start justify-between gap-3 rounded-md bg-muted/50 p-3"
-                    >
-                      <p className="flex-1 text-sm">{benefit.description}</p>
-                      <div className="flex items-center gap-1">
-                        <EditBenefitForm
-                          benefitId={benefit.id}
-                          currentDescription={benefit.description}
-                        />
-                        <DeleteBenefitDialog
-                          benefitId={benefit.id}
-                          benefitDescription={benefit.description}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                  <div className="flex items-center justify-end gap-2 sm:hidden">
-                    <AddBenefitForm
-                      planId={plan.id}
-                      planName={plan.name}
-                      currentBenefitCount={plan.planBenefits?.length ?? 0}
-                    />
-                    {plan.planBenefits && plan.planBenefits.length > 0 && (
-                      <ClearBenefitsDialog
-                        planId={plan.id}
-                        planName={plan.name}
-                        benefitCount={plan.planBenefits.length}
-                      />
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <p className="py-4 text-center text-muted-foreground text-sm">
-                  No benefits added yet. Add some benefits to describe what
-                  subscribers get with this plan.
-                </p>
-              )}
-            </div>
           </div>
         ))}
 
@@ -228,8 +152,7 @@ export function PublicationPlans({ publicationId }: PublicationPlansProps) {
             <strong>Note:</strong> Pricing changes are automatically synced with
             Paystack and will apply to new subscribers. Existing subscribers
             will continue with their current pricing until they renew their
-            subscription. Each plan can have up to {MAX_BENEFITS_PER_PLAN}{" "}
-            benefits.
+            subscription.
           </p>
         </div>
       </CardContent>
