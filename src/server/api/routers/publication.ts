@@ -248,6 +248,9 @@ export const publicationRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const foundPublication = await ctx.db.query.publication.findFirst({
         where: eq(publication.slug, input.slug),
+        with: {
+          benefits: true,
+        },
       });
 
       if (!foundPublication) {
@@ -304,6 +307,7 @@ export const publicationRouter = createTRPCRouter({
         publication: {
           name: foundPublication.name,
           description: foundPublication.description,
+          benefits: foundPublication.benefits,
           slug: foundPublication.slug,
           createdAt: foundPublication.createdAt,
         },
