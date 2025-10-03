@@ -148,7 +148,7 @@ function Plans({ plans, benefits }: PlansProps) {
 
   // The daily and hourly plans are not displayed in the UI. They are mainly for testing purposes.
   const monthlyPlan = plans.find((plan) => plan.interval === "monthly");
-  const yearlyPlan = plans.find((plan) => plan.interval === "annually");
+  const annualPlan = plans.find((plan) => plan.interval === "annually");
 
   if (plans.length === 0) {
     return <p className="text-center">No subscription plans available.</p>;
@@ -161,17 +161,10 @@ function Plans({ plans, benefits }: PlansProps) {
       </div>
       <div className="flex justify-center">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {monthlyPlan && (
+          {monthlyPlan && <PlanCard plan={monthlyPlan} benefits={benefits} />}
+          {annualPlan && (
             <PlanCard
-              plan={monthlyPlan}
-              benefits={benefits}
-              savingsWithAnnual={savingsWithAnnual}
-              percentageSaved={percentageSaved}
-            />
-          )}
-          {yearlyPlan && (
-            <PlanCard
-              plan={yearlyPlan}
+              plan={annualPlan}
               benefits={benefits}
               savingsWithAnnual={savingsWithAnnual}
               percentageSaved={percentageSaved}
@@ -186,8 +179,8 @@ function Plans({ plans, benefits }: PlansProps) {
 type PlanCardProps = {
   plan: Plan;
   benefits: Benefit[];
-  savingsWithAnnual: number;
-  percentageSaved: number;
+  savingsWithAnnual?: number;
+  percentageSaved?: number;
 };
 
 function PlanCard({
@@ -216,15 +209,19 @@ function PlanCard({
             <span className="text-sm">{benefit.description}</span>
           </div>
         ))}
-        {plan.interval === "annually" && savingsWithAnnual > 0 && (
-          <div className="mt-2 flex items-start gap-2">
-            <Icons.payments className="mt-0.5 h-4 w-4 flex-shrink-0 text-yellow-500" />
-            <span className="text-sm">
-              Save Ksh. {savingsWithAnnual} ({percentageSaved}%) compared to the
-              monthly plan
-            </span>
-          </div>
-        )}
+        {plan.interval === "annually" &&
+          typeof savingsWithAnnual !== "undefined" &&
+          typeof percentageSaved !== "undefined" &&
+          percentageSaved > 0 &&
+          savingsWithAnnual > 0 && (
+            <div className="mt-2 flex items-start gap-2">
+              <Icons.payments className="mt-0.5 h-4 w-4 flex-shrink-0 text-yellow-500" />
+              <span className="text-sm">
+                Save Ksh. {savingsWithAnnual} ({percentageSaved}%) compared to
+                the monthly plan
+              </span>
+            </div>
+          )}
       </CardContent>
 
       <CardFooter className="h-full items-end">
