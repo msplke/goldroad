@@ -146,6 +146,14 @@ function Plans({ plans, benefits }: PlansProps) {
     ? Math.round((savingsWithAnnual / (monthlyPlanPrice * 12)) * 100)
     : 0;
 
+  // The daily and hourly plans are not displayed in the UI. They are mainly for testing purposes.
+  const monthlyPlan = plans.find((plan) => plan.interval === "monthly");
+  const yearlyPlan = plans.find((plan) => plan.interval === "annually");
+
+  if (plans.length === 0) {
+    return <p className="text-center">No subscription plans available.</p>;
+  }
+
   return (
     <>
       <div className="mb-8 text-center">
@@ -153,15 +161,22 @@ function Plans({ plans, benefits }: PlansProps) {
       </div>
       <div className="flex justify-center">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {plans.map((plan) => (
+          {monthlyPlan && (
             <PlanCard
-              key={plan.id}
-              plan={plan}
+              plan={monthlyPlan}
               benefits={benefits}
               savingsWithAnnual={savingsWithAnnual}
               percentageSaved={percentageSaved}
             />
-          ))}
+          )}
+          {yearlyPlan && (
+            <PlanCard
+              plan={yearlyPlan}
+              benefits={benefits}
+              savingsWithAnnual={savingsWithAnnual}
+              percentageSaved={percentageSaved}
+            />
+          )}
         </div>
       </div>
     </>
