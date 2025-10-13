@@ -62,10 +62,6 @@ export const creator = createTable("creator", (d) => ({
   updatedAt,
 }));
 
-export const creatorRelations = relations(creator, ({ one }) => ({
-  tagInfo: one(tagInfo),
-}));
-
 export const publication = createTable("publication", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
   name: d.text().notNull(),
