@@ -23,8 +23,7 @@ const getSubscriptionSchemas = {
 
 const getSubscriptionByIdSchemas = {
   params: z.object({
-    // Subscription id or code
-    id_or_code: z.string(),
+    id_or_code: z.string().describe("ID or code of the subscription"),
   }),
   output: baseResponseSchema.extend({
     data: subscriptionSchema,
