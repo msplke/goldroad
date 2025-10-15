@@ -11,12 +11,14 @@ export const baseResponseSchema = z.object({
   message: z.string(),
 });
 
+export const metadataSchema = z.record(z.string(), z.unknown()).nullish();
+
 export const customerSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
   email: z.email(),
   phone: z.string().optional(),
-  metadata: z.record(z.string(), z.unknown()).optional(),
+  metadata: metadataSchema,
   customer_code: z.string(),
 });
 
