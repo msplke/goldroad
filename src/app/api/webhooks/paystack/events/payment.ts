@@ -68,7 +68,9 @@ async function handleSubscriptionCreationEvent(data: PaystackWebhookBodyData) {
     { idempotencyKey },
   );
 
-  console.log(`Running create subscriber task with handle: ${handle}`);
+  console.log(
+    `Running create subscriber task with handle: ${JSON.stringify(handle)}`,
+  );
 }
 
 async function handleFailedPaymentEvent(data: PaystackWebhookBodyData) {
@@ -97,7 +99,9 @@ async function handleFailedPaymentEvent(data: PaystackWebhookBodyData) {
     { idempotencyKey },
   );
   console.log(
-    `Running update on subsequent payment task with handle: ${handle}`,
+    `Running update on subsequent payment task with handle: ${JSON.stringify(
+      handle,
+    )}`,
   );
 }
 
@@ -142,6 +146,8 @@ async function handleSuccessfulPaymentEvent(data: PaystackWebhookBodyData) {
     { idempotencyKey },
   );
   console.log(
-    `Running update on subsequent payment task with handle: ${handle}`,
+    `Running update on subsequent payment task with handle: ${JSON.stringify(
+      handle,
+    )}`,
   );
 }

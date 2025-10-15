@@ -50,7 +50,9 @@ export async function handleSubscriptionDisabledEvent(
     { idempotencyKey },
   );
   console.log(
-    `Running handle subscription completed task with handle: ${handle}`,
+    `Running handle subscription completed task with handle: ${JSON.stringify(
+      handle,
+    )}`,
   );
 }
 
@@ -83,6 +85,8 @@ export async function handleSubscriptionCancelledEvent(
     { idempotencyKey },
   );
   console.log(
-    `Running handle subscription cancelled task with handle: ${handle}`,
+    `Running handle subscription cancelled task with handle: ${JSON.stringify(
+      handle,
+    )}`,
   );
 }
