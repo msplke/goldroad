@@ -1,8 +1,4 @@
-// 4. Payment pages
-
 import z from "zod";
-
-import { plan } from "~/server/db/schema";
 
 export const paymentPageTypeEnum = z.enum([
   "payment",
