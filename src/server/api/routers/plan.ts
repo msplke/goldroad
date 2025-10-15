@@ -6,11 +6,9 @@ import { getCreator } from "~/server/actions/trpc/creator";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import type { DbType } from "~/server/db";
 import { plan, publication } from "~/server/db/schema/app-schema";
-import {
-  type createPaymentPageSchema,
-  type createPlanSchema,
-  paystackClient,
-} from "~/server/fetch-clients/paystack";
+import { paystackClient } from "~/server/fetch-clients/paystack/client";
+import type { createPaymentPageSchema } from "~/server/fetch-clients/paystack/schemas/payment-page";
+import type { createPlanSchema } from "~/server/fetch-clients/paystack/schemas/plan";
 
 const CreatePlanInfoSchema = z.object({
   publicationId: z.uuid("Invalid publication ID"),
@@ -191,7 +189,9 @@ export const planRouter = createTRPCRouter({
 
         if (paystackError || !paystackResponse) {
           throw new TRPCError({
-            message: `Failed to update plan on Paystack: ${paystackError?.message || "Unknown error"}`,
+            message: `Failed to update plan on Paystack: ${
+              paystackError?.message || "Unknown error"
+            }`,
             code: "INTERNAL_SERVER_ERROR",
           });
         }

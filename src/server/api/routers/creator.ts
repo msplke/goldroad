@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import z from "zod";
 
+import { SUBACCOUNT_PERCENTAGE_CHARGE } from "~/lib/constants";
 import { checkCreatorExists, getCreator } from "~/server/actions/trpc/creator";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { decryptSecret, encryptSecret } from "~/server/crypto/kit-secrets";
@@ -13,12 +14,10 @@ import {
   tagInfo,
 } from "~/server/db/schema/app-schema";
 import { KIT_API_KEY_HEADER, kitClient } from "~/server/fetch-clients/kit";
-import {
-  createSubaccountSchema,
-  paystackClient,
-  planIntervalEnum,
-  subscriptionStatusEnum,
-} from "~/server/fetch-clients/paystack";
+import { paystackClient } from "~/server/fetch-clients/paystack/client";
+import { planIntervalEnum } from "~/server/fetch-clients/paystack/schemas/plan";
+import { createSubaccountSchema } from "~/server/fetch-clients/paystack/schemas/subaccount";
+import { subscriptionStatusEnum } from "~/server/fetch-clients/paystack/schemas/subscription";
 
 type SubaccountCreationInfo = z.infer<typeof createSubaccountSchema>;
 
@@ -115,7 +114,9 @@ export const creatorRouter = createTRPCRouter({
           });
         } else {
           throw new TRPCError({
-            message: `Kit API error: ${error.statusText || "Unable to validate API key"}`,
+            message: `Kit API error: ${
+              error.statusText || "Unable to validate API key"
+            }`,
             code: "INTERNAL_SERVER_ERROR",
           });
         }
@@ -214,7 +215,7 @@ export const creatorRouter = createTRPCRouter({
     }),
 
   addBankAccountInfo: protectedProcedure
-    .input(createSubaccountSchema)
+    .input(createSubaccountSchema.omit({ percentage_charge: true }))
     .mutation(async ({ ctx, input }) => {
       const { id: creatorId, paystackSubaccountCode } = await getCreator(
         ctx.db,
@@ -229,7 +230,10 @@ export const creatorRouter = createTRPCRouter({
 
       console.log("Creating subaccount...");
       // 1. Create Paystack subaccount
-      const code = await createPaystackSubaccount(input);
+      const code = await createPaystackSubaccount({
+        ...input,
+        percentage_charge: SUBACCOUNT_PERCENTAGE_CHARGE,
+      });
       // 2. Update db with subaccount code only
       await ctx.db
         .update(creator)
