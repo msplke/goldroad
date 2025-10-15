@@ -19,7 +19,7 @@ export const planSchema = z.object({
   id: z.coerce.string(),
   name: z.string(),
   plan_code: z.string(),
-  description: z.string().nullable().optional(),
+  description: z.string().nullish(),
   amount: z.number(),
   interval: planIntervalEnum.describe("Interval for the plan"),
   integration: z.number().optional(),

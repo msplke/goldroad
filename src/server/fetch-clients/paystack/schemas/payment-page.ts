@@ -1,5 +1,7 @@
 import z from "zod";
 
+import { metadataSchema } from "~/server/fetch-clients/paystack/schemas/common";
+
 export const paymentPageTypeEnum = z.enum([
   "payment",
   "subscription",
@@ -15,7 +17,7 @@ export const paymentPageSchema = z.object({
   slug: z.string(),
   currency: z.string(),
   type: paymentPageTypeEnum.optional(),
-  split_code: z.string().nullable().optional(),
+  split_code: z.string().nullish(),
   redirect_url: z.string().optional(),
   success_message: z.string().optional(),
   collect_phone: z.boolean(),
@@ -32,7 +34,7 @@ export const paymentPageSchema = z.object({
       }),
     )
     .optional(),
-  metadata: z.record(z.string(), z.unknown()).optional(),
+  metadata: metadataSchema,
   createdAt: z.string(),
   updatedAt: z.string(),
 });

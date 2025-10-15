@@ -28,7 +28,7 @@ const PaystackWebhookBodySchema = z.object({
     id: z.number().optional(),
     subscription_code: z.string().optional(),
     plan: planSchema.optional(),
-    next_payment_date: z.coerce.date().nullable().optional(),
+    next_payment_date: z.coerce.date().nullish(),
     amount: z.number().int(),
     status: z.string().optional(),
     customer: z.object({
