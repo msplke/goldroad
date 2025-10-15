@@ -53,6 +53,8 @@ export const planRoutes = {
   "@put/plan/:id_or_code": {
     params: planRouteParamsSchema,
     input: createPlanSchema.partial(),
-    output: baseResponseSchema,
+    output: baseResponseSchema.extend({
+      data: planSchema,
+    }),
   },
 };
