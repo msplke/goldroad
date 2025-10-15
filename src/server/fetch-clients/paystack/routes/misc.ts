@@ -2,6 +2,7 @@ import z from "zod";
 
 import {
   baseResponseSchema,
+  currencyEnum,
   paginationMetaSchema,
 } from "~/server/fetch-clients/paystack/schemas/common";
 import { bankSchema } from "~/server/fetch-clients/paystack/schemas/misc";
@@ -13,7 +14,7 @@ const getBankQuerySchema = z.object({
     .describe(
       "The country to obtain the list of supported banks. e.g country=ghana or country=nigeria",
     ),
-  currency: z.string().optional().describe("Currency e.g GHS, NGN"),
+  currency: currencyEnum.optional().describe("Filter banks by currency"),
   use_cursor: z.boolean().optional().describe("Use cursor for pagination"),
   perPage: z
     .number()
