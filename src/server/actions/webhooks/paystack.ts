@@ -463,6 +463,8 @@ async function getCreatorInfoFromPlanCode(
     case "hourly":
       intervalTag = foundTagInfo.kitHourlySubscriberTag;
       break;
+    default:
+      throw new Error("Unknown plan interval");
   }
 
   return {

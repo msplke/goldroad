@@ -1,10 +1,8 @@
 import z from "zod";
 
 import { env } from "~/env";
-import {
-  planSchema,
-  subscriptionStatusEnum,
-} from "~/server/fetch-clients/paystack";
+import { planSchema } from "~/server/fetch-clients/paystack/schemas/plan";
+import { subscriptionStatusEnum } from "~/server/fetch-clients/paystack/schemas/subscription";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 // `invoice.update` also runs when a charge attempt fails, but

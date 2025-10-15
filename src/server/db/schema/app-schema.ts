@@ -6,7 +6,7 @@ import { createdAt, createTable, updatedAt } from "~/server/db/schema/utils";
 import type {
   PlanInterval,
   SubscriptionStatus,
-} from "~/server/fetch-clients/paystack";
+} from "~/server/fetch-clients/paystack/schemas/common";
 
 export const paidSubscriber = createTable("paid_subscriber", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
