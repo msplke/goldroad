@@ -2,12 +2,10 @@ import { createFetch, createSchema } from "@better-fetch/fetch";
 import { z } from "zod";
 
 import { env } from "~/env";
-
-const PAYSTACK_BASE_URL = "https://api.paystack.co";
-
-/**The amount being taken by the business as a percentage of the total transaction
- * when a payment is made to a subaccount*/
-const SUBACCOUNT_PERCENTAGE_CHARGE = 5; // i.e. subaccount gets 95% of the transaction
+import {
+  PAYSTACK_BASE_URL,
+  SUBACCOUNT_PERCENTAGE_CHARGE,
+} from "~/lib/constants";
 
 // Common response shapes
 const customerSchema = z.object({
