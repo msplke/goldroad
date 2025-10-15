@@ -1,16 +1,15 @@
 import z from "zod";
 
 import {
+  baseQueryParamsSchema,
   baseResponseSchema,
   paginationMetaSchema,
 } from "~/server/fetch-clients/paystack/schemas/common";
 import { subscriptionSchema } from "~/server/fetch-clients/paystack/schemas/subscription";
 
 const getSubscriptionSchemas = {
-  query: z
-    .object({
-      perPage: z.coerce.number().optional(),
-      page: z.coerce.number().optional(),
+  query: baseQueryParamsSchema
+    .extend({
       customer: z.string().optional(),
       plan: z.string().optional(),
     })

@@ -11,6 +11,11 @@ export const baseResponseSchema = z.object({
   message: z.string(),
 });
 
+export const baseQueryParamsSchema = z.object({
+  perPage: z.coerce.number().optional().describe("Number of records to return"),
+  page: z.coerce.number().optional().describe("Page number to return"),
+});
+
 export const metadataSchema = z.record(z.string(), z.unknown()).nullish();
 
 export const customerSchema = z.object({
