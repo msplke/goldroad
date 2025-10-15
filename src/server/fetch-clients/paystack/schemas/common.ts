@@ -20,13 +20,15 @@ export const customerSchema = z.object({
   customer_code: z.string(),
 });
 
-export const paginationMetaSchema = z.object({
-  total: z.number(),
-  skipped: z.number(),
-  perPage: z.number(),
-  page: z.number(),
-  pageCount: z.number(),
-});
+export const paginationMetaSchema = z
+  .object({
+    total: z.number(),
+    skipped: z.number(),
+    perPage: z.number(),
+    page: z.number(),
+    pageCount: z.number(),
+  })
+  .optional();
 
 export const authorizationSchema = z.object({
   authorization_code: z.string(),
