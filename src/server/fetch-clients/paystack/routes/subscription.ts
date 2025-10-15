@@ -9,8 +9,8 @@ import { subscriptionSchema } from "~/server/fetch-clients/paystack/schemas/subs
 const getSubscriptionSchemas = {
   query: z
     .object({
-      perPage: z.number().optional(),
-      page: z.number().optional(),
+      perPage: z.coerce.number().optional(),
+      page: z.coerce.number().optional(),
       customer: z.string().optional(),
       plan: z.string().optional(),
     })

@@ -12,11 +12,11 @@ import {
 import { subscriptionStatusEnum } from "~/server/fetch-clients/paystack/schemas/subscription";
 
 const getPlanQuerySchema = z.object({
-  perPage: z.number().optional().describe("Number of records to return"),
-  page: z.number().optional().describe("Page number to return"),
+  perPage: z.coerce.number().optional().describe("Number of records to return"),
+  page: z.coerce.number().optional().describe("Page number to return"),
   status: subscriptionStatusEnum.optional().describe("Filter plans by status"),
   interval: planIntervalEnum.optional().describe("Filter plans by interval"),
-  amount: z.number().optional().describe("Filter plans by amount"),
+  amount: z.coerce.number().optional().describe("Filter plans by amount"),
 });
 
 const planRouteParamsSchema = z.object({
