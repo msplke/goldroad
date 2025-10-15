@@ -1,8 +1,8 @@
+import { baseResponseSchema } from "~/server/fetch-clients/paystack/schemas/common";
 import {
-  baseResponseSchema,
   createPaymentPageSchema,
   paymentPageSchema,
-} from "~/server/fetch-clients/paystack/schemas";
+} from "~/server/fetch-clients/paystack/schemas/payment-page";
 
 export const paymentPageRoutes = {
   // Create Payment Page
