@@ -1,4 +1,3 @@
-import type { FetchSchemaRoutes } from "@better-fetch/fetch";
 import z from "zod";
 
 import { baseResponseSchema } from "~/server/fetch-clients/paystack/schemas/common";
@@ -7,7 +6,7 @@ import {
   subaccountSchema,
 } from "~/server/fetch-clients/paystack/schemas/subaccount";
 
-export const subaccountRoutes: FetchSchemaRoutes = {
+export const subaccountRoutes = {
   // Create Subaccount
   "@post/subaccount": {
     input: createSubaccountSchema,
