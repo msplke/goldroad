@@ -15,6 +15,10 @@ export const planIntervalEnum = z.enum([
   "annually",
 ]);
 
+const planCurrencyEnum = currencyEnum
+  .optional()
+  .describe("Currency in which amount is set");
+
 export const planSchema = z.object({
   id: z.coerce.string(),
   name: z.string(),
@@ -31,9 +35,7 @@ export const createPlan = planSchema
     integration: true,
   })
   .extend({
-    currency: currencyEnum
-      .optional()
-      .describe("Currency in which amount is set"),
+    currency: planCurrencyEnum,
     invoice_limit: z
       .number()
       .optional()
@@ -57,7 +59,7 @@ export const createPlanSchema = z.object({
     .describe(
       "Set to false if you don't want text messages to be sent to your customers",
     ),
-  currency: z.string().optional().describe("Currency in which amount is set"),
+  currency: planCurrencyEnum,
   invoice_limit: z
     .number()
     .optional()

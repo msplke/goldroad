@@ -1,6 +1,9 @@
 import z from "zod";
 
-import { metadataSchema } from "~/server/fetch-clients/paystack/schemas/common";
+import {
+  currencyEnum,
+  metadataSchema,
+} from "~/server/fetch-clients/paystack/schemas/common";
 
 export const paymentPageTypeEnum = z.enum([
   "payment",
@@ -15,7 +18,7 @@ export const paymentPageSchema = z.object({
   description: z.string().optional(),
   amount: z.number().optional(),
   slug: z.string(),
-  currency: z.string(),
+  currency: currencyEnum,
   type: paymentPageTypeEnum.optional(),
   split_code: z.string().nullish(),
   redirect_url: z.string().optional(),
