@@ -21,7 +21,7 @@ export const paymentPageSchema = z.object({
   currency: currencyEnum,
   type: paymentPageTypeEnum.optional(),
   split_code: z.string().nullish(),
-  redirect_url: z.string().optional(),
+  redirect_url: z.url().optional(),
   success_message: z.string().optional(),
   collect_phone: z.boolean(),
   active: z.boolean(),
