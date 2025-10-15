@@ -7,6 +7,7 @@ import { paymentPageRoutes } from "~/server/fetch-clients/paystack/routes/paymen
 import { planRoutes } from "~/server/fetch-clients/paystack/routes/plan";
 import { subaccountRoutes } from "~/server/fetch-clients/paystack/routes/subaccount";
 import { subscriptionRoutes } from "~/server/fetch-clients/paystack/routes/subscription";
+import { transactionSplitRoutes } from "~/server/fetch-clients/paystack/routes/transaction-split";
 
 const paystackSchema = createSchema({
   ...subscriptionRoutes,
@@ -14,6 +15,7 @@ const paystackSchema = createSchema({
   ...bankRoute,
   ...subaccountRoutes,
   ...paymentPageRoutes,
+  ...transactionSplitRoutes,
 });
 
 export const paystackClient = createFetch({
