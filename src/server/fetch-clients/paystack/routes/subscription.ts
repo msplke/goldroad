@@ -1,4 +1,3 @@
-import type { FetchSchema, FetchSchemaRoutes } from "@better-fetch/fetch";
 import z from "zod";
 
 import {
@@ -7,7 +6,7 @@ import {
 } from "~/server/fetch-clients/paystack/schemas/common";
 import { subscriptionSchema } from "~/server/fetch-clients/paystack/schemas/subscription";
 
-const getSubscriptionSchemas: FetchSchema = {
+const getSubscriptionSchemas = {
   query: z
     .object({
       perPage: z.number().optional(),
@@ -22,7 +21,7 @@ const getSubscriptionSchemas: FetchSchema = {
   }),
 };
 
-const getSubscriptionByIdSchemas: FetchSchema = {
+const getSubscriptionByIdSchemas = {
   params: z.object({
     // Subscription id or code
     id_or_code: z.string(),
@@ -32,7 +31,7 @@ const getSubscriptionByIdSchemas: FetchSchema = {
   }),
 };
 
-const createSubscriptionSchemas: FetchSchema = {
+const createSubscriptionSchemas = {
   input: z.object({
     customer: z.string().describe("Customer's email address or customer code"),
     plan: z.string().describe("Plan code"),
@@ -50,7 +49,7 @@ const createSubscriptionSchemas: FetchSchema = {
   }),
 };
 
-const enableSubscriptionSchemas: FetchSchema = {
+const enableSubscriptionSchemas = {
   input: z.object({
     code: z.string().describe("Subscription code"),
     token: z.string().describe("Email token"),
@@ -60,7 +59,7 @@ const enableSubscriptionSchemas: FetchSchema = {
   }),
 };
 
-const disableSubscriptionSchemas: FetchSchema = {
+const disableSubscriptionSchemas = {
   input: z.object({
     code: z.string().describe("Subscription code"),
     token: z.string().describe("Email token"),
@@ -70,7 +69,7 @@ const disableSubscriptionSchemas: FetchSchema = {
   }),
 };
 
-export const subscriptionRoutes: FetchSchemaRoutes = {
+export const subscriptionRoutes = {
   // List Subscriptions
   "@get/subscription": getSubscriptionSchemas,
   // Fetch a Subscription

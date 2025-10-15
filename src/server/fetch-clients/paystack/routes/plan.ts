@@ -1,4 +1,3 @@
-import type { FetchSchemaRoutes } from "@better-fetch/fetch";
 import z from "zod";
 
 import {
@@ -20,7 +19,7 @@ const getPlanQuerySchema = z.object({
   amount: z.number().optional().describe("Filter plans by amount"),
 });
 
-export const planRoutes: FetchSchemaRoutes = {
+export const planRoutes = {
   // Create Plan
   "@post/plan": {
     input: createPlanSchema,

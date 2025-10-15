@@ -2,6 +2,8 @@
 
 import z from "zod";
 
+import { plan } from "~/server/db/schema";
+
 export const paymentPageTypeEnum = z.enum([
   "payment",
   "subscription",
@@ -17,6 +19,7 @@ export const paymentPageSchema = z.object({
   slug: z.string(),
   currency: z.string(),
   type: paymentPageTypeEnum.optional(),
+  split_code: z.string().nullable().optional(),
   redirect_url: z.string().optional(),
   success_message: z.string().optional(),
   collect_phone: z.boolean(),
@@ -38,17 +41,21 @@ export const paymentPageSchema = z.object({
   updatedAt: z.string(),
 });
 
-export const createPaymentPageSchema = paymentPageSchema.omit({
-  id: true,
-  slug: true,
-  currency: true,
-  success_message: true,
-  collect_phone: true,
-  active: true,
-  published: true,
-  createdAt: true,
-  updatedAt: true,
-});
+export const createPaymentPageSchema = paymentPageSchema
+  .omit({
+    id: true,
+    slug: true,
+    currency: true,
+    success_message: true,
+    collect_phone: true,
+    active: true,
+    published: true,
+    createdAt: true,
+    updatedAt: true,
+  })
+  .extend({
+    plan: z.string().optional(),
+  });
 
 export type CreatePaymentPageInput = z.infer<typeof createPaymentPageSchema>;
 export type PaymentPage = z.infer<typeof paymentPageSchema>;

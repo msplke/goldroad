@@ -1,4 +1,3 @@
-import type { FetchSchemaRoutes } from "@better-fetch/fetch";
 import z from "zod";
 
 import {
@@ -36,7 +35,7 @@ const getBankQuerySchema = z.object({
   previous: z.string().optional().describe("Cursor for the previous page"),
 });
 
-export const bankRoute: FetchSchemaRoutes = {
+export const bankRoute = {
   // List banks
   "@get/bank": {
     query: getBankQuerySchema.optional(),
