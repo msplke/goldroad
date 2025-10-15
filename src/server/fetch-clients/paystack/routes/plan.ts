@@ -19,6 +19,10 @@ const getPlanQuerySchema = z.object({
   amount: z.number().optional().describe("Filter plans by amount"),
 });
 
+const planRouteParamsSchema = z.object({
+  id_or_code: z.string().describe("ID or code of the plan"),
+});
+
 export const planRoutes = {
   // Create Plan
   "@post/plan": {
@@ -39,9 +43,7 @@ export const planRoutes = {
 
   // Fetch Plan
   "@get/plan/:id_or_code": {
-    params: z.object({
-      id_or_code: z.string().describe("ID or code of the plan"),
-    }),
+    params: planRouteParamsSchema,
     output: baseResponseSchema.extend({
       data: planSchema,
     }),
@@ -49,9 +51,7 @@ export const planRoutes = {
 
   // Update Plan
   "@put/plan/:id_or_code": {
-    params: z.object({
-      id_or_code: z.string().describe("ID or code of the plan"),
-    }),
+    params: planRouteParamsSchema,
     input: createPlanSchema.partial(),
     output: baseResponseSchema,
   },
