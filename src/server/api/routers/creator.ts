@@ -18,8 +18,12 @@ import { paystackClient } from "~/server/fetch-clients/paystack/client";
 import { planIntervalEnum } from "~/server/fetch-clients/paystack/schemas/plan";
 import { createSubaccountSchema } from "~/server/fetch-clients/paystack/schemas/subaccount";
 import { subscriptionStatusEnum } from "~/server/fetch-clients/paystack/schemas/subscription";
+import type { createTransactionSplitSchema } from "~/server/fetch-clients/paystack/schemas/transaction-split";
 
 type SubaccountCreationInfo = z.infer<typeof createSubaccountSchema>;
+type TransactionSplitCreationInfo = z.infer<
+  typeof createTransactionSplitSchema
+>;
 
 const kitTagEnum = z.union([subscriptionStatusEnum, planIntervalEnum]);
 export type KitTag = z.infer<typeof kitTagEnum>;
@@ -230,19 +234,52 @@ export const creatorRouter = createTRPCRouter({
 
       console.log("Creating subaccount...");
       // 1. Create Paystack subaccount
-      const code = await createPaystackSubaccount({
+      const subaccountCode = await createPaystackSubaccount({
         ...input,
         percentage_charge: SUBACCOUNT_PERCENTAGE_CHARGE,
       });
-      // 2. Update db with subaccount code only
+      // 2. Create transaction split
+      const splitCode = await createPaystackTransactionSplit({
+        name: `Goldroad: Split for creator - ${input.business_name}`,
+        currency: "KES",
+        type: "percentage",
+        subaccounts: [
+          {
+            subaccount: subaccountCode,
+            share: 100 - SUBACCOUNT_PERCENTAGE_CHARGE,
+          },
+        ],
+        bearer_type: "subaccount",
+        bearer_subaccount: subaccountCode,
+      });
+
+      // 3. Update db with subaccount code and split code
       await ctx.db
         .update(creator)
         .set({
-          paystackSubaccountCode: code,
+          paystackSubaccountCode: subaccountCode,
+          splitCode: splitCode,
         })
         .where(eq(creator.id, creatorId));
     }),
 });
+
+async function createPaystackTransactionSplit(
+  data: TransactionSplitCreationInfo,
+) {
+  const { data: response, error } = await paystackClient("@post/split", {
+    body: data,
+  });
+
+  if (error) {
+    throw new TRPCError({
+      message: `transaction split group creation error: ${error.message}`,
+      code: "INTERNAL_SERVER_ERROR",
+    });
+  }
+
+  return response.data.split_code;
+}
 
 async function createPaystackSubaccount(
   subaccountCreationInfo: SubaccountCreationInfo,
