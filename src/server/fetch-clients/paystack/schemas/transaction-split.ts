@@ -20,13 +20,19 @@ const splitBearerTypeEnum = z.enum([
 ]);
 
 export const transactionSplitSchema = z.object({
-  id: z.string().describe("ID of the transaction split"),
+  id: z.number().describe("ID of the transaction split"),
   name: z.string().describe("Name of the transaction split"),
   type: splitTypeEnum,
   currency: currencyEnum.describe("Currency of the transaction split"),
   subaccounts: z.array(
     z.object({
-      subaccount: subaccountSchema,
+      subaccount: subaccountSchema.pick({
+        id: true,
+        subaccount_code: true,
+        account_number: true,
+        settlement_bank: true,
+        metadata: true,
+      }),
       share: z.number().describe("Share of the transaction split"),
     }),
   ),
