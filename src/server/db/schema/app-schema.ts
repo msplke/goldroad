@@ -58,6 +58,7 @@ export const creator = createTable("creator", (d) => ({
   // To be encrypted
   kitApiKey: d.text(),
   paystackSubaccountCode: d.text(),
+  splitCode: d.text(),
   createdAt,
   updatedAt,
 }));
