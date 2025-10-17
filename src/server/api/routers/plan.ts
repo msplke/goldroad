@@ -30,7 +30,7 @@ type CreatePaystackPaymentPageInfo = z.infer<typeof createPaymentPageSchema>;
 
 /** Packages the arguments required for the `createPlan` function */
 type PlanCreationData = {
-  paystackSubaccountCode: string;
+  splitCode: string;
   createPaystackPlanInfo: CreatePaystackPlanInfo;
   publicationId: string;
   creatorId: string;
@@ -44,7 +44,7 @@ export const planRouter = createTRPCRouter({
       return await ctx.db.transaction(async (tx) => {
         const foundCreator = await getCreator(tx, ctx.session.user.id);
 
-        if (!foundCreator.paystackSubaccountCode) {
+        if (!foundCreator.splitCode) {
           throw new TRPCError({
             message: "Creator's bank information is not set",
             code: "BAD_REQUEST",
@@ -95,7 +95,7 @@ export const planRouter = createTRPCRouter({
         const monthlyPlan = await createPlan(tx, {
           createPaystackPlanInfo: monthlyPlanCreationInfo,
           publicationId: input.publicationId,
-          paystackSubaccountCode: foundCreator.paystackSubaccountCode,
+          splitCode: foundCreator.splitCode,
           creatorId: foundCreator.id,
         });
 
@@ -103,7 +103,7 @@ export const planRouter = createTRPCRouter({
         const annualPlan = await createPlan(tx, {
           createPaystackPlanInfo: annuallyPlanCreationInfo,
           publicationId: input.publicationId,
-          paystackSubaccountCode: foundCreator.paystackSubaccountCode,
+          splitCode: foundCreator.splitCode,
           creatorId: foundCreator.id,
         });
 
@@ -212,6 +212,7 @@ export const planRouter = createTRPCRouter({
     }),
 });
 
+/** Creates a plan and its associated payment page. */
 async function createPlan(db: DbType, data: PlanCreationData) {
   // 1. Create a Paystack Plan
   console.log(
@@ -223,12 +224,13 @@ async function createPlan(db: DbType, data: PlanCreationData) {
   console.log(
     `Creating Paystack Payment Page for '${data.createPaystackPlanInfo.name}...'`,
   );
+
   const paymentPageData = await createPaymentPage({
     name: data.createPaystackPlanInfo.name,
     type: "subscription",
     // 3. Link the plan and the creator's subaccount to the payment page
     plan: planData.id,
-    split_code: data.paystackSubaccountCode,
+    split_code: data.splitCode,
   });
 
   // 4. Add the plan to the database
