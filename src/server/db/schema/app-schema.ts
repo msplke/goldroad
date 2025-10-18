@@ -101,6 +101,18 @@ export const plan = createTable(
   ],
 );
 
+export const creatorRelations = relations(creator, ({ many, one }) => ({
+  user: one(user, {
+    fields: [creator.userId],
+    references: [user.id],
+  }),
+  publications: many(publication),
+  tagInfo: one(tagInfo, {
+    fields: [creator.id],
+    references: [tagInfo.creatorId],
+  }),
+}));
+
 export const publicationBenefit = createTable("publication_benefit", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
   publicationId: d
