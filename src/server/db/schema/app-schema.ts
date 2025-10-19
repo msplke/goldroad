@@ -77,6 +77,21 @@ export const publication = createTable("publication", (d) => ({
   updatedAt,
 }));
 
+export const oneTimePaymentPage = createTable("one_time_payment_page", (d) => ({
+  id: d.uuid().primaryKey().defaultRandom(),
+  publicationId: d
+    .uuid()
+    .notNull()
+    .references(() => publication.id, { onDelete: "cascade" }),
+  paystackPaymentPageId: d.bigint({ mode: "number" }).notNull(),
+  paystackPaymentPageUrlSlug: d.text().notNull(),
+  amount: d.integer(), // Can be null for variable amount pages, amount in Ksh.
+  minAmount: d.integer(), // Minimum amount for variable amount pages, in Ksh.
+  maxAmount: d.integer(), // Maximum amount for variable amount pages, in Ksh.
+  createdAt,
+  updatedAt,
+}));
+
 export const plan = createTable(
   "plan",
   (d) => ({

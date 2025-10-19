@@ -15,11 +15,13 @@ import type { DbType } from "~/server/db";
 import { user } from "~/server/db/schema";
 import {
   creator,
+  oneTimePaymentPage,
   plan,
   publication,
   publicationBenefit,
 } from "~/server/db/schema/app-schema";
 import { kitClient } from "~/server/fetch-clients/kit";
+import { paystackApiService } from "~/server/services/paystack/paystack-api";
 
 const CreatePublicationInfoSchema = z.object({
   name: z
@@ -136,6 +138,18 @@ export const publicationRouter = createTRPCRouter({
           kitPublicationTagId,
           input,
         );
+
+        const { id: paymentPageId, slug } =
+          await paystackApiService.paymentPage.create({
+            name: `${input.name} - One-Time Payment`,
+            description: `One-time payment page for ${input.name} publication`,
+          });
+
+        await tx.insert(oneTimePaymentPage).values({
+          publicationId,
+          paystackPaymentPageId: paymentPageId,
+          paystackPaymentPageUrlSlug: slug,
+        });
 
         console.log("Finished publication creation.");
         return publicationId;
