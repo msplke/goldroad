@@ -9,7 +9,7 @@ import { subaccountRoutes } from "~/server/fetch-clients/paystack/routes/subacco
 import { subscriptionRoutes } from "~/server/fetch-clients/paystack/routes/subscription";
 import { transactionSplitRoutes } from "~/server/fetch-clients/paystack/routes/transaction-split";
 
-const paystackSchema = createSchema({
+export const paystackSchema = createSchema({
   ...subscriptionRoutes,
   ...planRoutes,
   ...bankRoute,
