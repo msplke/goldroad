@@ -64,6 +64,11 @@ export default async function PublicationSubscriptionPage({
             description={data.publication.description}
           />
           <Plans plans={data.plans} benefits={data.publication.benefits} />
+          {data.oneTimePaymentPageSlug && (
+            <OneTimePaymentSection
+              paymentPageSlug={data.oneTimePaymentPageSlug}
+            />
+          )}
           <Footer />
         </div>
       </div>
@@ -236,5 +241,29 @@ function PlanCard({
         </Button>
       </CardFooter>
     </Card>
+  );
+}
+
+function OneTimePaymentSection({
+  paymentPageSlug,
+}: {
+  paymentPageSlug: string;
+}) {
+  return (
+    <div className="mt-16 text-center">
+      {/* <h2 className="mb-4 font-bold text-2xl">One-Time Payment</h2> */}
+      <p className="mb-6 text-muted-foreground">
+        Prefer to make a one-time payment instead of subscribing?
+      </p>
+      <Button asChild variant="outline">
+        <Link
+          href={`https://paystack.com/pay/${paymentPageSlug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Make a One-Time Payment
+        </Link>
+      </Button>
+    </div>
   );
 }

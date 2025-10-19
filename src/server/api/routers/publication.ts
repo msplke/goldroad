@@ -309,6 +309,20 @@ export const publicationRouter = createTRPCRouter({
         },
       });
 
+      const oneTimePaymentPageResult =
+        await ctx.db.query.oneTimePaymentPage.findFirst({
+          where: eq(oneTimePaymentPage.publicationId, foundPublication.id),
+          columns: {
+            paystackPaymentPageUrlSlug: true,
+          },
+        });
+
+      if (!oneTimePaymentPageResult) {
+        console.warn(
+          `No one-time payment page found for publication with id: ${foundPublication.id}`,
+        );
+      }
+
       if (plans.length === 0) {
         throw new TRPCError({
           message: "Plans for publication not found",
@@ -326,6 +340,8 @@ export const publicationRouter = createTRPCRouter({
           createdAt: foundPublication.createdAt,
         },
         plans,
+        oneTimePaymentPageSlug:
+          oneTimePaymentPageResult?.paystackPaymentPageUrlSlug || null,
       };
     }),
 
