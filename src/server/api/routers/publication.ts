@@ -89,6 +89,15 @@ export const publicationRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       return await ctx.db.transaction(async (tx) => {
         const foundCreator = await getCreator(tx, ctx.session.user.id);
+
+        if (!foundCreator.splitCode) {
+          throw new TRPCError({
+            message:
+              "Creator does not have a Paystack split code configured. Cannot create publication.",
+            code: "BAD_REQUEST",
+          });
+        }
+
         console.log("Checking for existing publication...");
         const existingPublication = await checkForExistingPublication(
           tx,
@@ -143,6 +152,7 @@ export const publicationRouter = createTRPCRouter({
           await paystackApiService.paymentPage.create({
             name: `${input.name} - One-Time Payment`,
             description: `One-time payment page for ${input.name} publication`,
+            split_code: foundCreator.splitCode,
           });
 
         await tx.insert(oneTimePaymentPage).values({
