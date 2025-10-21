@@ -9,9 +9,12 @@ import { decryptSecret } from "~/server/crypto/kit-secrets";
 import type { DbType } from "~/server/db";
 import {
   creator,
+  type InsertSuccessfulOneTimePayment,
+  oneTimePaymentPage,
   paidSubscriber,
   plan,
   publication,
+  successfulOneTimePayment,
   tagInfo,
 } from "~/server/db/schema/app-schema";
 import {
@@ -20,9 +23,6 @@ import {
   type kitSubscriberCreateSchema,
 } from "~/server/fetch-clients/kit";
 
-/** This function is currently stale. Some updates need to be made for it to
- * be usable
- */
 export async function createSubscriber(
   db: DbType,
   subscriberInfo: z.infer<typeof kitSubscriberCreateSchema>,
@@ -375,6 +375,35 @@ export async function updateOnFailedSubsequentPayment(
   } else {
     console.log("Kit integration not available, skipping Kit tag updates");
   }
+}
+
+/** Records information on a successful one-time payment onto the DB.
+ * @param paymentPageSlug - This is used to determine which publication
+ * the one-time payment was for. It works because the application is currently setup
+ * to use Paystack payment pages, and for some reason (fortunately for me),
+ * the payment page url is returned as metadata with the
+ * event denoting a successful payment (`charge.success`).
+ */
+export async function addSuccessfulOneTimePayment(
+  db: DbType,
+  paymentPageSlug: string,
+  oneTimePaymentData: Omit<InsertSuccessfulOneTimePayment, "publicationId">,
+) {
+  await db.transaction(async (tx) => {
+    const foundPage = await tx.query.oneTimePaymentPage.findFirst({
+      where: eq(oneTimePaymentPage.paystackPaymentPageUrlSlug, paymentPageSlug),
+      columns: { publicationId: true },
+    });
+
+    if (!foundPage) {
+      throw new Error("No associated publication found");
+    }
+
+    await tx.insert(successfulOneTimePayment).values({
+      ...oneTimePaymentData,
+      publicationId: foundPage.publicationId,
+    });
+  });
 }
 
 export async function getSubscriberInfoBySubscriptionCode(
