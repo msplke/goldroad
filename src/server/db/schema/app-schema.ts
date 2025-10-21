@@ -4,6 +4,7 @@ import { unique } from "drizzle-orm/pg-core";
 import { user } from "~/server/db/schema/auth-schema";
 import { createdAt, createTable, updatedAt } from "~/server/db/schema/utils";
 import type {
+  PaymentChannel,
   PlanInterval,
   SubscriptionStatus,
 } from "~/server/fetch-clients/paystack/schemas/common";
@@ -89,7 +90,7 @@ export const successfulOneTimePayment = createTable(
     lastName: d.text(),
     email: d.text().notNull(),
     amount: d.integer().notNull(), // Amount in Ksh.
-    channel: d.text().notNull(),
+    channel: d.text().$type<PaymentChannel>().notNull(),
     createdAt,
   }),
 );
