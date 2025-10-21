@@ -55,8 +55,7 @@ export const creator = createTable("creator", (d) => ({
     .text()
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  // To be encrypted
-  kitApiKey: d.text(),
+  kitApiKey: d.text(), // Stored as encrypted value
   paystackSubaccountCode: d.text(),
   splitCode: d.text(),
   createdAt,
@@ -76,6 +75,27 @@ export const publication = createTable("publication", (d) => ({
   createdAt,
   updatedAt,
 }));
+
+export const successfulOneTimePayment = createTable(
+  "successful_one_time_payment",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    publicationId: d
+      .uuid()
+      .notNull()
+      .references(() => publication.id, { onDelete: "cascade" }),
+    paystackPaymentReference: d.text().notNull(),
+    firstName: d.text(),
+    lastName: d.text(),
+    email: d.text().notNull(),
+    amount: d.integer().notNull(), // Amount in Ksh.
+    channel: d.text().notNull(),
+    createdAt,
+  }),
+);
+
+export type InsertSuccessfulOneTimePayment =
+  typeof successfulOneTimePayment.$inferInsert;
 
 export const oneTimePaymentPage = createTable("one_time_payment_page", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
