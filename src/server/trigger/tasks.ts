@@ -2,6 +2,7 @@ import { logger, schemaTask } from "@trigger.dev/sdk";
 import z from "zod";
 
 import {
+  addSuccessfulOneTimePayment,
   createSubscriber,
   getSubscriberInfoBySubscriptionCode,
   handleSubscriptionCancelled,
@@ -141,7 +142,6 @@ export const updateOnFailedSubsequentPaymentTask = schemaTask({
   run: async (payload, { ctx }) => {
     logger.log("Updating subscriber on failed subsequent payment...", { ctx });
     try {
-      // Implement the logic to handle failed subsequent payments if needed
       await updateOnFailedSubsequentPayment(
         db,
         payload.subscriptionCode,
@@ -151,6 +151,41 @@ export const updateOnFailedSubsequentPaymentTask = schemaTask({
     } catch (error) {
       logger.error(
         "Error occurred, unable to handle failed subsequent payment",
+        {
+          error,
+        },
+      );
+      throw error;
+    }
+  },
+});
+
+export const addSuccessfulOneTimePaymentTask = schemaTask({
+  id: "webhook:add-successful-one-time-payment",
+  schema: z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.email(),
+    amount: z.number(),
+    paystackPaymentReference: z.string(),
+    channel: z.string(),
+    paymentPageSlug: z.string(),
+  }),
+  run: async (payload, { ctx }) => {
+    logger.log("Recording successful one-time payment...", { ctx });
+    try {
+      await addSuccessfulOneTimePayment(db, payload.paymentPageSlug, {
+        amount: payload.amount,
+        email: payload.email,
+        channel: payload.channel,
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        paystackPaymentReference: payload.paystackPaymentReference,
+      });
+      return { message: "Recorded successful one-time payment" };
+    } catch (error) {
+      logger.error(
+        "Error occurred, unable to record successful one-time payment",
         {
           error,
         },
