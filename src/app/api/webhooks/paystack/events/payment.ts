@@ -1,10 +1,14 @@
 import { idempotencyKeys, tasks } from "@trigger.dev/sdk";
+import z from "zod";
 
-import type {
-  PaymentEvent,
-  PaystackWebhookBodyData,
+import {
+  type PaymentEvent,
+  type PaystackWebhookBodyData,
+  paystackWebhookDataSchema,
 } from "~/app/api/webhooks/paystack";
+import { objectIsEmpty } from "~/lib/utils";
 import type {
+  addSuccessfulOneTimePaymentTask,
   createSubscriberTask,
   updateOnFailedSubsequentPaymentTask,
   updateOnSuccessfulSubsequentPaymentTask,
@@ -15,6 +19,10 @@ export async function handlePaymentEvent(
   data: PaystackWebhookBodyData,
 ) {
   switch (event) {
+    case "charge.success": {
+      await handleOneTimePaymentSuccessEvent(data);
+      break;
+    }
     case "subscription.create": {
       await handleSubscriptionCreationEvent(data);
       break;
@@ -24,10 +32,68 @@ export async function handlePaymentEvent(
       break;
     }
     case "invoice.update": {
-      await handleSuccessfulPaymentEvent(data);
+      await handleSuccessfulSubscriptionPaymentEvent(data);
       break;
     }
   }
+}
+
+const strictlyEmptyObjectSchema = z
+  .object({})
+  .refine((data) => objectIsEmpty(data), {
+    error: "Object should not have any keys.",
+  });
+
+const oneTimePaymentSchema = z.object({
+  ...paystackWebhookDataSchema.shape,
+  reference: z.string(),
+  subscription: strictlyEmptyObjectSchema.optional(),
+  plan: strictlyEmptyObjectSchema,
+  subscription_code: z.undefined(),
+  split: paystackWebhookDataSchema.shape.split.nonoptional(),
+  metadata: z.object({
+    referrer: z.url(),
+  }),
+});
+
+async function handleOneTimePaymentSuccessEvent(data: PaystackWebhookBodyData) {
+  const result = oneTimePaymentSchema.safeParse(data);
+  if (result.error) {
+    console.log("This is not a one-time payment. Not processed.");
+    console.log(result.error);
+    return;
+  }
+
+  const parsedData = result.data;
+
+  const paymentPageSlug = parsedData.metadata.referrer.split("/").at(-1);
+  if (!paymentPageSlug) {
+    console.log(
+      "Unable to find payment page slug, which is required to find the publication that was paid for.",
+    );
+    return;
+  }
+
+  const idempotencyKey = await idempotencyKeys.create(
+    `record-successful-one-time-payment-${parsedData.reference}`,
+  );
+
+  const handle = await tasks.trigger<typeof addSuccessfulOneTimePaymentTask>(
+    "webhook:add-successful-one-time-payment",
+    {
+      amount: parsedData.amount,
+      firstName: parsedData.customer.first_name,
+      lastName: parsedData.customer.last_name,
+      email: parsedData.customer.email,
+      channel: parsedData.authorization.channel,
+      paystackPaymentReference: parsedData.reference,
+      paymentPageSlug,
+    },
+    { idempotencyKey },
+  );
+  console.log(
+    `Running one-time payment task with handle: ${JSON.stringify(handle)}`,
+  );
 }
 
 async function handleSubscriptionCreationEvent(data: PaystackWebhookBodyData) {
@@ -35,7 +101,7 @@ async function handleSubscriptionCreationEvent(data: PaystackWebhookBodyData) {
     console.log("No subscription code in subscription.create event, ignoring");
     return;
   }
-  if (!data.plan) {
+  if (!data.plan || objectIsEmpty(data.plan)) {
     console.log("No plan info in subscription.create event, ignoring");
     return;
   }
@@ -47,6 +113,8 @@ async function handleSubscriptionCreationEvent(data: PaystackWebhookBodyData) {
     console.log("No amount info in subscription.create event, ignoring");
     return;
   }
+
+  console.log("Subscription creation data:", data);
 
   const idempotencyKey = await idempotencyKeys.create(
     `paystack-subscription-create-${data.subscription_code}`,
@@ -105,7 +173,9 @@ async function handleFailedPaymentEvent(data: PaystackWebhookBodyData) {
   );
 }
 
-async function handleSuccessfulPaymentEvent(data: PaystackWebhookBodyData) {
+async function handleSuccessfulSubscriptionPaymentEvent(
+  data: PaystackWebhookBodyData,
+) {
   // Check if the invoice update is for a successful charge attempt
   if (data.status !== "success") {
     console.log(`Ignoring invoice.update event with status: ${data.status}`);
