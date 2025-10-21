@@ -12,6 +12,7 @@ import {
 } from "~/server/actions/webhooks/paystack";
 import { db } from "~/server/db";
 import { kitSubscriberCreateSchema } from "~/server/fetch-clients/kit";
+import { channelEnum } from "~/server/fetch-clients/paystack/schemas/common";
 
 export const createSubscriberTask = schemaTask({
   id: "webhook:create-subscriber",
@@ -168,7 +169,7 @@ export const addSuccessfulOneTimePaymentTask = schemaTask({
     email: z.email(),
     amount: z.number(),
     paystackPaymentReference: z.string(),
-    channel: z.string(),
+    channel: channelEnum,
     paymentPageSlug: z.string(),
   }),
   run: async (payload, { ctx }) => {

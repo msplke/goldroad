@@ -3,6 +3,31 @@ import z from "zod";
 import type { planIntervalEnum } from "~/server/fetch-clients/paystack/schemas/plan";
 import type { subscriptionStatusEnum } from "~/server/fetch-clients/paystack/schemas/subscription";
 
+// ==== Enums ====
+export const countryEnum = z.enum([
+  "ghana",
+  "kenya",
+  "nigeria",
+  "south africa",
+]);
+
+export const currencyEnum = z.enum(["XOF", "NGN", "KES", "GHS", "ZAR"]);
+export const channelEnum = z.enum([
+  "card",
+  "bank",
+  "apple_pay",
+  "ussd",
+  "qr",
+  "mobile_money",
+  "bank_transfer",
+  "eft",
+  "payattitude",
+]);
+
+export type PaymentChannel = z.infer<typeof channelEnum>;
+export type PlanInterval = z.infer<typeof planIntervalEnum>;
+export type SubscriptionStatus = z.infer<typeof subscriptionStatusEnum>;
+
 // === Common Schemas for Paystack API ====
 
 // Standard API response format
@@ -43,7 +68,7 @@ export const authorizationSchema = z.object({
   last4: z.string(),
   exp_month: z.string(),
   exp_year: z.string(),
-  channel: z.string(),
+  channel: channelEnum,
   card_type: z.string(),
   bank: z.string(),
   country_code: z.string(),
@@ -52,16 +77,3 @@ export const authorizationSchema = z.object({
   signature: z.string(),
   account_name: z.string().optional(),
 });
-
-// ==== Enums ====
-export const countryEnum = z.enum([
-  "ghana",
-  "kenya",
-  "nigeria",
-  "south africa",
-]);
-
-export const currencyEnum = z.enum(["XOF", "NGN", "KES", "GHS", "ZAR"]);
-
-export type PlanInterval = z.infer<typeof planIntervalEnum>;
-export type SubscriptionStatus = z.infer<typeof subscriptionStatusEnum>;
