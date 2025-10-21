@@ -1,6 +1,7 @@
 import z from "zod";
 
 import { env } from "~/env";
+import { authorizationSchema } from "~/server/fetch-clients/paystack/schemas/common";
 import { planSchema } from "~/server/fetch-clients/paystack/schemas/plan";
 import { subscriptionStatusEnum } from "~/server/fetch-clients/paystack/schemas/subscription";
 import { createHmac, timingSafeEqual } from "node:crypto";
@@ -12,6 +13,7 @@ export const PaymentEventEnum = z.enum([
   "subscription.create",
   "invoice.update",
   "invoice.payment_failed",
+  "charge.success",
 ]);
 
 export const CancellationEventEnum = z.enum([
@@ -26,8 +28,12 @@ const PaystackWebhookBodySchema = z.object({
   event: z.string(), // Keep as string for initial parsing
   data: z.object({
     id: z.number().optional(),
+    reference: z.string().optional(),
     subscription_code: z.string().optional(),
-    plan: planSchema.optional(),
+    plan: z.union([planSchema, z.object({})]).optional(),
+    authorization: authorizationSchema.pick({
+      channel: true,
+    }),
     next_payment_date: z.coerce.date().nullish(),
     amount: z.number().int(),
     status: z.string().optional(),
@@ -37,23 +43,37 @@ const PaystackWebhookBodySchema = z.object({
       email: z.email(),
     }),
     subscription: z
-      .object({
-        status: subscriptionStatusEnum,
-        subscription_code: z.string(),
-        amount: z.number().int(),
-        next_payment_date: z.coerce.date().nullable(),
-      })
+      .union([
+        z.object({
+          status: subscriptionStatusEnum,
+          subscription_code: z.string(),
+          amount: z.number().int(),
+          next_payment_date: z.coerce.date().nullable(),
+        }),
+        z.object({}),
+      ])
+      .optional(),
+    split: z
+      .union([
+        z.object({
+          split_code: z.string(),
+        }),
+        z.object({}),
+      ])
+      .optional(),
+    metadata: z
+      .union([z.record(z.string(), z.unknown()), z.number()])
       .optional(),
   }),
 });
 
-export type PaystackWebhookBodyData = z.infer<
-  typeof PaystackWebhookBodySchema.shape.data
->;
+export const paystackWebhookDataSchema = PaystackWebhookBodySchema.shape.data;
+export type PaystackWebhookBodyData = z.infer<typeof paystackWebhookDataSchema>;
 
 export function parseBody(rawBody: string) {
   try {
-    const parsedBody = PaystackWebhookBodySchema.safeParse(JSON.parse(rawBody));
+    const jsonBody = JSON.parse(rawBody);
+    const parsedBody = PaystackWebhookBodySchema.safeParse(jsonBody);
     if (!parsedBody.success) {
       console.log("Error parsing body:", parsedBody.error);
       return null;
