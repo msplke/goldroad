@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import z from "zod";
 
+import { fromBaseUnitsToSubunits } from "~/lib/utils";
 import { getCreator } from "~/server/actions/trpc/creator";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import type { DbType } from "~/server/db";
@@ -268,7 +269,7 @@ async function createPaymentPage(
 }
 
 async function createPaystackPlan(createPlanInfo: CreatePaystackPlanInfo) {
-  const amountInSubunits = createPlanInfo.amount * 100;
+  const amountInSubunits = fromBaseUnitsToSubunits(createPlanInfo.amount);
   const { data: response, error } = await paystackClient("@post/plan", {
     body: { ...createPlanInfo, amount: amountInSubunits, currency: "KES" },
   });

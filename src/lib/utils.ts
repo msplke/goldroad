@@ -96,3 +96,19 @@ export function generateSlugFromName(name: string): string {
 export function objectIsEmpty(obj: Record<string, unknown>): boolean {
   return Object.keys(obj).length === 0;
 }
+
+const PAYSTACK_SUBUNIT_CONVERSION_FACTOR = 100;
+
+export function fromSubunitsToBaseUnits(
+  currencyInSubunits: number,
+  conversionFactor: number = PAYSTACK_SUBUNIT_CONVERSION_FACTOR,
+): number {
+  return currencyInSubunits / conversionFactor;
+}
+
+export function fromBaseUnitsToSubunits(
+  currencyInSubunits: number,
+  conversionFactor: number = PAYSTACK_SUBUNIT_CONVERSION_FACTOR,
+) {
+  return currencyInSubunits * conversionFactor;
+}
