@@ -6,7 +6,7 @@ import {
   type PaystackWebhookBodyData,
   paystackWebhookDataSchema,
 } from "~/app/api/webhooks/paystack";
-import { objectIsEmpty } from "~/lib/utils";
+import { fromSubunitsToBaseUnits, objectIsEmpty } from "~/lib/utils";
 import type {
   addSuccessfulOneTimePaymentTask,
   createSubscriberTask,
@@ -81,7 +81,7 @@ async function handleOneTimePaymentSuccessEvent(data: PaystackWebhookBodyData) {
   const handle = await tasks.trigger<typeof addSuccessfulOneTimePaymentTask>(
     "webhook:add-successful-one-time-payment",
     {
-      amount: parsedData.amount,
+      amount: fromSubunitsToBaseUnits(parsedData.amount),
       firstName: parsedData.customer.first_name,
       lastName: parsedData.customer.last_name,
       email: parsedData.customer.email,
@@ -129,7 +129,7 @@ async function handleSubscriptionCreationEvent(data: PaystackWebhookBodyData) {
         first_name: data.customer.first_name,
       },
       nextPaymentDate: data.next_payment_date,
-      amount: data.amount / 100, // Convert from subunits to units
+      amount: fromSubunitsToBaseUnits(data.amount),
       planCode: data.plan.plan_code,
       subscriptionCode: data.subscription_code,
     },
@@ -211,7 +211,7 @@ async function handleSuccessfulSubscriptionPaymentEvent(
       subscriptionCode: data.subscription.subscription_code,
       planCode: data.plan.plan_code,
       nextPaymentDate: data.subscription.next_payment_date,
-      amount: data.amount / 100, // Convert from subunits to units
+      amount: fromSubunitsToBaseUnits(data.amount / 100),
     },
     { idempotencyKey },
   );
