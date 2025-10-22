@@ -38,11 +38,7 @@ export async function handlePaymentEvent(
   }
 }
 
-const strictlyEmptyObjectSchema = z
-  .object({})
-  .refine((data) => objectIsEmpty(data), {
-    error: "Object should not have any keys.",
-  });
+const strictlyEmptyObjectSchema = z.strictObject({});
 
 const oneTimePaymentSchema = z.object({
   ...paystackWebhookDataSchema.shape,
