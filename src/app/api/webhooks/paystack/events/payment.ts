@@ -114,8 +114,6 @@ async function handleSubscriptionCreationEvent(data: PaystackWebhookBodyData) {
     return;
   }
 
-  console.log("Subscription creation data:", data);
-
   const idempotencyKey = await idempotencyKeys.create(
     `paystack-subscription-create-${data.subscription_code}`,
   );
