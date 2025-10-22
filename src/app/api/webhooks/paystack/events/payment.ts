@@ -209,7 +209,7 @@ async function handleSuccessfulSubscriptionPaymentEvent(
       subscriptionCode: data.subscription.subscription_code,
       planCode: data.plan.plan_code,
       nextPaymentDate: data.subscription.next_payment_date,
-      amount: fromSubunitsToBaseUnits(data.amount / 100),
+      amount: fromSubunitsToBaseUnits(data.amount),
     },
     { idempotencyKey },
   );
