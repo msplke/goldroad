@@ -107,8 +107,8 @@ export function fromSubunitsToBaseUnits(
 }
 
 export function fromBaseUnitsToSubunits(
-  currencyInSubunits: number,
+  currencyInBaseUnits: number,
   conversionFactor: number = PAYSTACK_SUBUNIT_CONVERSION_FACTOR,
 ) {
-  return currencyInSubunits * conversionFactor;
+  return Math.round(currencyInBaseUnits * conversionFactor);
 }
