@@ -88,40 +88,41 @@ export function OverviewKPIs() {
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-3">
-      {kpis.map((kpi, index) => {
-        const Icon = kpi.icon;
-        return (
-          <Card
-            key={kpi.title}
-            className={cn(
-              "group hover:-translate-y-1 relative overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-black/5 hover:shadow-lg",
-              kpi.bgColor,
-              kpi.borderColor,
-              "slide-in-from-bottom-4 animate-in duration-500",
-            )}
-            style={{ animationDelay: `${index * 100}ms` }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent" />
-            <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="font-medium text-gray-700 text-sm">
-                {kpi.title}
-              </CardTitle>
-              <div
-                className={cn(
-                  "rounded-lg bg-gradient-to-br p-2",
-                  kpi.color,
-                  "shadow-sm",
-                )}
-              >
-                <Icon className="h-4 w-4 text-white" />
-              </div>
-            </CardHeader>
-            <CardContent className="relative">
-              <div className="mb-2 font-bold text-3xl text-gray-900 transition-transform duration-200 group-hover:scale-105">
-                {kpi.value}
-              </div>
-              {/* <div className="flex items-center gap-2 text-sm">
+    <div className="space-y-4">
+      <div className="grid gap-6 md:grid-cols-3">
+        {kpis.map((kpi, index) => {
+          const Icon = kpi.icon;
+          return (
+            <Card
+              key={kpi.title}
+              className={cn(
+                "group hover:-translate-y-1 relative overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-black/5 hover:shadow-lg",
+                kpi.bgColor,
+                kpi.borderColor,
+                "slide-in-from-bottom-4 animate-in duration-500",
+              )}
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent" />
+              <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="font-medium text-gray-700 text-sm">
+                  {kpi.title}
+                </CardTitle>
+                <div
+                  className={cn(
+                    "rounded-lg bg-gradient-to-br p-2",
+                    kpi.color,
+                    "shadow-sm",
+                  )}
+                >
+                  <Icon className="h-4 w-4 text-white" />
+                </div>
+              </CardHeader>
+              <CardContent className="relative">
+                <div className="mb-2 font-bold text-3xl text-gray-900 transition-transform duration-200 group-hover:scale-105">
+                  {kpi.value}
+                </div>
+                {/* <div className="flex items-center gap-2 text-sm">
                 {kpi.trend === "up" && (
                   <div className="flex items-center gap-1 rounded-full bg-green-100 px-2 py-1 text-green-700">
                     <ArrowUpRight className="h-3 w-3" />
@@ -134,10 +135,15 @@ export function OverviewKPIs() {
                   </span>
                 )}
               </div> */}
-            </CardContent>
-          </Card>
-        );
-      })}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+      <div className="text-muted-foreground text-sm">
+        Note: These stats are for revenue earned through subscriptions only
+        (excludes one-time payments).
+      </div>
     </div>
   );
 }

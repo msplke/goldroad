@@ -97,6 +97,8 @@ export const successfulOneTimePayment = createTable(
 
 export type InsertSuccessfulOneTimePayment =
   typeof successfulOneTimePayment.$inferInsert;
+export type SelectSuccessfulOneTimePayment =
+  typeof successfulOneTimePayment.$inferSelect;
 
 export const oneTimePaymentPage = createTable("one_time_payment_page", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
@@ -167,6 +169,7 @@ export const publicationRelations = relations(publication, ({ many, one }) => ({
     fields: [publication.creatorId],
     references: [creator.id],
   }),
+  oneTimePayments: many(successfulOneTimePayment),
 }));
 
 export const planRelations = relations(plan, ({ one }) => ({
@@ -181,6 +184,16 @@ export const publicationBenefitRelations = relations(
   ({ one }) => ({
     publication: one(publication, {
       fields: [publicationBenefit.publicationId],
+      references: [publication.id],
+    }),
+  }),
+);
+
+export const successfulOneTimePaymentRelations = relations(
+  successfulOneTimePayment,
+  ({ one }) => ({
+    publication: one(publication, {
+      fields: [successfulOneTimePayment.publicationId],
       references: [publication.id],
     }),
   }),
