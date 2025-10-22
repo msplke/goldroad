@@ -3,6 +3,7 @@
 import { Sparkles } from "lucide-react";
 import { useState } from "react";
 
+import { OneTimePaymentsTableWithData } from "~/components/dashboard/one-time-payments-table";
 import { OverviewKPIs } from "~/components/dashboard/overview-kpis";
 import { SubscribersTableWithData } from "~/components/dashboard/subscribers-table";
 import { OnboardingChecklist } from "~/components/onboarding/onboarding-checklist";
@@ -58,6 +59,12 @@ export default function DashboardPage() {
               <h2 className="font-semibold text-xl">Recent Subscribers</h2>
             </div>
             <SubscribersTableWithData />
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-xl">
+                Recent One-time Payments
+              </h2>
+            </div>
+            <OneTimePaymentsTableWithData />
           </div>
         </div>
       </div>
