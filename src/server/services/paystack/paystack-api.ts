@@ -25,11 +25,12 @@ class BetterFetchPaystackApiService implements PaystackApiService<FetchClient> {
 
   paymentPage: PaymentPageEndpoints = {
     create: async (input: CreatePaymentPageInput) => {
-      const { data: response } = await this.$fetch("@post/page", {
+      const response = await this.$fetch("@post/page", {
         throw: true,
         body: input,
       });
-      return { id: response.id, slug: response.slug };
+
+      return { id: response.data.id, slug: response.data.slug };
     },
   };
 }
