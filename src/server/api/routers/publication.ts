@@ -270,6 +270,8 @@ export const publicationRouter = createTRPCRouter({
   getBySlug: publicProcedure
     .input(z.object({ slug: z.string().min(4, "Slug is required") }))
     .query(async ({ ctx, input }) => {
+      // TODO: Need to check if onboarding info has been set up for the creator
+      // before allowing one-time payments or subscriptions
       const foundPublication = await ctx.db.query.publication.findFirst({
         where: eq(publication.slug, input.slug),
         with: {
