@@ -57,8 +57,8 @@ export const creator = createTable("creator", (d) => ({
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   kitApiKey: d.text(), // Stored as encrypted value
-  paystackSubaccountCode: d.text(),
-  splitCode: d.text(),
+  paystackSubaccountCode: d.text().unique(),
+  splitCode: d.text().unique(),
   createdAt,
   updatedAt,
 }));
@@ -85,7 +85,7 @@ export const successfulOneTimePayment = createTable(
       .uuid()
       .notNull()
       .references(() => publication.id, { onDelete: "cascade" }),
-    paystackPaymentReference: d.text().notNull(),
+    paystackPaymentReference: d.text().unique().notNull(),
     firstName: d.text(),
     lastName: d.text(),
     email: d.text().notNull(),
@@ -106,8 +106,8 @@ export const oneTimePaymentPage = createTable("one_time_payment_page", (d) => ({
     .uuid()
     .notNull()
     .references(() => publication.id, { onDelete: "cascade" }),
-  paystackPaymentPageId: d.bigint({ mode: "number" }).notNull(),
-  paystackPaymentPageUrlSlug: d.text().notNull(),
+  paystackPaymentPageId: d.bigint({ mode: "number" }).unique().notNull(),
+  paystackPaymentPageUrlSlug: d.text().unique().notNull(),
   amount: d.integer(), // Can be null for variable amount pages, amount in Ksh.
   minAmount: d.integer(), // Minimum amount for variable amount pages, in Ksh.
   maxAmount: d.integer(), // Maximum amount for variable amount pages, in Ksh.
