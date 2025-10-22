@@ -145,7 +145,6 @@ export const creatorRelations = relations(creator, ({ many, one }) => ({
     references: [user.id],
   }),
   publications: many(publication),
-  oneTimePaymentPages: many(oneTimePaymentPage),
   tagInfo: one(tagInfo, {
     fields: [creator.id],
     references: [tagInfo.creatorId],
