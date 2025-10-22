@@ -399,10 +399,15 @@ export async function addSuccessfulOneTimePayment(
       throw new Error("No associated publication found");
     }
 
-    await tx.insert(successfulOneTimePayment).values({
-      ...oneTimePaymentData,
-      publicationId: foundPage.publicationId,
-    });
+    await tx
+      .insert(successfulOneTimePayment)
+      .values({
+        ...oneTimePaymentData,
+        publicationId: foundPage.publicationId,
+      })
+      .onConflictDoNothing({
+        target: successfulOneTimePayment.paystackPaymentReference,
+      });
   });
 }
 
