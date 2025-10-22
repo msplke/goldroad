@@ -11,15 +11,15 @@ import {
 import { api } from "~/trpc/react";
 
 type OneTimePayment = {
-  id: string | null;
+  id: string;
   publicationName: string;
-  email: string | null;
-  createdAt: Date | null;
-  publicationId: string | null;
-  paystackPaymentReference: string | null;
+  email: string;
+  createdAt: Date;
+  publicationId: string;
+  paystackPaymentReference: string;
   firstName: string | null;
   lastName: string | null;
-  amount: number | null;
+  amount: number;
   channel:
     | "card"
     | "bank"
@@ -29,20 +29,17 @@ type OneTimePayment = {
     | "mobile_money"
     | "bank_transfer"
     | "eft"
-    | "payattitude"
-    | null;
+    | "payattitude";
 };
 
-function formatCurrency(amount: number | null): string {
-  if (amount === null) return "N/A";
+function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("en-KE", {
     style: "currency",
     currency: "KES",
   }).format(amount);
 }
 
-function formatDate(date: Date | null): string {
-  if (!date) return "N/A";
+function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",

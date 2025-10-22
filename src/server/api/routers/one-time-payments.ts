@@ -41,7 +41,7 @@ export const oneTimePaymentsRouter = createTRPCRouter({
         })
         .from(publication)
         .where(eq(publication.creatorId, creatorId))
-        .leftJoin(
+        .innerJoin(
           successfulOneTimePayment,
           eq(successfulOneTimePayment.publicationId, publication.id),
         )
