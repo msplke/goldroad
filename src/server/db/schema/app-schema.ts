@@ -145,6 +145,7 @@ export const creatorRelations = relations(creator, ({ many, one }) => ({
     references: [user.id],
   }),
   publications: many(publication),
+  oneTimePaymentPages: many(oneTimePaymentPage),
   tagInfo: one(tagInfo, {
     fields: [creator.id],
     references: [tagInfo.creatorId],
@@ -170,6 +171,7 @@ export const publicationRelations = relations(publication, ({ many, one }) => ({
     references: [creator.id],
   }),
   oneTimePayments: many(successfulOneTimePayment),
+  oneTimePaymentPage: many(oneTimePaymentPage),
 }));
 
 export const planRelations = relations(plan, ({ one }) => ({
@@ -194,6 +196,16 @@ export const successfulOneTimePaymentRelations = relations(
   ({ one }) => ({
     publication: one(publication, {
       fields: [successfulOneTimePayment.publicationId],
+      references: [publication.id],
+    }),
+  }),
+);
+
+export const oneTimePaymentPageRelations = relations(
+  oneTimePaymentPage,
+  ({ one }) => ({
+    publication: one(publication, {
+      fields: [oneTimePaymentPage.publicationId],
       references: [publication.id],
     }),
   }),
