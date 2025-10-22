@@ -15,9 +15,7 @@ const limitQuerySchema = z
   .max(MAX_RECENT_RECORDS);
 
 export const oneTimePaymentsRouter = createTRPCRouter({
-  /** Gets the most recent one-time payments for the current creator
-   * (the number is determined by the `NO_OF_RECENT_RECORDS` constant in ~/lib/constants (default 5))
-   * */
+  /** Gets the most recent one-time payments for the current creator * */
   getRecent: protectedProcedure
     .input(
       z.object({
