@@ -2,14 +2,12 @@ import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import z from "zod";
 
-import { fromBaseUnitsToSubunits } from "~/lib/utils";
 import { getCreator } from "~/server/actions/trpc/creator";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import type { DbType } from "~/server/db";
 import { plan, publication } from "~/server/db/schema/app-schema";
-import { paystackClient } from "~/server/fetch-clients/paystack/client";
-import type { createPaymentPageSchema } from "~/server/fetch-clients/paystack/schemas/payment-page";
 import type { createPlanSchema } from "~/server/fetch-clients/paystack/schemas/plan";
+import { paystackApiService } from "~/server/services/paystack/paystack-api";
+import type { PaystackApiService } from "~/server/services/paystack/paystack-api-service";
 
 const CreatePlanInfoSchema = z.object({
   publicationId: z.uuid("Invalid publication ID"),
@@ -27,14 +25,11 @@ const UpdatePlanInfoSchema = z.object({
 });
 
 type CreatePaystackPlanInfo = z.infer<typeof createPlanSchema>;
-type CreatePaystackPaymentPageInfo = z.infer<typeof createPaymentPageSchema>;
 
-/** Packages the arguments required for the `createPlan` function */
-type PlanCreationData = {
+/** Packages the arguments required to create a plan and a payment page linked to the created plan */
+type PlanAndPaymentPageCreationData = {
   splitCode: string;
   createPaystackPlanInfo: CreatePaystackPlanInfo;
-  publicationId: string;
-  creatorId: string;
 };
 
 export const planRouter = createTRPCRouter({
@@ -51,6 +46,8 @@ export const planRouter = createTRPCRouter({
             code: "BAD_REQUEST",
           });
         }
+
+        const splitCode = foundCreator.splitCode;
 
         // Verify the publication belongs to this creator
         const publicationResult = await tx.query.publication.findFirst({
@@ -92,26 +89,37 @@ export const planRouter = createTRPCRouter({
           amount: input.annualAmount,
         };
 
-        console.log("Creating monthly plan...");
-        const monthlyPlan = await createPlan(tx, {
-          createPaystackPlanInfo: monthlyPlanCreationInfo,
-          publicationId: input.publicationId,
-          splitCode: foundCreator.splitCode,
-          creatorId: foundCreator.id,
-        });
+        const paystackPlanCreationInfoArray = [
+          monthlyPlanCreationInfo,
+          annuallyPlanCreationInfo,
+        ];
 
-        console.log("Creating annual plan...");
-        const annualPlan = await createPlan(tx, {
-          createPaystackPlanInfo: annuallyPlanCreationInfo,
-          publicationId: input.publicationId,
-          splitCode: foundCreator.splitCode,
-          creatorId: foundCreator.id,
-        });
+        const dbPlans = paystackPlanCreationInfoArray.map(
+          async (creationInfo) => {
+            console.log(`Creating plan '${creationInfo.name}' on Paystack...`);
+            const data = await createPaystackPlanAndPaymentPage(
+              paystackApiService,
+              {
+                createPaystackPlanInfo: creationInfo,
+                splitCode,
+              },
+            );
+            const result = await tx
+              .insert(plan)
+              .values({
+                ...data,
+                publicationId: publicationResult.id,
+              })
+              .returning();
+            return result[0];
+          },
+        );
 
         console.log("Plans created successfully.");
+
         return {
-          monthlyPlan,
-          annualPlan,
+          monthlyPlan: dbPlans[0],
+          annualPlan: dbPlans[1],
         };
       });
     }),
@@ -179,23 +187,10 @@ export const planRouter = createTRPCRouter({
         console.log(
           `Updating Paystack plan ${foundPlan.paystackPlanCode} with new amount ${input.amount}...`,
         );
-        const amountInSubunits = input.amount * 100;
-        const { data: paystackResponse, error: paystackError } =
-          await paystackClient("@put/plan/:id_or_code", {
-            params: { id_or_code: foundPlan.paystackPlanCode },
-            body: {
-              amount: amountInSubunits,
-            },
-          });
 
-        if (paystackError || !paystackResponse) {
-          throw new TRPCError({
-            message: `Failed to update plan on Paystack: ${
-              paystackError?.message || "Unknown error"
-            }`,
-            code: "INTERNAL_SERVER_ERROR",
-          });
-        }
+        await paystackApiService.plan.update(foundPlan.paystackPlanCode, {
+          amount: input.amount,
+        });
 
         // Update the plan in our database
         await tx
@@ -213,20 +208,26 @@ export const planRouter = createTRPCRouter({
     }),
 });
 
-/** Creates a plan and its associated payment page. */
-async function createPlan(db: DbType, data: PlanCreationData) {
+/** Creates a Paystack plan and its associated payment page */
+async function createPaystackPlanAndPaymentPage(
+  paystackApiService: PaystackApiService<unknown>,
+  data: PlanAndPaymentPageCreationData,
+) {
   // 1. Create a Paystack Plan
   console.log(
     `Creating Paystack Plan for '${data.createPaystackPlanInfo.name}'...`,
   );
-  const planData = await createPaystackPlan(data.createPaystackPlanInfo);
+
+  const planData = await paystackApiService.plan.create(
+    data.createPaystackPlanInfo,
+  );
 
   // 2. Create a Paystack Payment Page for that plan
   console.log(
     `Creating Paystack Payment Page for '${data.createPaystackPlanInfo.name}...'`,
   );
 
-  const paymentPageData = await createPaymentPage({
+  const paymentPageData = await paystackApiService.paymentPage.create({
     name: data.createPaystackPlanInfo.name,
     type: "subscription",
     // 3. Link the plan and the creator's subaccount to the payment page
@@ -234,52 +235,12 @@ async function createPlan(db: DbType, data: PlanCreationData) {
     split_code: data.splitCode,
   });
 
-  // 4. Add the plan to the database
-  const result = await db
-    .insert(plan)
-    .values({
-      name: data.createPaystackPlanInfo.name,
-      interval: data.createPaystackPlanInfo.interval,
-      amount: data.createPaystackPlanInfo.amount,
-      paystackPaymentPageId: paymentPageData.id,
-      paystackPaymentPageUrlSlug: paymentPageData.slug,
-      paystackPlanCode: planData.plan_code,
-      publicationId: data.publicationId,
-    })
-    .returning();
-
-  return result[0];
-}
-
-async function createPaymentPage(
-  createPaymentPageInfo: CreatePaystackPaymentPageInfo,
-) {
-  const { data: response, error } = await paystackClient("@post/page", {
-    body: createPaymentPageInfo,
-  });
-
-  if (error) {
-    throw new TRPCError({
-      message: error.message,
-      code: "INTERNAL_SERVER_ERROR",
-    });
-  }
-
-  return response.data;
-}
-
-async function createPaystackPlan(createPlanInfo: CreatePaystackPlanInfo) {
-  const amountInSubunits = fromBaseUnitsToSubunits(createPlanInfo.amount);
-  const { data: response, error } = await paystackClient("@post/plan", {
-    body: { ...createPlanInfo, amount: amountInSubunits, currency: "KES" },
-  });
-
-  if (error) {
-    throw new TRPCError({
-      message: error.message,
-      code: "INTERNAL_SERVER_ERROR",
-    });
-  }
-
-  return response.data;
+  return {
+    name: data.createPaystackPlanInfo.name,
+    interval: data.createPaystackPlanInfo.interval,
+    amount: data.createPaystackPlanInfo.amount,
+    paystackPaymentPageId: paymentPageData.id,
+    paystackPaymentPageUrlSlug: paymentPageData.slug,
+    paystackPlanCode: planData.planCode,
+  };
 }
