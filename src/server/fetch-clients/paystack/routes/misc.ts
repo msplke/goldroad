@@ -2,14 +2,14 @@ import z from "zod";
 
 import {
   baseResponseSchema,
+  countryEnum,
   currencyEnum,
   paginationMetaSchema,
 } from "~/server/fetch-clients/paystack/schemas/common";
 import { bankSchema } from "~/server/fetch-clients/paystack/schemas/misc";
 
-const getBankQuerySchema = z.object({
-  country: z
-    .string()
+const listBanksQuerySchema = z.object({
+  country: countryEnum
     .optional()
     .describe(
       "The country to obtain the list of supported banks. e.g country=ghana or country=nigeria",
@@ -36,10 +36,12 @@ const getBankQuerySchema = z.object({
   previous: z.string().optional().describe("Cursor for the previous page"),
 });
 
+export type ListBanksQueryParams = z.infer<typeof listBanksQuerySchema>;
+
 export const bankRoute = {
   // List banks
   "@get/bank": {
-    query: getBankQuerySchema.optional(),
+    query: listBanksQuerySchema.optional(),
     output: baseResponseSchema.extend({
       data: z.array(bankSchema),
       meta: paginationMetaSchema,

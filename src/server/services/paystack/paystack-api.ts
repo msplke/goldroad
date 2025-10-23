@@ -7,6 +7,7 @@ import {
   type paystackSchema,
 } from "~/server/fetch-clients/paystack/client";
 import type {
+  MiscellaneousEndpoints,
   PaymentPageEndpoints,
   PaystackApiService,
   SubaccountEndpoints,
@@ -52,6 +53,20 @@ class BetterFetchPaystackApiService implements PaystackApiService<FetchClient> {
       });
 
       return { subaccountCode: response.data.subaccount_code };
+    },
+  };
+  miscellaneous: MiscellaneousEndpoints = {
+    listBanks: async (query) => {
+      const response = await this.$fetch("@get/bank", {
+        throw: true,
+        query,
+      });
+
+      return response.data.map((bank) => ({
+        id: bank.id,
+        name: bank.name,
+        code: bank.code,
+      }));
     },
   };
 }

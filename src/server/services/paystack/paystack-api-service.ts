@@ -1,3 +1,4 @@
+import type { ListBanksQueryParams } from "~/server/fetch-clients/paystack/routes/misc";
 import type { CreatePaymentPageInput } from "~/server/fetch-clients/paystack/schemas/payment-page";
 import type { SubaccountCreationInfo } from "~/server/fetch-clients/paystack/schemas/subaccount";
 import type { TransactionSplitCreationInfo } from "~/server/fetch-clients/paystack/schemas/transaction-split";
@@ -16,6 +17,8 @@ export interface PaystackApiService<FetchClient> {
   split: TransactionSplitEndpoints;
   /** Endpoints for managing subaccounts */
   subaccount: SubaccountEndpoints;
+  /** Miscellaneous endpoints for various supporting APIs */
+  miscellaneous: MiscellaneousEndpoints;
 }
 
 export interface PaymentPageEndpoints {
@@ -37,4 +40,12 @@ export interface SubaccountEndpoints {
   create: (
     input: SubaccountCreationInfo,
   ) => Promise<{ subaccountCode: string }>;
+}
+
+/** The Miscellaneous API are supporting APIs that can be used to provide more details to other APIs */
+export interface MiscellaneousEndpoints {
+  /** Get a list of supported banks and their properties */
+  listBanks: (
+    query: ListBanksQueryParams,
+  ) => Promise<Array<{ id: number; name: string; code: string }>>;
 }
