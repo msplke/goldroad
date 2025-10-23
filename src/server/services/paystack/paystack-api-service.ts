@@ -1,4 +1,5 @@
 import type { CreatePaymentPageInput } from "~/server/fetch-clients/paystack/schemas/payment-page";
+import type { TransactionSplitCreationInfo } from "~/server/fetch-clients/paystack/schemas/transaction-split";
 
 /** This defines the Paystack API endpoints that will be used by the application.
  * Each method corresponds to a specific API call to Paystack.
@@ -10,6 +11,8 @@ export interface PaystackApiService<FetchClient> {
   $fetch: FetchClient;
   /** Endpoints for managing payment pages */
   paymentPage: PaymentPageEndpoints;
+  /** Endpoints for managing transaction splits */
+  split: TransactionSplitEndpoints;
 }
 
 export interface PaymentPageEndpoints {
@@ -17,4 +20,11 @@ export interface PaymentPageEndpoints {
   create: (
     input: CreatePaymentPageInput,
   ) => Promise<{ id: number; slug: string }>;
+}
+
+export interface TransactionSplitEndpoints {
+  /** Create a new split on Paystack and return  */
+  create: (
+    input: TransactionSplitCreationInfo,
+  ) => Promise<{ splitCode: string }>;
 }

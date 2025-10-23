@@ -6,10 +6,10 @@ import {
   paystackClient,
   type paystackSchema,
 } from "~/server/fetch-clients/paystack/client";
-import type { CreatePaymentPageInput } from "~/server/fetch-clients/paystack/schemas/payment-page";
 import type {
   PaymentPageEndpoints,
   PaystackApiService,
+  TransactionSplitEndpoints,
 } from "~/server/services/paystack/paystack-api-service";
 
 type FetchClient = BetterFetch<{
@@ -24,13 +24,23 @@ class BetterFetchPaystackApiService implements PaystackApiService<FetchClient> {
   }
 
   paymentPage: PaymentPageEndpoints = {
-    create: async (input: CreatePaymentPageInput) => {
+    create: async (input) => {
       const response = await this.$fetch("@post/page", {
         throw: true,
         body: input,
       });
 
       return { id: response.data.id, slug: response.data.slug };
+    },
+  };
+  split: TransactionSplitEndpoints = {
+    create: async (input) => {
+      const response = await this.$fetch("@post/split", {
+        throw: true,
+        body: input,
+      });
+
+      return { splitCode: response.data.split_code };
     },
   };
 }

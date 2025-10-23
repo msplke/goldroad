@@ -18,12 +18,9 @@ import { paystackClient } from "~/server/fetch-clients/paystack/client";
 import { planIntervalEnum } from "~/server/fetch-clients/paystack/schemas/plan";
 import { createSubaccountSchema } from "~/server/fetch-clients/paystack/schemas/subaccount";
 import { subscriptionStatusEnum } from "~/server/fetch-clients/paystack/schemas/subscription";
-import type { createTransactionSplitSchema } from "~/server/fetch-clients/paystack/schemas/transaction-split";
+import { paystackApiService } from "~/server/services/paystack/paystack-api";
 
 type SubaccountCreationInfo = z.infer<typeof createSubaccountSchema>;
-type TransactionSplitCreationInfo = z.infer<
-  typeof createTransactionSplitSchema
->;
 
 const kitTagEnum = z.union([subscriptionStatusEnum, planIntervalEnum]);
 export type KitTag = z.infer<typeof kitTagEnum>;
@@ -238,8 +235,9 @@ export const creatorRouter = createTRPCRouter({
         ...input,
         percentage_charge: SUBACCOUNT_PERCENTAGE_CHARGE,
       });
+
       // 2. Create transaction split
-      const splitCode = await createPaystackTransactionSplit({
+      const { splitCode } = await paystackApiService.split.create({
         name: `Goldroad: Split for creator - ${input.business_name}`,
         currency: "KES",
         type: "percentage",
@@ -263,23 +261,6 @@ export const creatorRouter = createTRPCRouter({
         .where(eq(creator.id, creatorId));
     }),
 });
-
-async function createPaystackTransactionSplit(
-  data: TransactionSplitCreationInfo,
-) {
-  const { data: response, error } = await paystackClient("@post/split", {
-    body: data,
-  });
-
-  if (error) {
-    throw new TRPCError({
-      message: `transaction split group creation error: ${error.message}`,
-      code: "INTERNAL_SERVER_ERROR",
-    });
-  }
-
-  return response.data.split_code;
-}
 
 async function createPaystackSubaccount(
   subaccountCreationInfo: SubaccountCreationInfo,

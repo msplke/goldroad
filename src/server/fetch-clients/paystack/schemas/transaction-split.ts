@@ -62,6 +62,10 @@ export const createTransactionSplitSchema = transactionSplitSchema
       ),
   });
 
+export type TransactionSplitCreationInfo = z.infer<
+  typeof createTransactionSplitSchema
+>;
+
 export const transactionSplitQueryParamsSchema = baseQueryParamsSchema
   .extend({
     active: z.coerce.boolean().optional().describe("Filter by active status"),
