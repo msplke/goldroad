@@ -2,6 +2,7 @@ import "server-only";
 
 import type { BetterFetch } from "@better-fetch/fetch";
 
+import { fromBaseUnitsToSubunits } from "~/lib/utils";
 import {
   paystackClient,
   type paystackSchema,
@@ -10,6 +11,7 @@ import type {
   MiscellaneousEndpoints,
   PaymentPageEndpoints,
   PaystackApiService,
+  PlanEndpoints,
   SubaccountEndpoints,
   TransactionSplitEndpoints,
 } from "~/server/services/paystack/paystack-api-service";
@@ -67,6 +69,34 @@ class BetterFetchPaystackApiService implements PaystackApiService<FetchClient> {
         name: bank.name,
         code: bank.code,
       }));
+    },
+  };
+  plan: PlanEndpoints = {
+    create: async (input) => {
+      const amountInSubunits = fromBaseUnitsToSubunits(input.amount);
+
+      const response = await this.$fetch("@post/plan", {
+        throw: true,
+        body: {
+          ...input,
+          amount: amountInSubunits,
+          currency: "KES", // We are currently only supporting KES
+        },
+      });
+
+      return { id: response.data.id, planCode: response.data.plan_code };
+    },
+    update: async (planCode, input) => {
+      const amountInSubunits =
+        input.amount && fromBaseUnitsToSubunits(input.amount);
+
+      await this.$fetch(`@put/plan/${planCode}`, {
+        throw: true,
+        body: {
+          ...input,
+          amount: amountInSubunits,
+        },
+      });
     },
   };
 }

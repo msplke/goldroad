@@ -65,3 +65,9 @@ export const createPlanSchema = z.object({
     .optional()
     .describe("Number of invoices to raise during subscription"),
 });
+
+export const updatePlanSchema = createPlanSchema.partial();
+
+export type CreatePlanInfo = z.infer<typeof createPlanSchema>;
+export type UpdatePlanInfo = z.infer<typeof updatePlanSchema>;
+export type PaystackPlan = z.infer<typeof planSchema>;

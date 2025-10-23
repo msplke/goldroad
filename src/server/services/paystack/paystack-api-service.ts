@@ -1,5 +1,9 @@
 import type { ListBanksQueryParams } from "~/server/fetch-clients/paystack/routes/misc";
 import type { CreatePaymentPageInput } from "~/server/fetch-clients/paystack/schemas/payment-page";
+import type {
+  CreatePlanInfo,
+  UpdatePlanInfo,
+} from "~/server/fetch-clients/paystack/schemas/plan";
 import type { SubaccountCreationInfo } from "~/server/fetch-clients/paystack/schemas/subaccount";
 import type { TransactionSplitCreationInfo } from "~/server/fetch-clients/paystack/schemas/transaction-split";
 
@@ -19,6 +23,8 @@ export interface PaystackApiService<FetchClient> {
   subaccount: SubaccountEndpoints;
   /** Miscellaneous endpoints for various supporting APIs */
   miscellaneous: MiscellaneousEndpoints;
+  /** Endpoints for managing plans */
+  plan: PlanEndpoints;
 }
 
 export interface PaymentPageEndpoints {
@@ -48,4 +54,24 @@ export interface MiscellaneousEndpoints {
   listBanks: (
     query: ListBanksQueryParams,
   ) => Promise<Array<{ id: number; name: string; code: string }>>;
+}
+
+export interface PlanEndpoints {
+  /** Create a new plan on Paystack.
+   * @param input - The information required to create the plan,
+   *  excluding currency which is to be set to "KES" in the implementation
+   *  (this is the currency supported by the platform for now).
+   */
+  create: (
+    input: Omit<CreatePlanInfo, "currency">,
+  ) => Promise<{ id: string; planCode: string }>;
+  /** Update an existing plan on Paystack.
+   * @param planCode - The code of the plan to update
+   * @param input - The information to update on the plan,
+   *  excluding currency which cannot be updated.
+   */
+  update: (
+    planCode: string,
+    input: Omit<UpdatePlanInfo, "currency">,
+  ) => Promise<void>;
 }
