@@ -1,4 +1,5 @@
 import type { CreatePaymentPageInput } from "~/server/fetch-clients/paystack/schemas/payment-page";
+import type { SubaccountCreationInfo } from "~/server/fetch-clients/paystack/schemas/subaccount";
 import type { TransactionSplitCreationInfo } from "~/server/fetch-clients/paystack/schemas/transaction-split";
 
 /** This defines the Paystack API endpoints that will be used by the application.
@@ -13,6 +14,8 @@ export interface PaystackApiService<FetchClient> {
   paymentPage: PaymentPageEndpoints;
   /** Endpoints for managing transaction splits */
   split: TransactionSplitEndpoints;
+  /** Endpoints for managing subaccounts */
+  subaccount: SubaccountEndpoints;
 }
 
 export interface PaymentPageEndpoints {
@@ -27,4 +30,11 @@ export interface TransactionSplitEndpoints {
   create: (
     input: TransactionSplitCreationInfo,
   ) => Promise<{ splitCode: string }>;
+}
+
+export interface SubaccountEndpoints {
+  /** Create a new subaccount on Paystack */
+  create: (
+    input: SubaccountCreationInfo,
+  ) => Promise<{ subaccountCode: string }>;
 }

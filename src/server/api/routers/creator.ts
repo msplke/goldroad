@@ -14,13 +14,10 @@ import {
   tagInfo,
 } from "~/server/db/schema/app-schema";
 import { KIT_API_KEY_HEADER, kitClient } from "~/server/fetch-clients/kit";
-import { paystackClient } from "~/server/fetch-clients/paystack/client";
 import { planIntervalEnum } from "~/server/fetch-clients/paystack/schemas/plan";
 import { createSubaccountSchema } from "~/server/fetch-clients/paystack/schemas/subaccount";
 import { subscriptionStatusEnum } from "~/server/fetch-clients/paystack/schemas/subscription";
 import { paystackApiService } from "~/server/services/paystack/paystack-api";
-
-type SubaccountCreationInfo = z.infer<typeof createSubaccountSchema>;
 
 const kitTagEnum = z.union([subscriptionStatusEnum, planIntervalEnum]);
 export type KitTag = z.infer<typeof kitTagEnum>;
@@ -231,7 +228,7 @@ export const creatorRouter = createTRPCRouter({
 
       console.log("Creating subaccount...");
       // 1. Create Paystack subaccount
-      const subaccountCode = await createPaystackSubaccount({
+      const { subaccountCode } = await paystackApiService.subaccount.create({
         ...input,
         percentage_charge: SUBACCOUNT_PERCENTAGE_CHARGE,
       });
@@ -261,23 +258,6 @@ export const creatorRouter = createTRPCRouter({
         .where(eq(creator.id, creatorId));
     }),
 });
-
-async function createPaystackSubaccount(
-  subaccountCreationInfo: SubaccountCreationInfo,
-) {
-  const { data: response, error } = await paystackClient("@post/subaccount", {
-    body: subaccountCreationInfo,
-  });
-
-  if (error) {
-    throw new TRPCError({
-      message: `subaccount creation error: ${error.message}`,
-      code: "INTERNAL_SERVER_ERROR",
-    });
-  }
-
-  return response.data.subaccount_code;
-}
 
 async function addStatusAndTierTagsToKit(
   kitApiKey: string,

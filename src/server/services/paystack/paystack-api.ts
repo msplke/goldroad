@@ -9,6 +9,7 @@ import {
 import type {
   PaymentPageEndpoints,
   PaystackApiService,
+  SubaccountEndpoints,
   TransactionSplitEndpoints,
 } from "~/server/services/paystack/paystack-api-service";
 
@@ -41,6 +42,16 @@ class BetterFetchPaystackApiService implements PaystackApiService<FetchClient> {
       });
 
       return { splitCode: response.data.split_code };
+    },
+  };
+  subaccount: SubaccountEndpoints = {
+    create: async (input) => {
+      const response = await this.$fetch("@post/subaccount", {
+        throw: true,
+        body: input,
+      });
+
+      return { subaccountCode: response.data.subaccount_code };
     },
   };
 }
