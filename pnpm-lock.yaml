@@ -99,8 +99,8 @@ importers:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       superjson:
-        specifier: ^2.2.3
-        version: 2.2.3
+        specifier: ^2.2.5
+        version: 2.2.5
       tailwind-merge:
         specifier: ^3.3.1
         version: 3.3.1
@@ -3305,8 +3305,8 @@ packages:
       babel-plugin-macros:
         optional: true
 
-  superjson@2.2.3:
-    resolution: {integrity: sha512-ay3d+LW/S6yppKoTz3Bq4mG0xrS5bFwfWEBmQfbC7lt5wmtk+Obq0TxVuA9eYRirBTQb1K3eEpBRHMQEo0WyVw==}
+  superjson@2.2.5:
+    resolution: {integrity: sha512-zWPTX96LVsA/eVYnqOM2+ofcdPqdS1dAF1LN4TS2/MWuUpfitd9ctTa87wt4xrYnZnkLtS69xpBdSxVBP5Rm6w==}
     engines: {node: '>=16'}
 
   supports-color@10.2.0:
@@ -4817,7 +4817,7 @@ snapshots:
       socket.io: 4.7.4(supports-color@10.2.0)
       socket.io-client: 4.7.5(supports-color@10.2.0)
       std-env: 3.9.0
-      superjson: 2.2.3
+      superjson: 2.2.5
       tinyexec: 0.3.2
       uncrypto: 0.1.3
       zod: 3.25.76
@@ -6453,7 +6453,7 @@ snapshots:
       client-only: 0.0.1
       react: 19.2.0
 
-  superjson@2.2.3:
+  superjson@2.2.5:
     dependencies:
       copy-anything: 4.0.5
 
