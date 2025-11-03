@@ -115,8 +115,8 @@ importers:
         specifier: ^4.1.16
         version: 4.1.16
       '@trigger.dev/build':
-        specifier: 4.0.5
-        version: 4.0.5(supports-color@10.2.0)(typescript@5.9.3)
+        specifier: 4.0.6
+        version: 4.0.6(typescript@5.9.3)
       '@types/node':
         specifier: ^24.10.0
         version: 24.10.0
@@ -1713,8 +1713,16 @@ packages:
     resolution: {integrity: sha512-qmTAB6IX11XCWPxqW8mU6gJFtOoz15lmwg9C1Guww6Oxyffro3lLIGKBbg6gdneXPWjON7b18V8IGsDZf2thAA==}
     engines: {node: '>=18.20.0'}
 
+  '@trigger.dev/build@4.0.6':
+    resolution: {integrity: sha512-NJ7N50mNTW43h7jJ/ynsjX1xT+R7fisxVytmwnjb8ZaCgScNp1zDdzGlJjhIjiIWU7G83qpZE1H8eoqjo7tOyg==}
+    engines: {node: '>=18.20.0'}
+
   '@trigger.dev/core@4.0.5':
     resolution: {integrity: sha512-SHelq2kBGdsOHVJzdbp+Twm9kXqmPBMtwVoosAuINC8mYpJzighwUD0e65uwYqgg0DqLldD408ZwfhTEQyDq0A==}
+    engines: {node: '>=18.20.0'}
+
+  '@trigger.dev/core@4.0.6':
+    resolution: {integrity: sha512-V4w0Wmvw4fst0dbQ7LjmYuaWyLVlwNcLc6f2EB39XqoS7PVQGfRm6KCFWc0sG5x9xa/RBpusXcwmRK0C5QgW9g==}
     engines: {node: '>=18.20.0'}
 
   '@trigger.dev/schema-to-json@4.0.5':
@@ -4789,7 +4797,58 @@ snapshots:
       - typescript
       - utf-8-validate
 
+  '@trigger.dev/build@4.0.6(typescript@5.9.3)':
+    dependencies:
+      '@trigger.dev/core': 4.0.6
+      pkg-types: 1.3.1
+      tinyglobby: 0.2.14
+      tsconfck: 3.1.3(typescript@5.9.3)
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - typescript
+      - utf-8-validate
+
   '@trigger.dev/core@4.0.5(supports-color@10.2.0)':
+    dependencies:
+      '@bugsnag/cuid': 3.2.1
+      '@electric-sql/client': 1.0.14
+      '@google-cloud/precise-date': 4.0.0
+      '@jsonhero/path': 1.0.21
+      '@opentelemetry/api': 1.9.0
+      '@opentelemetry/api-logs': 0.203.0
+      '@opentelemetry/core': 2.0.1(@opentelemetry/api@1.9.0)
+      '@opentelemetry/exporter-logs-otlp-http': 0.203.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/exporter-trace-otlp-http': 0.203.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/instrumentation': 0.203.0(@opentelemetry/api@1.9.0)(supports-color@10.2.0)
+      '@opentelemetry/resources': 2.0.1(@opentelemetry/api@1.9.0)
+      '@opentelemetry/sdk-logs': 0.203.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/sdk-trace-base': 2.0.1(@opentelemetry/api@1.9.0)
+      '@opentelemetry/sdk-trace-node': 2.0.1(@opentelemetry/api@1.9.0)
+      '@opentelemetry/semantic-conventions': 1.36.0
+      dequal: 2.0.3
+      eventsource: 3.0.7
+      eventsource-parser: 3.0.6
+      execa: 8.0.1
+      humanize-duration: 3.33.0
+      jose: 5.10.0
+      nanoid: 3.3.8
+      prom-client: 15.1.3
+      socket.io: 4.7.4(supports-color@10.2.0)
+      socket.io-client: 4.7.5(supports-color@10.2.0)
+      std-env: 3.9.0
+      superjson: 2.2.5
+      tinyexec: 0.3.2
+      uncrypto: 0.1.3
+      zod: 3.25.76
+      zod-error: 1.5.0
+      zod-validation-error: 1.5.0(zod@3.25.76)
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
+  '@trigger.dev/core@4.0.6':
     dependencies:
       '@bugsnag/cuid': 3.2.1
       '@electric-sql/client': 1.0.14
