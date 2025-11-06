@@ -30,7 +30,7 @@ export const stepConfigs: StepConfig[] = [
     content: {
       title: "Provide Bank Details",
       description:
-        "We'll use these details to create a Paystack subaccount for your payouts.",
+        "We'll route payments made by your supporters to this account.",
       fields: [
         {
           name: "bankCode",
@@ -51,8 +51,6 @@ export const stepConfigs: StepConfig[] = [
           type: "text",
         },
       ],
-      helpText:
-        "We'll create a Paystack subaccount using our main account and send payments directly to your bank.",
       selectOptions: {
         bankCode: [
           { value: "044", label: "Access Bank" },
@@ -83,7 +81,7 @@ export const stepConfigs: StepConfig[] = [
     icon: FileText,
     content: {
       title: "Create Your Publication",
-      description: "Set up your publication details that subscribers will see.",
+      description: "Set up the publication details that subscribers will see.",
       fields: [
         {
           name: "publicationName",
@@ -99,7 +97,7 @@ export const stepConfigs: StepConfig[] = [
         },
       ],
       helpText:
-        "This information will be displayed on your public pricing page and payment forms.",
+        "This information will be displayed on your public pricing page.",
       requiresPrevious: [1], // Requires Bank Details to be completed
     },
   },
@@ -108,7 +106,7 @@ export const stepConfigs: StepConfig[] = [
     icon: DollarSign,
     content: {
       title: "Setup Payment Plans",
-      description: "Configure your subscription pricing and benefits.",
+      description: "Configure your subscription pricing.",
       fields: [
         {
           name: "monthlyAmount",
@@ -131,7 +129,7 @@ export const stepConfigs: StepConfig[] = [
         },
       ],
       helpText:
-        "Annual plans should offer savings compared to monthly. We'll create Paystack payment plans and generate your pricing page.",
+        "Annual plans should offer savings compared to monthly. We'll automatically generate your public pricing page for you.",
       requiresPrevious: [1, 2], // Requires Bank Details and Publication
     },
   },

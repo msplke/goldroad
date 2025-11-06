@@ -9,15 +9,16 @@ export function CallToAction() {
           Start Accepting Local Payments Today
         </h2>
         <p className="mx-auto mb-8 max-w-2xl text-xl opacity-90">
-          Join plenty of African creators who are already earning with local
-          payments and Kit integration.
+          Join plenty of Kenyan creators earning from recurring subscriptions,
+          one-time tips, and local payments. Kit optional. Payouts to your bank.
         </p>
         <Button size="lg" variant="secondary" className="px-8 text-lg">
           Get Started Free
           <Icons.arrowRight className="ml-2 h-5 w-5" />
         </Button>
         <p className="mt-4 text-sm opacity-75">
-          No setup fees. No monthly charges. Start earning in minutes.
+          5% platform fee + Paystack fees. No setup fees. Start earning in
+          minutes.
         </p>
       </div>
     </section>

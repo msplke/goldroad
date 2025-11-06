@@ -23,19 +23,20 @@ export const marketingConfig: MarketingConfig = {
 
 export const features: Feature[] = [
   {
-    title: "Local Payment Processing",
-    description: "Accept payments via Paystack from customers across Africa.",
+    title: "Recurring & One-Time Support",
+    description:
+      "Accept monthly subscriptions, annual plans, or one-time contributions from your audience and supporters.",
     icon: "payments",
   },
   {
-    title: "Kit Auto-Sync",
+    title: "Optional Mailing List Sync",
     description:
-      "Paying subscribers automatically added to your mailing list on Kit.",
+      'Automatically sync paying subscribers to Kit for separate "paid" content. Or skip it and keep using Substack or your existing writing platform.',
     icon: "users",
   },
   {
-    title: "Instant Bank Payouts",
-    description: "Get paid directly to your local bank account.",
+    title: "Payouts to Your Bank",
+    description: "Get paid directly to your bank account (1-2 working days).",
     icon: "zap",
   },
 ];

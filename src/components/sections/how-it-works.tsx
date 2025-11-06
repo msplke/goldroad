@@ -13,11 +13,9 @@ export function HowItWorks() {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary font-bold text-2xl text-primary-foreground">
               1
             </div>
-            <h3 className="mb-3 font-semibold text-xl">
-              Connect Your Accounts
-            </h3>
+            <h3 className="mb-3 font-semibold text-xl">Connect Your Account</h3>
             <p className="text-muted-foreground">
-              Link your Paystack and Kit accounts in minutes
+              Set up the account you'd like us to route payments to
             </p>
           </div>
           <div className="text-center">

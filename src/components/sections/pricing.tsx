@@ -27,15 +27,15 @@ export function Pricing() {
             <ul className="mb-8 space-y-3">
               <li className="flex items-center">
                 <Icons.checkCircle className="mr-3 h-5 w-5 text-primary" />
-                <span>Unlimited subscribers</span>
+                <span>Unlimited recurring & one-time subscribers</span>
               </li>
               <li className="flex items-center">
                 <Icons.checkCircle className="mr-3 h-5 w-5 text-primary" />
-                <span>Kit integration</span>
+                <span>Kit sync (optional — connect anytime)</span>
               </li>
               <li className="flex items-center">
                 <Icons.checkCircle className="mr-3 h-5 w-5 text-primary" />
-                <span>Local bank payouts</span>
+                <span>Bank payouts in 1-2 working days</span>
               </li>
               <li className="flex items-center">
                 <Icons.checkCircle className="mr-3 h-5 w-5 text-primary" />
