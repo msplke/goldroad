@@ -1,0 +1,12 @@
+minimumReleaseAge: 1440
+
+# Build scripts reviewed and intentionally NOT run. All of these ship
+# prebuilt binaries (or only use install scripts for optional native
+# fallbacks), so nothing here needs to execute code at install time.
+# Flip an entry to `true` only after reviewing what its script does.
+allowBuilds:
+  "@depot/cli": false
+  better-sqlite3: false
+  esbuild: false
+  protobufjs: false
+  sharp: false
