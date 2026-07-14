@@ -90,15 +90,17 @@ export function EditPlanPricingForm({ plan }: EditPlanPricingProps) {
                   Price (KES per{" "}
                   {plan.interval === "monthly" ? "month" : "year"})
                 </FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    min={100}
-                    placeholder="Amount in KES"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                  />
-                </FormControl>
+                <FormControl
+                  render={
+                    <Input
+                      type="number"
+                      min={100}
+                      placeholder="Amount in KES"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                  }
+                />
                 <FormMessage />
               </FormItem>
             )}

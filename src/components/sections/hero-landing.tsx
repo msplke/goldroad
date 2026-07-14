@@ -20,21 +20,23 @@ export function HeroLanding() {
         </p>
 
         <div className="flex flex-col justify-center gap-4 sm:flex-row">
-          <Button asChild size="lg" className="px-8 text-lg">
-            <Link href="/login">
-              Get Started Free
-              <Icons.arrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
+          <Button
+            size="lg"
+            className="px-8 text-lg"
+            render={
+              <Link href="/login">
+                Get Started Free
+                <Icons.arrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            }
+          />
 
           <Button
-            asChild
             variant="outline"
             size="lg"
             className="bg-transparent px-8 text-lg"
-          >
-            <a href="#how-it-works">See How It Works</a>
-          </Button>
+            render={<a href="#how-it-works">See How It Works</a>}
+          />
         </div>
       </div>
     </section>

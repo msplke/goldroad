@@ -56,12 +56,14 @@ export function ClearBenefitsDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" variant="destructive" className="h-8">
-          <Trash2 className="mr-1 h-3 w-3" />
-          Clear All
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button size="sm" variant="destructive" className="h-8">
+            <Trash2 className="mr-1 h-3 w-3" />
+            Clear All
+          </Button>
+        }
+      />
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Clear All Benefits</DialogTitle>

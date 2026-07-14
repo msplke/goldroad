@@ -411,17 +411,17 @@ export function OnboardingModal({
                       variant="link"
                       size="sm"
                       className="mt-1 h-auto p-0"
-                      asChild
-                    >
-                      <a
-                        href={currentStepConfig.content.helpLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Open Documentation{" "}
-                        <ExternalLink className="ml-1 h-3 w-3" />
-                      </a>
-                    </Button>
+                      render={
+                        <a
+                          href={currentStepConfig.content.helpLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Open Documentation{" "}
+                          <ExternalLink className="ml-1 h-3 w-3" />
+                        </a>
+                      }
+                    />
                   )}
                 </div>
               )}

@@ -44,7 +44,6 @@ export function SidebarNav({
                     return (
                       <SidebarMenuItem key={item.href}>
                         <SidebarMenuButton
-                          asChild
                           isActive={isActive}
                           tooltip={
                             isDisabled
@@ -56,40 +55,41 @@ export function SidebarNav({
                               ? "cursor-not-allowed opacity-50 hover:bg-transparent"
                               : ""
                           }
-                        >
-                          {isDisabled ? (
-                            <div className="flex w-full items-center gap-3 rounded-md font-medium text-sm">
-                              <Icon className="size-4" />
-                              <span>{item.title}</span>
-                            </div>
-                          ) : isExternal ? (
-                            <a
-                              href={item.href}
-                              className="flex w-full items-center gap-3 rounded-md font-medium text-sm hover:bg-muted"
-                              target={
-                                item.href.startsWith("mailto:")
-                                  ? "_self"
-                                  : "_blank"
-                              }
-                              rel={
-                                item.href.startsWith("mailto:")
-                                  ? undefined
-                                  : "noopener noreferrer"
-                              }
-                            >
-                              <Icon className="size-4" />
-                              <span>{item.title}</span>
-                            </a>
-                          ) : (
-                            <Link
-                              href={item.href}
-                              className="flex w-full items-center gap-3 rounded-md font-medium text-sm hover:bg-muted"
-                            >
-                              <Icon className="size-4" />
-                              <span>{item.title}</span>
-                            </Link>
-                          )}
-                        </SidebarMenuButton>
+                          render={
+                            isDisabled ? (
+                              <div className="flex w-full items-center gap-3 rounded-md font-medium text-sm">
+                                <Icon className="size-4" />
+                                <span>{item.title}</span>
+                              </div>
+                            ) : isExternal ? (
+                              <a
+                                href={item.href}
+                                className="flex w-full items-center gap-3 rounded-md font-medium text-sm hover:bg-muted"
+                                target={
+                                  item.href.startsWith("mailto:")
+                                    ? "_self"
+                                    : "_blank"
+                                }
+                                rel={
+                                  item.href.startsWith("mailto:")
+                                    ? undefined
+                                    : "noopener noreferrer"
+                                }
+                              >
+                                <Icon className="size-4" />
+                                <span>{item.title}</span>
+                              </a>
+                            ) : (
+                              <Link
+                                href={item.href}
+                                className="flex w-full items-center gap-3 rounded-md font-medium text-sm hover:bg-muted"
+                              >
+                                <Icon className="size-4" />
+                                <span>{item.title}</span>
+                              </Link>
+                            )
+                          }
+                        />
                       </SidebarMenuItem>
                     );
                   })}

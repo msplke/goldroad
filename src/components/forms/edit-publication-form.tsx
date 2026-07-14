@@ -125,9 +125,9 @@ export function EditPublicationForm({ publication }: EditPublicationFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Publication Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="My Newsletter" {...field} />
-                  </FormControl>
+                  <FormControl
+                    render={<Input placeholder="My Newsletter" {...field} />}
+                  />
                   <FormMessage />
                 </FormItem>
               )}
@@ -140,21 +140,23 @@ export function EditPublicationForm({ publication }: EditPublicationFormProps) {
                 <FormItem>
                   <FormLabel>Publication Slug</FormLabel>
                   <div className="flex gap-2">
-                    <FormControl>
-                      <Input
-                        placeholder="my-newsletter"
-                        {...field}
-                        onChange={(e) => {
-                          // Convert to lowercase and replace invalid characters
-                          const value = e.target.value
-                            .toLowerCase()
-                            .replace(/[^a-z0-9-]/g, "-")
-                            .replace(/-+/g, "-")
-                            .replace(/^-|-$/g, "");
-                          field.onChange(value);
-                        }}
-                      />
-                    </FormControl>
+                    <FormControl
+                      render={
+                        <Input
+                          placeholder="my-newsletter"
+                          {...field}
+                          onChange={(e) => {
+                            // Convert to lowercase and replace invalid characters
+                            const value = e.target.value
+                              .toLowerCase()
+                              .replace(/[^a-z0-9-]/g, "-")
+                              .replace(/-+/g, "-")
+                              .replace(/^-|-$/g, "");
+                            field.onChange(value);
+                          }}
+                        />
+                      }
+                    />
                     <Button
                       type="button"
                       variant="outline"
@@ -180,13 +182,15 @@ export function EditPublicationForm({ publication }: EditPublicationFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="A weekly newsletter about..."
-                      rows={4}
-                      {...field}
-                    />
-                  </FormControl>
+                  <FormControl
+                    render={
+                      <Textarea
+                        placeholder="A weekly newsletter about..."
+                        rows={4}
+                        {...field}
+                      />
+                    }
+                  />
                   <FormMessage />
                 </FormItem>
               )}

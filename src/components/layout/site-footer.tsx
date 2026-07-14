@@ -32,9 +32,11 @@ export function SiteFooter({ className }: React.HTMLAttributes<HTMLElement>) {
                   {item.title}
                 </Button>
               ) : (
-                <Button key={item.title} variant="link" asChild>
-                  <Link href={item.href}>{item.title}</Link>
-                </Button>
+                <Button
+                  key={item.title}
+                  variant="link"
+                  render={<Link href={item.href}>{item.title}</Link>}
+                />
               ),
             )}
           </div>

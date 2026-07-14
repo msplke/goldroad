@@ -34,9 +34,7 @@ export function AddPaymentPlanForm({
           name="publicationId"
           render={({ field }) => (
             <FormItem className="hidden">
-              <FormControl>
-                <Input type="hidden" {...field} />
-              </FormControl>
+              <FormControl render={<Input type="hidden" {...field} />} />
             </FormItem>
           )}
         />
@@ -46,14 +44,16 @@ export function AddPaymentPlanForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Monthly Plan Amount (Ksh.)</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="5000"
-                  {...field}
-                  onChange={(e) => field.onChange(+e.target.value)}
-                />
-              </FormControl>
+              <FormControl
+                render={
+                  <Input
+                    type="number"
+                    placeholder="5000"
+                    {...field}
+                    onChange={(e) => field.onChange(+e.target.value)}
+                  />
+                }
+              />
               <FormMessage />
             </FormItem>
           )}
@@ -64,14 +64,16 @@ export function AddPaymentPlanForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Annual Plan Amount (Ksh.)</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="50000"
-                  {...field}
-                  onChange={(e) => field.onChange(+e.target.value)}
-                />
-              </FormControl>
+              <FormControl
+                render={
+                  <Input
+                    type="number"
+                    placeholder="50000"
+                    {...field}
+                    onChange={(e) => field.onChange(+e.target.value)}
+                  />
+                }
+              />
               <FormMessage />
             </FormItem>
           )}

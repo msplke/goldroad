@@ -35,9 +35,9 @@ export function AddPublicationForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Publication Name</FormLabel>
-              <FormControl>
-                <Input placeholder="My Newsletter" {...field} />
-              </FormControl>
+              <FormControl
+                render={<Input placeholder="My Newsletter" {...field} />}
+              />
               <FormMessage />
             </FormItem>
           )}
@@ -49,13 +49,15 @@ export function AddPublicationForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="A weekly newsletter about..."
-                  rows={4}
-                  {...field}
-                />
-              </FormControl>
+              <FormControl
+                render={
+                  <Textarea
+                    placeholder="A weekly newsletter about..."
+                    rows={4}
+                    {...field}
+                  />
+                }
+              />
               <FormMessage />
             </FormItem>
           )}

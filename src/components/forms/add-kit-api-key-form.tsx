@@ -44,32 +44,34 @@ export function AddKitApiKeyForm({
                   (Optional)
                 </span>
               </FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Input
-                    placeholder="Your API key (leave empty to skip)"
-                    type={showApiKey ? "text" : "password"}
-                    className="pr-10"
-                    {...field}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowApiKey(!showApiKey)}
-                  >
-                    {showApiKey ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                    <span className="sr-only">
-                      {showApiKey ? "Hide API key" : "Show API key"}
-                    </span>
-                  </Button>
-                </div>
-              </FormControl>
+              <FormControl
+                render={
+                  <div className="relative">
+                    <Input
+                      placeholder="Your API key (leave empty to skip)"
+                      type={showApiKey ? "text" : "password"}
+                      className="pr-10"
+                      {...field}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowApiKey(!showApiKey)}
+                    >
+                      {showApiKey ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                      <span className="sr-only">
+                        {showApiKey ? "Hide API key" : "Show API key"}
+                      </span>
+                    </Button>
+                  </div>
+                }
+              />
               <FormMessage />
             </FormItem>
           )}

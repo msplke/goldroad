@@ -54,12 +54,16 @@ export function OnboardingGuard({ children, fallback }: OnboardingGuardProps) {
             optional.
           </p>
           <div className="flex gap-2">
-            <Button variant="outline" asChild className="flex-1">
-              <Link href="/dashboard">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Overview
-              </Link>
-            </Button>
+            <Button
+              variant="outline"
+              className="flex-1"
+              render={
+                <Link href="/dashboard">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Overview
+                </Link>
+              }
+            />
           </div>
         </CardContent>
       </Card>
