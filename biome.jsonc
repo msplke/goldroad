@@ -32,6 +32,16 @@
       "react": "recommended"
     }
   },
+  "overrides": [
+    {
+      // Generic wrapper: the control association (htmlFor/children) happens
+      // at call sites, which this rule cannot see.
+      "includes": ["src/components/ui/label.tsx"],
+      "linter": {
+        "rules": { "a11y": { "noLabelWithoutControl": "off" } }
+      }
+    }
+  ],
   "assist": {
     "actions": {
       "source": {
