@@ -17,6 +17,11 @@ Findings are ordered by severity. Anything not directly proven is marked "unveri
 
 ## HIGH
 
+### H0. Trigger.dev production deploys are broken: "Project not found"
+`.github/workflows/release-trigger-prod.yml` — the deploy on the July 2026 merge failed with `Project not found: proj_ylfntikuurvooheskvbe` (run 29347541617). The workflow last succeeded 2025-12-14; nothing in the repo changed the project ref (`trigger.config.ts`), so the Trigger.dev-side project or the `TRIGGER_ACCESS_TOKEN` secret has likely been deleted/rotated/rescoped in the meantime. Until fixed, scheduled/background jobs run the December 2025 task code.
+**Fix:** verify the project ref in the Trigger.dev dashboard and re-issue/update the `TRIGGER_ACCESS_TOKEN` repo secret, then re-run the workflow.
+
+
 ### H1. Renewal-payment webhooks are deduplicated by subscription code only — renewals get silently dropped
 `src/app/api/webhooks/paystack/events/payment.ts:195-197` (`paystack-invoice-payment-success-${data.subscription.subscription_code}`) and `payment.ts:148-150` (failed-payment variant). The Trigger.dev idempotency key contains no invoice/reference component, so **every renewal of the same subscription produces the same key**. Within the idempotency-key TTL (Trigger.dev default 30 days) the second `invoice.update` is treated as a duplicate and never processed: `totalRevenue` and `nextPaymentDate` are not updated. Guaranteed loss for the daily/hourly (test) intervals; monthly renewals sit right at the 30-day TTL boundary. Compare the one-time-payment key, which correctly uses the payment `reference` (`payment.ts:73-75`).
 **Fix:** include a per-invoice discriminator in the key, e.g. `...-${subscription_code}-${data.id ?? data.reference}` (same for the failed-payment key).
