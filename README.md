@@ -12,7 +12,7 @@ Goldroad lets creators in Kenya monetize a publication (newsletter, blog, commun
 - [Trigger.dev v4](https://trigger.dev) for webhook-driven background jobs
 - [Paystack](https://paystack.com) (subaccounts, splits, plans, payment pages, webhooks)
 - [Kit](https://kit.com) v4 API (subscriber sync + tagging), keys encrypted at rest (AES-256-GCM)
-- [Biome](https://biomejs.dev) (lint + format), [Zod 4](https://zod.dev), TypeScript 7
+- [Biome](https://biomejs.dev) (lint + format), [Zod 4](https://zod.dev), TypeScript 5.9
 - pnpm 11, deployed on Vercel
 
 ## Prerequisites
