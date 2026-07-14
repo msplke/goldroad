@@ -84,17 +84,19 @@ export function AddBenefitForm({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={isAtLimit}
-          className="h-8"
-        >
-          <Plus className="mr-1 h-3 w-3" />
-          Add Benefit
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={isAtLimit}
+            className="h-8"
+          >
+            <Plus className="mr-1 h-3 w-3" />
+            Add Benefit
+          </Button>
+        }
+      />
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add Benefit</DialogTitle>
@@ -114,14 +116,16 @@ export function AddBenefitForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Benefit Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Describe what subscribers get by subscribing to this publication..."
-                      rows={3}
-                      maxLength={500}
-                    />
-                  </FormControl>
+                  <FormControl
+                    render={
+                      <Textarea
+                        {...field}
+                        placeholder="Describe what subscribers get by subscribing to this publication..."
+                        rows={3}
+                        maxLength={500}
+                      />
+                    }
+                  />
                   <div className="flex justify-between text-muted-foreground text-xs">
                     <FormMessage />
                     <span>{field.value.length}/500</span>

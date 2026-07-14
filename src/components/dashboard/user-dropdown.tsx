@@ -57,26 +57,28 @@ export function UserDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="relative h-10 w-10 rounded-full hover:bg-accent"
-        >
-          <Avatar className="h-8 w-8">
-            {user.image && (
-              <AvatarImage
-                src={user.image}
-                alt={user.name || user.email || "User avatar"}
-              />
-            )}
-            <AvatarFallback className="bg-primary font-medium text-primary-foreground text-sm">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <span className="sr-only">User menu</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            variant="ghost"
+            className="relative h-10 w-10 rounded-full hover:bg-accent"
+          >
+            <Avatar className="h-8 w-8">
+              {user.image && (
+                <AvatarImage
+                  src={user.image}
+                  alt={user.name || user.email || "User avatar"}
+                />
+              )}
+              <AvatarFallback className="bg-primary font-medium text-primary-foreground text-sm">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <span className="sr-only">User menu</span>
+          </Button>
+        }
+      />
+      <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="font-medium text-sm leading-none">
@@ -88,12 +90,14 @@ export function UserDropdown() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/dashboard/settings" className="cursor-pointer">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
-          </Link>
-        </DropdownMenuItem>
+        <DropdownMenuItem
+          render={
+            <Link href="/dashboard/settings" className="cursor-pointer">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </Link>
+          }
+        />
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
           <LogOut className="mr-2 h-4 w-4" />

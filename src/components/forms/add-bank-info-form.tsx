@@ -45,19 +45,25 @@ export function AddBankInfoForm({
             <FormItem>
               <FormLabel>Bank/Mobile Money</FormLabel>
               <Select
-                onValueChange={field.onChange}
-                value={field.value}
+                onValueChange={(value) => field.onChange(value ?? "")}
+                value={field.value || null}
+                items={response?.map((bank) => ({
+                  label: bank.name,
+                  value: bank.code,
+                }))}
                 disabled={isLoading || isError}
               >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={
-                        isLoading ? "Loading banks..." : "Select your bank"
-                      }
-                    />
-                  </SelectTrigger>
-                </FormControl>
+                <FormControl
+                  render={
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={
+                          isLoading ? "Loading banks..." : "Select your bank"
+                        }
+                      />
+                    </SelectTrigger>
+                  }
+                />
 
                 <SelectContent>
                   {isLoading ? (
@@ -94,9 +100,9 @@ export function AddBankInfoForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Account Number/Mobile Number</FormLabel>
-              <FormControl>
-                <Input placeholder="1234567890" {...field} />
-              </FormControl>
+              <FormControl
+                render={<Input placeholder="1234567890" {...field} />}
+              />
               <FormMessage />
             </FormItem>
           )}
@@ -108,9 +114,9 @@ export function AddBankInfoForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Account Name</FormLabel>
-              <FormControl>
-                <Input placeholder="John Doe" {...field} />
-              </FormControl>
+              <FormControl
+                render={<Input placeholder="John Doe" {...field} />}
+              />
               <FormMessage />
             </FormItem>
           )}

@@ -43,11 +43,15 @@ export function Pricing() {
               </li>
             </ul>
 
-            <Button asChild size="lg" className="w-full text-lg">
-              <Link href="/login" aria-label="Start accepting payments">
-                Start Accepting Payments
-              </Link>
-            </Button>
+            <Button
+              size="lg"
+              className="w-full text-lg"
+              render={
+                <Link href="/login" aria-label="Start accepting payments">
+                  Start Accepting Payments
+                </Link>
+              }
+            />
           </CardContent>
         </Card>
       </div>

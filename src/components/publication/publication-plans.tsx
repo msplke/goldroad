@@ -84,9 +84,10 @@ export function PublicationPlans({ publicationId }: PublicationPlansProps) {
               Plans are typically created during the onboarding process. If you
               need to create or modify plans, please contact support.
             </p>
-            <Button variant="outline" asChild>
-              <Link href="/dashboard">Go to Dashboard</Link>
-            </Button>
+            <Button
+              variant="outline"
+              render={<Link href="/dashboard">Go to Dashboard</Link>}
+            />
           </div>
         </CardContent>
       </Card>
@@ -128,20 +129,20 @@ export function PublicationPlans({ publicationId }: PublicationPlansProps) {
               </div>
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <Button
-                  asChild
                   size="sm"
                   variant="outline"
                   className="w-full sm:w-auto"
-                >
-                  <a
-                    href={`https://paystack.com/pay/${plan.paystackPaymentPageUrlSlug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    View Page
-                  </a>
-                </Button>
+                  render={
+                    <a
+                      href={`https://paystack.com/pay/${plan.paystackPaymentPageUrlSlug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      View Page
+                    </a>
+                  }
+                />
               </div>
             </div>
           </div>

@@ -56,16 +56,18 @@ export function DeleteBenefitDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          size="sm"
-          variant="ghost"
-          className="h-6 w-6 p-0 text-destructive hover:text-destructive"
-        >
-          <Trash2 className="h-3 w-3" />
-          <span className="sr-only">Delete benefit</span>
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+          >
+            <Trash2 className="h-3 w-3" />
+            <span className="sr-only">Delete benefit</span>
+          </Button>
+        }
+      />
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Delete Benefit</DialogTitle>

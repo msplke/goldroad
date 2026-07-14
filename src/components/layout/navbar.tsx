@@ -60,18 +60,22 @@ export function NavBar({ scroll = false }: { scroll?: boolean }) {
 
         <div className="hidden items-center gap-4 md:flex">
           {session ? (
-            <Button asChild size="sm">
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
+            <Button
+              size="sm"
+              render={<Link href="/dashboard">Dashboard</Link>}
+            />
           ) : (
             <>
-              <Button asChild size="sm" variant="ghost">
-                <Link href="/login">Sign In</Link>
-              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                render={<Link href="/login">Sign In</Link>}
+              />
 
-              <Button asChild size="sm">
-                <Link href="/login">Get Started</Link>
-              </Button>
+              <Button
+                size="sm"
+                render={<Link href="/login">Get Started</Link>}
+              />
             </>
           )}
           <ModeToggle />

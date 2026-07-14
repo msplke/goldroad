@@ -124,15 +124,17 @@ export function PersonalDetailsForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter your full name"
-                        disabled={
-                          isLoadingUser || updatePersonalDetails.isPending
-                        }
-                        {...field}
-                      />
-                    </FormControl>
+                    <FormControl
+                      render={
+                        <Input
+                          placeholder="Enter your full name"
+                          disabled={
+                            isLoadingUser || updatePersonalDetails.isPending
+                          }
+                          {...field}
+                        />
+                      }
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -144,16 +146,18 @@ export function PersonalDetailsForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email Address</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="Enter your email address"
-                        disabled={
-                          isLoadingUser || updatePersonalDetails.isPending
-                        }
-                        {...field}
-                      />
-                    </FormControl>
+                    <FormControl
+                      render={
+                        <Input
+                          type="email"
+                          placeholder="Enter your email address"
+                          disabled={
+                            isLoadingUser || updatePersonalDetails.isPending
+                          }
+                          {...field}
+                        />
+                      }
+                    />
                     <FormMessage />
                   </FormItem>
                 )}

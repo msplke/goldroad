@@ -64,11 +64,16 @@ export function PublicationShareLink({
               <Copy className="h-4 w-4" />
             )}
           </Button>
-          <Button asChild size="icon" variant="outline" title="Open in new tab">
-            <a href={shareUrl} target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          </Button>
+          <Button
+            size="icon"
+            variant="outline"
+            title="Open in new tab"
+            render={
+              <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            }
+          />
         </div>
 
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -85,12 +90,16 @@ export function PublicationShareLink({
               </>
             )}
           </Button>
-          <Button variant="outline" asChild className="flex-1">
-            <a href={shareUrl} target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="mr-2 h-4 w-4" />
-              Preview
-            </a>
-          </Button>
+          <Button
+            variant="outline"
+            className="flex-1"
+            render={
+              <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Preview
+              </a>
+            }
+          />
         </div>
       </CardContent>
     </Card>

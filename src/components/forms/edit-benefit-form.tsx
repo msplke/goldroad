@@ -86,12 +86,14 @@ export function EditBenefitForm({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
-          <Edit className="h-3 w-3" />
-          <span className="sr-only">Edit benefit</span>
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+            <Edit className="h-3 w-3" />
+            <span className="sr-only">Edit benefit</span>
+          </Button>
+        }
+      />
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Edit Benefit</DialogTitle>
@@ -106,14 +108,16 @@ export function EditBenefitForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Benefit Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Describe what subscribers get with this publication..."
-                      rows={3}
-                      maxLength={500}
-                    />
-                  </FormControl>
+                  <FormControl
+                    render={
+                      <Textarea
+                        {...field}
+                        placeholder="Describe what subscribers get with this publication..."
+                        rows={3}
+                        maxLength={500}
+                      />
+                    }
+                  />
                   <div className="flex justify-between text-muted-foreground text-xs">
                     <FormMessage />
                     <span>{field.value.length}/500</span>

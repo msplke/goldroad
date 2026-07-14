@@ -230,15 +230,18 @@ function PlanCard({
       </CardContent>
 
       <CardFooter className="h-full items-end">
-        <Button asChild className="w-full">
-          <Link
-            href={`https://paystack.com/pay/${plan.paystackPaymentPageUrlSlug}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Subscribe
-          </Link>
-        </Button>
+        <Button
+          className="w-full"
+          render={
+            <Link
+              href={`https://paystack.com/pay/${plan.paystackPaymentPageUrlSlug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Subscribe
+            </Link>
+          }
+        />
       </CardFooter>
     </Card>
   );
@@ -255,15 +258,18 @@ function OneTimePaymentSection({
       <p className="mb-6 text-muted-foreground">
         Prefer to make a one-time payment instead of subscribing?
       </p>
-      <Button asChild variant="outline">
-        <Link
-          href={`https://paystack.com/pay/${paymentPageSlug}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Make a One-Time Payment
-        </Link>
-      </Button>
+      <Button
+        variant="outline"
+        render={
+          <Link
+            href={`https://paystack.com/pay/${paymentPageSlug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Make a One-Time Payment
+          </Link>
+        }
+      />
     </div>
   );
 }

@@ -129,38 +129,40 @@ export function KitSettingsForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Kit API Key</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={showApiKey ? "text" : "password"}
-                        placeholder={
-                          isConnected
-                            ? "Enter new API key to update"
-                            : "Enter your Kit API key"
-                        }
-                        disabled={isLoading}
-                        className="pr-10"
-                        {...field}
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowApiKey(!showApiKey)}
-                        disabled={isLoading}
-                      >
-                        {showApiKey ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                        <span className="sr-only">
-                          {showApiKey ? "Hide API key" : "Show API key"}
-                        </span>
-                      </Button>
-                    </div>
-                  </FormControl>
+                  <FormControl
+                    render={
+                      <div className="relative">
+                        <Input
+                          type={showApiKey ? "text" : "password"}
+                          placeholder={
+                            isConnected
+                              ? "Enter new API key to update"
+                              : "Enter your Kit API key"
+                          }
+                          disabled={isLoading}
+                          className="pr-10"
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowApiKey(!showApiKey)}
+                          disabled={isLoading}
+                        >
+                          {showApiKey ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                          <span className="sr-only">
+                            {showApiKey ? "Hide API key" : "Show API key"}
+                          </span>
+                        </Button>
+                      </div>
+                    }
+                  />
                   <FormMessage />
                   <div className="space-y-2">
                     <p className="text-muted-foreground text-xs">
@@ -172,17 +174,17 @@ export function KitSettingsForm() {
                       variant="link"
                       size="sm"
                       className="h-auto p-0 text-xs"
-                      asChild
-                    >
-                      <Link
-                        href="https://help.kit.com/en/articles/9902901-kit-api-overview"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        How to find your Kit API key
-                        <ExternalLink className="ml-1 h-3 w-3" />
-                      </Link>
-                    </Button>
+                      render={
+                        <Link
+                          href="https://help.kit.com/en/articles/9902901-kit-api-overview"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          How to find your Kit API key
+                          <ExternalLink className="ml-1 h-3 w-3" />
+                        </Link>
+                      }
+                    />
                   </div>
                 </FormItem>
               )}

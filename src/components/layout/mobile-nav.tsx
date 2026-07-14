@@ -74,29 +74,37 @@ export function MobileNav() {
 
         <div className="mt-8 flex items-center justify-between">
           {session ? (
-            <Button asChild size="sm" onClick={() => setOpen(false)}>
-              <Link href="/dashboard" className="font-medium capitalize">
-                Dashboard
-              </Link>
-            </Button>
+            <Button
+              size="sm"
+              onClick={() => setOpen(false)}
+              render={
+                <Link href="/dashboard" className="font-medium capitalize">
+                  Dashboard
+                </Link>
+              }
+            />
           ) : (
             <div className="flex items-center gap-3 py-3">
               <Button
-                asChild
                 size="sm"
                 variant="secondary"
                 onClick={() => setOpen(false)}
-              >
-                <Link href="/login" className="font-medium capitalize">
-                  Sign In
-                </Link>
-              </Button>
+                render={
+                  <Link href="/login" className="font-medium capitalize">
+                    Sign In
+                  </Link>
+                }
+              />
 
-              <Button asChild size="sm" onClick={() => setOpen(false)}>
-                <Link href="/login" className="font-medium capitalize">
-                  Get Started
-                </Link>
-              </Button>
+              <Button
+                size="sm"
+                onClick={() => setOpen(false)}
+                render={
+                  <Link href="/login" className="font-medium capitalize">
+                    Get Started
+                  </Link>
+                }
+              />
             </div>
           )}
 
