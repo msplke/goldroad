@@ -38,9 +38,9 @@ export function NavBar({ scroll = false }: { scroll?: boolean }) {
 
           {links?.length ? (
             <nav className="hidden gap-6 md:flex">
-              {links?.map((link, index) => (
+              {links?.map((link) => (
                 <Link
-                  key={`${index}-${link.title}`}
+                  key={link.href}
                   href={link.disabled ? "#" : link.href}
                   prefetch={true}
                   className={cn(
