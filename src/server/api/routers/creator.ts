@@ -192,7 +192,10 @@ export const creatorRouter = createTRPCRouter({
         };
 
         if (existingTagInfo) {
-          await ctx.db.update(tagInfo).set(values);
+          await ctx.db
+            .update(tagInfo)
+            .set(values)
+            .where(eq(tagInfo.creatorId, creatorId));
         } else {
           await ctx.db.insert(tagInfo).values(values);
         }
