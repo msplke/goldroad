@@ -22,11 +22,29 @@ Findings are ordered by severity. Anything not directly proven is marked "unveri
 **Fix:** verify the project ref in the Trigger.dev dashboard and re-issue/update the `TRIGGER_ACCESS_TOKEN` repo secret, then re-run the workflow.
 
 
-### H1. Renewal-payment webhooks are deduplicated by subscription code only — renewals get silently dropped
+### H1. ~~Renewal-payment webhooks are deduplicated by subscription code only~~ — FIXED in this run
+**Status: fixed** — both invoice idempotency keys now include the invoice discriminator (`data.id ?? data.reference`). Original finding kept below for the record.
+
+#### Original finding
 `src/app/api/webhooks/paystack/events/payment.ts:195-197` (`paystack-invoice-payment-success-${data.subscription.subscription_code}`) and `payment.ts:148-150` (failed-payment variant). The Trigger.dev idempotency key contains no invoice/reference component, so **every renewal of the same subscription produces the same key**. Within the idempotency-key TTL (Trigger.dev default 30 days) the second `invoice.update` is treated as a duplicate and never processed: `totalRevenue` and `nextPaymentDate` are not updated. Guaranteed loss for the daily/hourly (test) intervals; monthly renewals sit right at the 30-day TTL boundary. Compare the one-time-payment key, which correctly uses the payment `reference` (`payment.ts:73-75`).
 **Fix:** include a per-invoice discriminator in the key, e.g. `...-${subscription_code}-${data.id ?? data.reference}` (same for the failed-payment key).
 
-### H2. Global-unique subscriber email loses paid subscriptions
+### H2. ~~Global-unique subscriber email loses paid subscriptions~~ — FIXED in code; needs a one-time DB step
+**Status: code fixed** — `paid_subscriber.email` is now unique per publication (`unique_subscriber_email_per_publication` on `(email, publication_id)`), the webhook upserts on re-subscribe, and webhook retries are no-ops.
+**Deploy runbook (ordering matters — the code and schema are coupled):**
+1. Against the production DB, add the column and backfill (old code keeps working; column is still nullable):
+   ```sql
+   ALTER TABLE goldroad_paid_subscriber ADD COLUMN IF NOT EXISTS publication_id uuid;
+   UPDATE goldroad_paid_subscriber ps
+     SET publication_id = p.publication_id
+     FROM goldroad_plan p WHERE p.id = ps.plan_id;
+   ```
+2. Merge/deploy this change (new code writes `publication_id` on every insert/update).
+3. Run `pnpm db:push` to tighten the schema (NOT NULL + FK, drop the old global email unique, add the composite unique).
+
+Original finding kept below for the record.
+
+#### Original finding
 `src/server/db/schema/app-schema.ts:14` — `paidSubscriber.email` is `unique()` across the whole table, but `createSubscriber` (`src/server/actions/webhooks/paystack.ts:104-118`) only guards conflicts on `paystackSubscriptionCode`. Two real flows violate the email constraint: (a) the same reader subscribing to a second creator's publication, (b) a reader re-subscribing after cancellation (new subscription code, same email). The insert throws, the Trigger.dev task fails all retries, and a **charged** subscriber is never recorded in the DB (dashboard, revenue, Kit sync all miss them).
 **Fix:** drop the unique constraint on `email` (or scope it as `unique(email, planId)`), and decide upsert semantics for re-subscribes.
 
