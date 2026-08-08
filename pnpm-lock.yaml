@@ -28,7 +28,7 @@ importers:
         version: 8.21.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@trigger.dev/sdk':
         specifier: 4.5.3
-        version: 4.5.3(react@19.2.7)(supports-color@10.2.2)(zod@4.4.3)
+        version: 4.5.3(react@19.2.7)(zod@4.4.3)
       '@trpc/client':
         specifier: ^11.18.0
         version: 11.18.0(@trpc/server@11.18.0(typescript@5.9.3))(typescript@5.9.3)
@@ -88,14 +88,14 @@ importers:
         version: 4.4.3
     devDependencies:
       '@biomejs/biome':
-        specifier: 2.5.6
-        version: 2.5.6
+        specifier: 2.5.7
+        version: 2.5.7
       '@tailwindcss/postcss':
         specifier: ^4.3.3
         version: 4.3.3
       '@trigger.dev/build':
-        specifier: 4.5.9
-        version: 4.5.9(magicast@0.3.5)(supports-color@10.2.2)(typescript@5.9.3)
+        specifier: 4.5.10
+        version: 4.5.10(magicast@0.3.5)(supports-color@10.2.2)(typescript@5.9.3)
       '@types/node':
         specifier: ^24.13.3
         version: 24.13.3
@@ -115,14 +115,14 @@ importers:
         specifier: ^17.3.0
         version: 17.3.0
       postcss:
-        specifier: ^8.5.25
-        version: 8.5.25
+        specifier: ^8.5.26
+        version: 8.5.26
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
       trigger.dev:
-        specifier: 4.5.9
-        version: 4.5.9(react@19.2.7)(typescript@5.9.3)
+        specifier: 4.5.10
+        version: 4.5.10(react@19.2.7)(typescript@5.9.3)
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
@@ -263,59 +263,59 @@ packages:
   '@better-fetch/fetch@1.3.1':
     resolution: {integrity: sha512-ABkD1WhyfPZprKRQI3bhATjeiFuNWC9PXhfGWqL+sg/gKrM977oFrYkdb4msM3hgUGonr7KlOsOFT5TU2rht9g==}
 
-  '@biomejs/biome@2.5.6':
-    resolution: {integrity: sha512-lxVNjv7UF6KfhMJfL9gaUHbWdJdHbsAj6OSmwSYNdhRuG67NxNQ4Xdvh3TUxsSK9sBzJBQhEJj3AopmmNJ5pSA==}
+  '@biomejs/biome@2.5.7':
+    resolution: {integrity: sha512-zr8K/DcY5tYsQOQwqMJ0AWElo6QgmgNI7idXgXLhevVszlt8RGVpesEJPqx3ThazLaOwjJ5Y8fz3BtH5fGZNsw==}
     engines: {node: '>=14.21.3'}
     hasBin: true
 
-  '@biomejs/cli-darwin-arm64@2.5.6':
-    resolution: {integrity: sha512-zMOLZP4oMrjh6m1zcSj1ud2awUPgTuMVbmQhYYWL7J8HwCnbHHBvTm7VBTRuY7epT5bez76IpKYQ11ZAqHFlnw==}
+  '@biomejs/cli-darwin-arm64@2.5.7':
+    resolution: {integrity: sha512-vxo/Ls3/PYdQWyLhYYcgMOCzQypAjcY+iihS8M0wW03l16TCLW4zqZzGo75gm1VdCMj38hTVZ31KBWrZ4G9dJw==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [darwin]
 
-  '@biomejs/cli-darwin-x64@2.5.6':
-    resolution: {integrity: sha512-JAC1VqzvO7Th5ZplU0G2uGfkZbxEe9uDDektPAhF0JLusoz1w+T4okp2bkykI0bbaO2vslKiRfj4gU43JaGreA==}
+  '@biomejs/cli-darwin-x64@2.5.7':
+    resolution: {integrity: sha512-Cd3Ga61amT/Yl/0x8elP5hhGYaFy4bw6WuysTgf7oo8TA5tJ5A1k+DkVoJ2BHbTVil51gTX9VPzArnrlLJ3Kyg==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [darwin]
 
-  '@biomejs/cli-linux-arm64-musl@2.5.6':
-    resolution: {integrity: sha512-eUa3jeeYvfMt19LBeh6E5PUZpxnTC4JqNWo+EDjTtQjAr2xLGnWaxACtVU1DQqmHYbvThlJzLX+ZsYgrqh2qVw==}
+  '@biomejs/cli-linux-arm64-musl@2.5.7':
+    resolution: {integrity: sha512-xPI5yB6XlpDbNkS+bm1t42olw5c4l3UrlOmLg7KtLJvjvkNF/1V4tnUgfkylGIeb3u/T+BzMGYqgQhzjAoJzuQ==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@biomejs/cli-linux-arm64@2.5.6':
-    resolution: {integrity: sha512-6XsYwCFkp5sMxl85ffhgeGpGgs6A7dRYFnkceZ7WVxvycuTnGdD5xa534Z3xfrBQ0JCMK/mujT6ZNPJoghedwg==}
+  '@biomejs/cli-linux-arm64@2.5.7':
+    resolution: {integrity: sha512-rR2QE0yF2GYSuYuKIa7pKvODGJqnOH+2eDREAM8wV+mWKSkMQKdAp4zXEZfTaxY8PMoNONnpgSWcBCyLDPDOKg==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@biomejs/cli-linux-x64-musl@2.5.6':
-    resolution: {integrity: sha512-2Vp13QdKysH3HIWLaYLhUUwbK+jbZonJD1K+Lr0d0RO4wH7mkYd43vJixEDm8cUWrowoRz4UUHF1nm9Ae7ym8A==}
+  '@biomejs/cli-linux-x64-musl@2.5.7':
+    resolution: {integrity: sha512-rE5VZi+qtmPgQH+l7jVxYoZ18b/TiHEhulhMpjmCZH1PltSbjRcxNWywC3HZ9tYottG7ORkeTtoscBilKSBm0g==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@biomejs/cli-linux-x64@2.5.6':
-    resolution: {integrity: sha512-Pop9VXCFUhFTMfFefZ39S+u2rOPyNp5iHlxbZRwXGACHLy2r0jjiRgJHmaEKJzL3SyxlVeGShXhvvElvWowonA==}
+  '@biomejs/cli-linux-x64@2.5.7':
+    resolution: {integrity: sha512-FQgqJhscrqJUFptGaRSUJWlXAExwWcDwLuK49dvKfkQ1bB5SEEyFssnsxQY83Xm6jR0EbbX3+8+D5bfvYqUG2Q==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@biomejs/cli-win32-arm64@2.5.6':
-    resolution: {integrity: sha512-tDGshcm6BdkZOCGnTDX0Y8/U4IfBSlnUU7T56nNDuPEfed+aHg+u8G36NB43fJVl0Os6+QURXIE1yuD7AaEofA==}
+  '@biomejs/cli-win32-arm64@2.5.7':
+    resolution: {integrity: sha512-Oq4x0CCwP4jirrcTywXs5kOGZ4v5vuEP+gWrbtjApOA2CL9F3F9GlIdQIci8AKSCa/zURanMRpX/4wQ7Am6hHg==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [win32]
 
-  '@biomejs/cli-win32-x64@2.5.6':
-    resolution: {integrity: sha512-WN05KwXnTO/2J45RQPvzZMXf7tZUIofHoR35xIPfCo7pQ2RFidxI8sfb5mGsaTxdMmEOzHzOPRCdA5/fCpc7xQ==}
+  '@biomejs/cli-win32-x64@2.5.7':
+    resolution: {integrity: sha512-V+0wu/nrj2S+MhP4EQ0uHNolP0IALEsz45pg0WoKkHfDeh0+ItHwP/p7bX5RPoMOl9NkpHYWdYPhIcy2mACHvQ==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [win32]
@@ -1408,6 +1408,9 @@ packages:
   '@s2-dev/streamstore@0.22.10':
     resolution: {integrity: sha512-dtm+oFHVE8szINwOUoNQdx9xpGSJOrcAEvsxspPFvomjYKGnmhIRmU4OX8o6kxcPoiK76S1tPeU0smjZdmOngA==}
 
+  '@s2-dev/streamstore@0.25.0':
+    resolution: {integrity: sha512-oB8OJObT/s2Q68Tr01NLfDnQPFJp/Kn2pP3seWybgP7VrjQ+j1efXReOsyVCDsUBVMxkyPlzt75o/+GuL5Q3vg==}
+
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
 
@@ -1568,20 +1571,28 @@ packages:
     resolution: {integrity: sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==}
     engines: {node: '>=12'}
 
-  '@trigger.dev/build@4.5.9':
-    resolution: {integrity: sha512-CAZTBZBqErQSPjl0T0C/EB3vwS5pMNVGruYtzQIaCXnKXfg0abGRiH1sNrj7M2buGm+h8ttbpWfssyb/GlvGdA==}
+  '@trigger.dev/build@4.5.10':
+    resolution: {integrity: sha512-kw0gjhOzP5/TkgPtwLsbbe6roegiqSZcWm2e0vBsIQB/VufVNc4j+vm7ugK1H2H06oebIezPGrxHbldX7gVGPA==}
+    engines: {node: '>=18.20.0'}
+    peerDependencies:
+      '@typescript/typescript6': ^6.0.0
+      typescript: '>=5.0.0'
+    peerDependenciesMeta:
+      '@typescript/typescript6':
+        optional: true
+      typescript:
+        optional: true
+
+  '@trigger.dev/core@4.5.10':
+    resolution: {integrity: sha512-3EubsNMrT82VcTDP6+jP72BGNVutbaZzsg5Trm4kf3fmjpd4PrfNpUFTw+c61SpUWKuAFW1mLwQ+i7MKK3TWLA==}
     engines: {node: '>=18.20.0'}
 
   '@trigger.dev/core@4.5.3':
     resolution: {integrity: sha512-xtVvpQIDKIKWcWW4obdb5pXlhTxVKQL3ZvRlcY8K1LARlNhn++j3j0O1KZN7llVF5Rd7tAGGgkBE7948IGuYXA==}
     engines: {node: '>=18.20.0'}
 
-  '@trigger.dev/core@4.5.9':
-    resolution: {integrity: sha512-tXmIxg31Z5cPAXZozvTxLhHY8r8dbDNIFsaKZAcPYLSnaPMCK7uwJufYDLpvLmfNStPvs9x4DNAD4UW3ClyUIA==}
-    engines: {node: '>=18.20.0'}
-
-  '@trigger.dev/schema-to-json@4.5.9':
-    resolution: {integrity: sha512-R3rZJFHVW92NMXRZtmxS1laP8sZdRTCioDBmLH4hsqXmsvnPwOZQEBSnW/7kJGIzW6B2DF/esLAAr6ArfGGwrg==}
+  '@trigger.dev/schema-to-json@4.5.10':
+    resolution: {integrity: sha512-awDQad7JjicVar2Og8kJf+aTTJUX1JEAVR8e4Jw268wCjRA3PijI9erbF+rmZwktvdHOiSjswokysxjS3KxWIQ==}
     engines: {node: '>=18.20.0'}
     peerDependencies:
       '@sinclair/typebox': '>=0.34.30'
@@ -2731,6 +2742,11 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
+  nanoid@3.3.17:
+    resolution: {integrity: sha512-xQLf0A3HOMlgHq0n247/LRuAOYmB7dXJ/DvAxGvsSBij45XtBSmQycu+F8ODbHwns/XyFZagyL1+J0Offw1E0g==}
+    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
   nanoid@3.3.8:
     resolution: {integrity: sha512-WNLf5Sd8oZxOm+TzppcYk8gVOgP+l58xNy58D0nbUnOxOWRWvlcCV4kUF7ltmI6PsrLl/BgKEyS4mqsGChFN0w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
@@ -2912,8 +2928,8 @@ packages:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
     engines: {node: ^10 || ^12 || >=14}
 
-  postcss@8.5.25:
-    resolution: {integrity: sha512-DTPx3RWSSnWyzLxQnlH0rJP+EW5ekl16ZU4/psbIhA0e53kJfdgaN5vKM+xP7yJtXVu+nfdVFmlgFDEKAe4Pyw==}
+  postcss@8.5.26:
+    resolution: {integrity: sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ==}
     engines: {node: ^10 || ^12 || >=14}
 
   postgres@3.4.9:
@@ -3264,8 +3280,8 @@ packages:
     resolution: {integrity: sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==}
     engines: {node: '>=0.6'}
 
-  trigger.dev@4.5.9:
-    resolution: {integrity: sha512-2MgUqMD6CnUhmefFDRiYy86lQ0h/j/QFkL9NE3JgDNQfxrOVxWHYDLwclc6USUEn1liSiTAc7EqHfKyvNn2rUQ==}
+  trigger.dev@4.5.10:
+    resolution: {integrity: sha512-ZDkQqAkD3KrqKgJWUPE2ck18kzcEueODZaQDuDALaWhoBM5DXKzxwFoLUneeT2+VOl8CtNRyAQ/aUN/01wwnKg==}
     engines: {node: '>=18.20.0'}
     hasBin: true
 
@@ -3521,39 +3537,39 @@ snapshots:
 
   '@better-fetch/fetch@1.3.1': {}
 
-  '@biomejs/biome@2.5.6':
+  '@biomejs/biome@2.5.7':
     optionalDependencies:
-      '@biomejs/cli-darwin-arm64': 2.5.6
-      '@biomejs/cli-darwin-x64': 2.5.6
-      '@biomejs/cli-linux-arm64': 2.5.6
-      '@biomejs/cli-linux-arm64-musl': 2.5.6
-      '@biomejs/cli-linux-x64': 2.5.6
-      '@biomejs/cli-linux-x64-musl': 2.5.6
-      '@biomejs/cli-win32-arm64': 2.5.6
-      '@biomejs/cli-win32-x64': 2.5.6
+      '@biomejs/cli-darwin-arm64': 2.5.7
+      '@biomejs/cli-darwin-x64': 2.5.7
+      '@biomejs/cli-linux-arm64': 2.5.7
+      '@biomejs/cli-linux-arm64-musl': 2.5.7
+      '@biomejs/cli-linux-x64': 2.5.7
+      '@biomejs/cli-linux-x64-musl': 2.5.7
+      '@biomejs/cli-win32-arm64': 2.5.7
+      '@biomejs/cli-win32-x64': 2.5.7
 
-  '@biomejs/cli-darwin-arm64@2.5.6':
+  '@biomejs/cli-darwin-arm64@2.5.7':
     optional: true
 
-  '@biomejs/cli-darwin-x64@2.5.6':
+  '@biomejs/cli-darwin-x64@2.5.7':
     optional: true
 
-  '@biomejs/cli-linux-arm64-musl@2.5.6':
+  '@biomejs/cli-linux-arm64-musl@2.5.7':
     optional: true
 
-  '@biomejs/cli-linux-arm64@2.5.6':
+  '@biomejs/cli-linux-arm64@2.5.7':
     optional: true
 
-  '@biomejs/cli-linux-x64-musl@2.5.6':
+  '@biomejs/cli-linux-x64-musl@2.5.7':
     optional: true
 
-  '@biomejs/cli-linux-x64@2.5.6':
+  '@biomejs/cli-linux-x64@2.5.7':
     optional: true
 
-  '@biomejs/cli-win32-arm64@2.5.6':
+  '@biomejs/cli-win32-arm64@2.5.7':
     optional: true
 
-  '@biomejs/cli-win32-x64@2.5.6':
+  '@biomejs/cli-win32-x64@2.5.7':
     optional: true
 
   '@bugsnag/cuid@3.2.2': {}
@@ -4275,7 +4291,14 @@ snapshots:
   '@rollup/rollup-darwin-arm64@4.62.2':
     optional: true
 
-  '@s2-dev/streamstore@0.22.10(supports-color@10.2.2)':
+  '@s2-dev/streamstore@0.22.10':
+    dependencies:
+      '@protobuf-ts/runtime': 2.11.1
+      debug: 4.4.3(supports-color@10.2.2)
+    transitivePeerDependencies:
+      - supports-color
+
+  '@s2-dev/streamstore@0.25.0(supports-color@10.2.2)':
     dependencies:
       '@protobuf-ts/runtime': 2.11.1
       debug: 4.4.3(supports-color@10.2.2)
@@ -4372,7 +4395,7 @@ snapshots:
       '@alloc/quick-lru': 5.2.0
       '@tailwindcss/node': 4.3.3
       '@tailwindcss/oxide': 4.3.3
-      postcss: 8.5.25
+      postcss: 8.5.26
       tailwindcss: 4.3.3
 
   '@tanstack/query-core@5.101.2': {}
@@ -4390,20 +4413,63 @@ snapshots:
 
   '@tanstack/table-core@8.21.3': {}
 
-  '@trigger.dev/build@4.5.9(magicast@0.3.5)(supports-color@10.2.2)(typescript@5.9.3)':
+  '@trigger.dev/build@4.5.10(magicast@0.3.5)(supports-color@10.2.2)(typescript@5.9.3)':
     dependencies:
       '@prisma/config': 6.19.3(magicast@0.3.5)
-      '@trigger.dev/core': 4.5.9(supports-color@10.2.2)
+      '@trigger.dev/core': 4.5.10(supports-color@10.2.2)
       mlly: 1.8.2
       pkg-types: 1.3.1
       resolve: 1.22.12
       tinyglobby: 0.2.17
       tsconfck: 3.1.3(typescript@5.9.3)
+    optionalDependencies:
+      typescript: 5.9.3
     transitivePeerDependencies:
       - bufferutil
       - magicast
       - supports-color
-      - typescript
+      - utf-8-validate
+
+  '@trigger.dev/core@4.5.10(supports-color@10.2.2)':
+    dependencies:
+      '@bugsnag/cuid': 3.2.2
+      '@electric-sql/client': 1.0.14
+      '@google-cloud/precise-date': 4.0.0
+      '@jsonhero/path': 1.0.21
+      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/api-logs': 0.218.0
+      '@opentelemetry/core': 2.7.1(@opentelemetry/api@1.9.1)
+      '@opentelemetry/exporter-logs-otlp-http': 0.218.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/exporter-metrics-otlp-http': 0.218.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/exporter-trace-otlp-http': 0.218.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/host-metrics': 0.38.3(@opentelemetry/api@1.9.1)
+      '@opentelemetry/instrumentation': 0.218.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
+      '@opentelemetry/resources': 2.7.1(@opentelemetry/api@1.9.1)
+      '@opentelemetry/sdk-logs': 0.218.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/sdk-metrics': 2.7.1(@opentelemetry/api@1.9.1)
+      '@opentelemetry/sdk-trace-base': 2.7.1(@opentelemetry/api@1.9.1)
+      '@opentelemetry/sdk-trace-node': 2.7.1(@opentelemetry/api@1.9.1)
+      '@opentelemetry/semantic-conventions': 1.41.1
+      '@s2-dev/streamstore': 0.25.0(supports-color@10.2.2)
+      dequal: 2.0.3
+      eventsource: 3.0.7
+      eventsource-parser: 3.1.0
+      execa: 8.0.1
+      humanize-duration: 3.34.0
+      jose: 5.10.0
+      nanoid: 3.3.8
+      prom-client: 15.1.3
+      socket.io: 4.7.4(supports-color@10.2.2)
+      socket.io-client: 4.7.5(supports-color@10.2.2)
+      std-env: 3.10.0
+      tinyexec: 0.3.2
+      uncrypto: 0.1.3
+      zod: 3.25.76
+      zod-error: 1.5.0
+      zod-validation-error: 1.5.0(zod@3.25.76)
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
       - utf-8-validate
 
   '@trigger.dev/core@4.5.3':
@@ -4426,7 +4492,7 @@ snapshots:
       '@opentelemetry/sdk-trace-base': 2.7.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/sdk-trace-node': 2.7.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.41.1
-      '@s2-dev/streamstore': 0.22.10(supports-color@10.2.2)
+      '@s2-dev/streamstore': 0.22.10
       dequal: 2.0.3
       eventsource: 3.0.7
       eventsource-parser: 3.1.0
@@ -4448,52 +4514,10 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@trigger.dev/core@4.5.9(supports-color@10.2.2)':
-    dependencies:
-      '@bugsnag/cuid': 3.2.2
-      '@electric-sql/client': 1.0.14
-      '@google-cloud/precise-date': 4.0.0
-      '@jsonhero/path': 1.0.21
-      '@opentelemetry/api': 1.9.1
-      '@opentelemetry/api-logs': 0.218.0
-      '@opentelemetry/core': 2.7.1(@opentelemetry/api@1.9.1)
-      '@opentelemetry/exporter-logs-otlp-http': 0.218.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/exporter-metrics-otlp-http': 0.218.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/exporter-trace-otlp-http': 0.218.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/host-metrics': 0.38.3(@opentelemetry/api@1.9.1)
-      '@opentelemetry/instrumentation': 0.218.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
-      '@opentelemetry/resources': 2.7.1(@opentelemetry/api@1.9.1)
-      '@opentelemetry/sdk-logs': 0.218.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/sdk-metrics': 2.7.1(@opentelemetry/api@1.9.1)
-      '@opentelemetry/sdk-trace-base': 2.7.1(@opentelemetry/api@1.9.1)
-      '@opentelemetry/sdk-trace-node': 2.7.1(@opentelemetry/api@1.9.1)
-      '@opentelemetry/semantic-conventions': 1.41.1
-      '@s2-dev/streamstore': 0.22.10(supports-color@10.2.2)
-      dequal: 2.0.3
-      eventsource: 3.0.7
-      eventsource-parser: 3.1.0
-      execa: 8.0.1
-      humanize-duration: 3.34.0
-      jose: 5.10.0
-      nanoid: 3.3.8
-      prom-client: 15.1.3
-      socket.io: 4.7.4(supports-color@10.2.2)
-      socket.io-client: 4.7.5(supports-color@10.2.2)
-      std-env: 3.10.0
-      tinyexec: 0.3.2
-      uncrypto: 0.1.3
-      zod: 3.25.76
-      zod-error: 1.5.0
-      zod-validation-error: 1.5.0(zod@3.25.76)
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-
-  '@trigger.dev/schema-to-json@4.5.9(supports-color@10.2.2)':
+  '@trigger.dev/schema-to-json@4.5.10(supports-color@10.2.2)':
     dependencies:
       '@sodaru/yup-to-json-schema': 2.0.1
-      '@trigger.dev/core': 4.5.9(supports-color@10.2.2)
+      '@trigger.dev/core': 4.5.10(supports-color@10.2.2)
       effect: 3.21.4
       zod: 3.25.76
       zod-to-json-schema: 3.25.2(zod@3.25.76)
@@ -4502,7 +4526,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@trigger.dev/sdk@4.5.3(react@19.2.7)(supports-color@10.2.2)(zod@4.4.3)':
+  '@trigger.dev/sdk@4.5.3(react@19.2.7)(zod@4.4.3)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/semantic-conventions': 1.41.1
@@ -5576,6 +5600,8 @@ snapshots:
 
   nanoid@3.3.16: {}
 
+  nanoid@3.3.17: {}
+
   nanoid@3.3.8: {}
 
   nanostores@1.4.0: {}
@@ -5738,9 +5764,9 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  postcss@8.5.25:
+  postcss@8.5.26:
     dependencies:
-      nanoid: 3.3.16
+      nanoid: 3.3.17
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -6177,7 +6203,7 @@ snapshots:
 
   toidentifier@1.0.1: {}
 
-  trigger.dev@4.5.9(react@19.2.7)(typescript@5.9.3):
+  trigger.dev@4.5.10(react@19.2.7)(typescript@5.9.3):
     dependencies:
       '@clack/prompts': 0.11.0
       '@depot/cli': 0.0.1-cli.2.80.0
@@ -6190,10 +6216,10 @@ snapshots:
       '@opentelemetry/resources': 2.7.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/sdk-trace-node': 2.7.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.41.1
-      '@s2-dev/streamstore': 0.22.10(supports-color@10.2.2)
-      '@trigger.dev/build': 4.5.9(magicast@0.3.5)(supports-color@10.2.2)(typescript@5.9.3)
-      '@trigger.dev/core': 4.5.9(supports-color@10.2.2)
-      '@trigger.dev/schema-to-json': 4.5.9(supports-color@10.2.2)
+      '@s2-dev/streamstore': 0.25.0(supports-color@10.2.2)
+      '@trigger.dev/build': 4.5.10(magicast@0.3.5)(supports-color@10.2.2)(typescript@5.9.3)
+      '@trigger.dev/core': 4.5.10(supports-color@10.2.2)
+      '@trigger.dev/schema-to-json': 4.5.10(supports-color@10.2.2)
       ansi-escapes: 7.3.0
       braces: 3.0.3
       c12: 1.11.2(magicast@0.3.5)
@@ -6246,6 +6272,7 @@ snapshots:
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - '@sinclair/typebox'
+      - '@typescript/typescript6'
       - arktype
       - bufferutil
       - react
