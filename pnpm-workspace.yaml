@@ -1,9 +1,4 @@
-minimumReleaseAge: 1440
-
-# Build scripts reviewed and intentionally NOT run. All of these ship
-# prebuilt binaries (or only use install scripts for optional native
-# fallbacks), so nothing here needs to execute code at install time.
-# Flip an entry to `true` only after reviewing what its script does.
+# Dependency build scripts reviewed and denied (pnpm 11 requires an explicit decision).
 allowBuilds:
   "@depot/cli": false
   better-sqlite3: false

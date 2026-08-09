@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import "server-only";
 
 /** These are actions that are to be executed only in Paystack webhooks */
@@ -32,8 +32,14 @@ export async function createSubscriber(
   nextPaymentDate: Date,
 ) {
   // Get the id of the tag that shows that a payment has been done
-  const { intervalTag, statusTag, publicationTag, planId, kitApiKey } =
-    await getCreatorInfoFromPlanCode(db, planCode);
+  const {
+    intervalTag,
+    statusTag,
+    publicationTag,
+    planId,
+    publicationId,
+    kitApiKey,
+  } = await getCreatorInfoFromPlanCode(db, planCode);
 
   let kitSubscriberId: number | null = null;
 
@@ -100,11 +106,41 @@ export async function createSubscriber(
     );
   }
 
+  // Subscribers are keyed by (email, publication): a re-subscribe (new
+  // subscription code for the same person) updates the existing row instead
+  // of violating the old global email unique (AUDIT H2). Webhook retries
+  // (same subscription code) are no-ops.
+  const existingSubscriber = await db.query.paidSubscriber.findFirst({
+    where: and(
+      eq(paidSubscriber.email, subscriberInfo.email_address),
+      eq(paidSubscriber.publicationId, publicationId),
+    ),
+  });
+
+  if (existingSubscriber) {
+    if (existingSubscriber.paystackSubscriptionCode === subscriptionCode) {
+      return;
+    }
+    await db
+      .update(paidSubscriber)
+      .set({
+        planId,
+        paystackSubscriptionCode: subscriptionCode,
+        kitSubscriberId: kitSubscriberId ?? existingSubscriber.kitSubscriberId,
+        status: "active",
+        totalRevenue: existingSubscriber.totalRevenue + amount,
+        nextPaymentDate,
+      })
+      .where(eq(paidSubscriber.id, existingSubscriber.id));
+    return;
+  }
+
   // Add the subscriber to the database (with or without Kit subscriber ID)
   await db
     .insert(paidSubscriber)
     .values({
       planId,
+      publicationId,
       email: subscriberInfo.email_address,
       firstName: subscriberInfo.first_name ?? "",
       paystackSubscriptionCode: subscriptionCode,
@@ -478,6 +514,7 @@ async function getCreatorInfoFromPlanCode(
       publicationTag: foundPublication.kitPublicationTagId,
       statusTag: null,
       planId: foundPlan.id,
+      publicationId: foundPlan.publicationId,
       kitApiKey: creatorInfo.kitApiKey,
     };
   }
@@ -507,6 +544,7 @@ async function getCreatorInfoFromPlanCode(
     publicationTag: foundPublication.kitPublicationTagId,
     statusTag: foundTagInfo.kitActiveTagId,
     planId: foundPlan.id,
+    publicationId: foundPlan.publicationId,
     kitApiKey: creatorInfo.kitApiKey,
   };
 }
