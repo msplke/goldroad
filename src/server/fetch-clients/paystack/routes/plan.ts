@@ -8,6 +8,7 @@ import {
   createPlanSchema,
   planIntervalEnum,
   planSchema,
+  updatePlanSchema,
 } from "~/server/fetch-clients/paystack/schemas/plan";
 import { subscriptionStatusEnum } from "~/server/fetch-clients/paystack/schemas/subscription";
 
@@ -52,7 +53,7 @@ export const planRoutes = {
   // Update Plan
   "@put/plan/:id_or_code": {
     params: planRouteParamsSchema,
-    input: createPlanSchema.partial(),
+    input: updatePlanSchema,
     output: baseResponseSchema.extend({
       data: planSchema,
     }),

@@ -1,12 +1,11 @@
-import { TRPCError } from "@trpc/server";
 import z from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { paystackClient } from "~/server/fetch-clients/paystack/client";
 import {
   countryEnum,
   currencyEnum,
 } from "~/server/fetch-clients/paystack/schemas/common";
+import { paystackApiService } from "~/server/services/paystack/paystack-api";
 
 export const paystackRouter = createTRPCRouter({
   bank: publicProcedure
@@ -17,22 +16,11 @@ export const paystackRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input }) => {
-      const { data: response, error } = await paystackClient("@get/bank", {
-        cache: "no-store", // disables caching for this request
-        query: {
-          country: input.country,
-          currency: input.currency,
-        },
-        throws: true,
+      const bankData = await paystackApiService.miscellaneous.listBanks({
+        country: input.country,
+        currency: input.currency,
       });
 
-      if (!response) {
-        throw new TRPCError({
-          message: error.message || "Failed to fetch banks",
-          code: "INTERNAL_SERVER_ERROR",
-        });
-      }
-
-      return response.data;
+      return bankData;
     }),
 });
