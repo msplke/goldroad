@@ -33,3 +33,5 @@ export const createSubaccountSchema = subaccountSchema.omit({
   createdAt: true,
   updatedAt: true,
 });
+
+export type SubaccountCreationInfo = z.infer<typeof createSubaccountSchema>;
