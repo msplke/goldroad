@@ -3,5 +3,12 @@
   "extends": [
     "github>peterkibuchi/renovate-config",
     "customManagers:biomeVersions"
+  ],
+  "packageRules": [
+    {
+      "description": "The trigger.dev CLI, @trigger.dev/build and @trigger.dev/sdk bump together. `trigger deploy` aborts in CI when any @trigger.dev/* package differs from the CLI's version. The SDK is a dependency and the CLI and build extension are devDependencies, so the preset put them in separate groups that landed on different days, and the prod deploy failed from August until the SDK caught up.",
+      "groupName": "trigger.dev",
+      "matchPackageNames": ["@trigger.dev/**", "trigger.dev"]
+    }
   ]
 }
