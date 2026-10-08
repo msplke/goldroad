@@ -9,26 +9,40 @@ import type {
   SubscriptionStatus,
 } from "~/server/fetch-clients/paystack/schemas/common";
 
-export const paidSubscriber = createTable("paid_subscriber", (d) => ({
-  id: d.uuid().primaryKey().defaultRandom(),
-  email: d.text().unique().notNull(),
-  firstName: d.text(),
-  paystackSubscriptionCode: d.text().unique().notNull(),
-  kitSubscriberId: d.bigint({ mode: "number" }).unique(), // Optional for creators without Kit integration
-  status: d
-    .varchar({ length: 20 })
-    .$type<SubscriptionStatus>()
-    .default("active")
-    .notNull(),
-  planId: d
-    .uuid()
-    .references(() => plan.id, { onDelete: "cascade" })
-    .notNull(),
-  nextPaymentDate: d.timestamp({ mode: "date", withTimezone: true }),
-  totalRevenue: d.integer().notNull(), // Amount in Ksh.
-  createdAt,
-  updatedAt,
-}));
+export const paidSubscriber = createTable(
+  "paid_subscriber",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    email: d.text().notNull(),
+    firstName: d.text(),
+    paystackSubscriptionCode: d.text().unique().notNull(),
+    kitSubscriberId: d.bigint({ mode: "number" }).unique(), // Optional for creators without Kit integration
+    status: d
+      .varchar({ length: 20 })
+      .$type<SubscriptionStatus>()
+      .default("active")
+      .notNull(),
+    planId: d
+      .uuid()
+      .references(() => plan.id, { onDelete: "cascade" })
+      .notNull(),
+    publicationId: d
+      .uuid()
+      .references(() => publication.id, { onDelete: "cascade" })
+      .notNull(),
+    nextPaymentDate: d.timestamp({ mode: "date", withTimezone: true }),
+    totalRevenue: d.integer().notNull(), // Amount in Ksh.
+    createdAt,
+    updatedAt,
+  }),
+  // The same email may subscribe to many publications, but only once each.
+  (t) => [
+    unique("unique_subscriber_email_per_publication").on(
+      t.email,
+      t.publicationId,
+    ),
+  ],
+);
 
 export const tagInfo = createTable("tag_info", (d) => ({
   id: d.uuid().defaultRandom().primaryKey(),
