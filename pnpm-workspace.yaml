@@ -10,6 +10,3 @@ allowBuilds:
   esbuild: false
   protobufjs: false
   sharp: false
-minimumReleaseAgeExclude:
-  # Renovate security update: next@16.2.11 || 16.3.3
-  - next@16.2.11 || 16.3.3
