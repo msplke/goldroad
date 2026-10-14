@@ -10,6 +10,8 @@ const config: NextConfig = {
   /** We already do linting and typechecking as separate tasks in CI */
   typescript: { ignoreBuildErrors: true },
   allowedDevOrigins: ["*.ngrok-free.app"],
+  /** Keep `next dev` from writing an AGENTS.md into the repo */
+  agentRules: false,
 };
 
 export default config;
