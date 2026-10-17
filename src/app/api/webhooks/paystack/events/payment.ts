@@ -145,8 +145,10 @@ async function handleFailedPaymentEvent(data: PaystackWebhookBodyData) {
     return;
   }
 
+  // Key must be unique per invoice, not per subscription: renewals of the
+  // same subscription would otherwise dedupe against each other (AUDIT H1).
   const idempotencyKey = await idempotencyKeys.create(
-    `paystack-invoice-payment-failed-${data.subscription.subscription_code}`,
+    `paystack-invoice-payment-failed-${data.subscription.subscription_code}-${data.id ?? data.reference ?? ""}`,
   );
 
   const handle = await tasks.trigger<
@@ -192,8 +194,10 @@ async function handleSuccessfulSubscriptionPaymentEvent(
     return;
   }
 
+  // Key must be unique per invoice, not per subscription: renewals of the
+  // same subscription would otherwise dedupe against each other (AUDIT H1).
   const idempotencyKey = await idempotencyKeys.create(
-    `paystack-invoice-payment-success-${data.subscription.subscription_code}`,
+    `paystack-invoice-payment-success-${data.subscription.subscription_code}-${data.id ?? data.reference ?? ""}`,
   );
 
   const handle = await tasks.trigger<
